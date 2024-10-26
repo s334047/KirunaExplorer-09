@@ -1,0 +1,29 @@
+-- database: ./db.db
+
+DROP TABLE Attachment;
+CREATE TABLE Attachment (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    Path TEXT UNIQUE NOT NULL,
+    DocumentId INTEGER NOT NULL REFERENCES Document(Id)
+    ON DELETE CASCADE
+);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-1", 1);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-2", 1);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-3", 2);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-4", 2);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-5", 3);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-6", 3);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-7", 4);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-8", 4);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-9", 5);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-10", 5);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-11", 6);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-12", 6);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-13", 7);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-14", 7);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-15", 8);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-16", 8);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-17", 9);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-18", 9);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-19", 10);
+INSERT INTO Attachment (Path, DocumentId) VALUES ("Media/Attachment/Attachment-20", 10);

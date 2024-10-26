@@ -1,0 +1,11 @@
+-- database: ./db.db
+
+DROP TABLE User;
+CREATE TABLE User (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    Username TEXT UNIQUE NOT NULL,
+    Password TEXT NOT NULL,
+    Salt TEXT NOT NULL,
+    Role TEXT NOT NULL
+);
+INSERT INTO User (Username, Password, Salt, Role) VALUES ("", "", "", "");

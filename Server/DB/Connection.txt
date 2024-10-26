@@ -1,0 +1,18 @@
+-- database: ./db.db
+
+DROP TABLE Connection;
+CREATE TABLE Connection (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    SourceDocId INTEGER NOT NULL REFERENCES Document(Id) ON DELETE CASCADE,
+    TargetDocId INTEGER NOT NULL REFERENCES Document(Id) ON DELETE CASCADE,
+    UNIQUE (SourceDocId, TargetDocId)
+);
+INSERT INTO Connection (SourceDocId, TargetDocId) VALUES (1, 2);
+INSERT INTO Connection (SourceDocId, TargetDocId) VALUES (2, 3);
+INSERT INTO Connection (SourceDocId, TargetDocId) VALUES (3, 4);
+INSERT INTO Connection (SourceDocId, TargetDocId) VALUES (4, 5);
+INSERT INTO Connection (SourceDocId, TargetDocId) VALUES (5, 6);
+INSERT INTO Connection (SourceDocId, TargetDocId) VALUES (6, 7);
+INSERT INTO Connection (SourceDocId, TargetDocId) VALUES (7, 8);
+INSERT INTO Connection (SourceDocId, TargetDocId) VALUES (8, 9);
+INSERT INTO Connection (SourceDocId, TargetDocId) VALUES (9, 10);

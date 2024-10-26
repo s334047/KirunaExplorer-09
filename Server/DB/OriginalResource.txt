@@ -1,0 +1,29 @@
+-- database: ./db.db
+
+DROP TABLE Resource;
+CREATE TABLE Resource (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    Path TEXT UNIQUE NOT NULL,
+    DocumentId INTEGER NOT NULL REFERENCES Document(Id)
+    ON DELETE CASCADE
+);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-1", 1);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-2", 1);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-3", 2);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-4", 2);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-5", 3);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-6", 3);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-7", 4);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-8", 4);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-9", 5);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-10", 5);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-11", 6);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-12", 6);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-13", 7);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-14", 7);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-15", 8);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-16", 8);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-17", 9);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-18", 9);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-19", 10);
+INSERT INTO Resource (Path, DocumentId) VALUES ("./Media/OriginalResource/Resource-20", 10);

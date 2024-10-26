@@ -1,0 +1,36 @@
+-- database: ./db.db
+
+DROP TABLE Document;
+CREATE TABLE Document (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    Title TEXT UNIQUE NOT NULL,
+    Stackeholder TEXT NOT NULL,
+    Scale TEXT NOT NULL,
+    Date TEXT NOT NULL,
+    Type TEXT NOT NULL,
+    Language TEXT NOT NULL,
+    Page INTEGER NOT NULL,
+    Coordinate TEXT NOT NULL,
+    Area TEXT NOT NULL,
+    Description TEXT NOT NULL
+);
+INSERT INTO Document (Title, Stackeholder, Scale, Date, Type, Language, Page, Coordinate, Area, Description)
+VALUES ("Document 1", "Stackeholder 1", "Scale 1", "Date 1", "Type 1", "Language 1", 1, "Coordinate 1", "Area 1", "Description 1");
+INSERT INTO Document (Title, Stackeholder, Scale, Date, Type, Language, Page, Coordinate, Area, Description)
+VALUES ("Document 2", "Stackeholder 2", "Scale 2", "Date 2", "Type 2", "Language 2", 2, "Coordinate 2", "Area 2", "Description 2");
+INSERT INTO Document (Title, Stackeholder, Scale, Date, Type, Language, Page, Coordinate, Area, Description)
+VALUES ("Document 3", "Stackeholder 3", "Scale 3", "Date 3", "Type 3", "Language 3", 3, "Coordinate 3", "Area 3", "Description 3");
+INSERT INTO Document (Title, Stackeholder, Scale, Date, Type, Language, Page, Coordinate, Area, Description)
+VALUES ("Document 4", "Stackeholder 4", "Scale 4", "Date 4", "Type 4", "Language 4", 4, "Coordinate 4", "Area 4", "Description 4");
+INSERT INTO Document (Title, Stackeholder, Scale, Date, Type, Language, Page, Coordinate, Area, Description)
+VALUES ("Document 5", "Stackeholder 5", "Scale 5", "Date 5", "Type 5", "Language 5", 5, "Coordinate 5", "Area 5", "Description 5");
+INSERT INTO Document (Title, Stackeholder, Scale, Date, Type, Language, Page, Coordinate, Area, Description)
+VALUES ("Document 6", "Stackeholder 6", "Scale 6", "Date 6", "Type 6", "Language 6", 6, "Coordinate 6", "Area 6", "Description 6");
+INSERT INTO Document (Title, Stackeholder, Scale, Date, Type, Language, Page, Coordinate, Area, Description)
+VALUES ("Document 7", "Stackeholder 7", "Scale 7", "Date 7", "Type 7", "Language 7", 7, "Coordinate 7", "Area 7", "Description 7");
+INSERT INTO Document (Title, Stackeholder, Scale, Date, Type, Language, Page, Coordinate, Area, Description)
+VALUES ("Document 8", "Stackeholder 8", "Scale 8", "Date 8", "Type 8", "Language 8", 8, "Coordinate 8", "Area 8", "Description 8");
+INSERT INTO Document (Title, Stackeholder, Scale, Date, Type, Language, Page, Coordinate, Area, Description)
+VALUES ("Document 9", "Stackeholder 9", "Scale 9", "Date 9", "Type 9", "Language 9", 9, "Coordinate 9", "Area 9", "Description 9");
+INSERT INTO Document (Title, Stackeholder, Scale, Date, Type, Language, Page, Coordinate, Area, Description)
+VALUES ("Document 10", "Stackeholder 10", "Scale 10", "Date 10", "Type 10", "Language 10", 10, "Coordinate 10", "Area 10", "Description 10");
