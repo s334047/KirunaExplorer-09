@@ -15,11 +15,5 @@
   "bugs": {
     "url": "https://github.com/s334047/KirunaExplorer-09/issues"
   },
-  "homepage": "https://github.com/s334047/KirunaExplorer-09#readme",
-  "devDependencies": {
-    "jest": "^29.7.0"
-  },
-  "scripts": {
-    "test": "jest"
-  }
+  "homepage": "https://github.com/s334047/KirunaExplorer-09#readme"
 }
