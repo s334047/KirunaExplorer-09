@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, LayersControl, Polygon } from 'react-l
 import L from 'leaflet';
 import { Card, Button, Row, Col } from 'react-bootstrap';
 
-function MapViewer() {
+function MapViewer(props) {
     const position = [67.8558, 20.2253];
     const bounds = [
         [67, 20],
@@ -97,7 +97,7 @@ function MapViewer() {
             )}
 
             {!selectedDoc && <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000 }}>
-                <Button variant="light" onClick={() => alert('DOCUMENT FORM!')} style={{ border: '2px solid gray', display: 'flex', alignItems: 'center' }}>
+                <Button variant="light" onClick={props.handleShow} style={{ border: '2px solid gray', display: 'flex', alignItems: 'center' }}>
                     <div style={{ textAlign: 'left' }}>
                         <span style={{ display: 'block', fontSize: '12px' }}>Add</span>
                         <span style={{ display: 'block', fontSize: '12px' }}>Document</span>
