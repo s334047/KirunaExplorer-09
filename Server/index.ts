@@ -1,8 +1,8 @@
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
-import Dao from './Dao/daoStory1';
-import { DocumentDescription } from './Components/DocumentDescription';
+import Dao from './Dao/daoStory1.js';
+import { DocumentDescription } from './Components/DocumentDescription.js';
 
 const dao = new Dao();
 
