@@ -25,3 +25,8 @@
   backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
+
+.custom-label-color {
+  color: #154109;
+  font-weight: bold;
+}
