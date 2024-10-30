@@ -1,7 +1,73 @@
-import React, { useState } from 'react';
-import { MapContainer, TileLayer, Marker, LayersControl, Polygon } from 'react-leaflet';
+import React, { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, LayersControl, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import 'leaflet-draw';
+import 'leaflet-draw/dist/leaflet.draw.css';
 import { Card, Button, Row, Col } from 'react-bootstrap';
+
+
+/*function MapWithDraw({ polygons, setPolygons }) {
+    const map = useMap();
+
+    useEffect(() => {
+        // Controlla se leaflet-draw è stato caricato correttamente
+        if (L.Control.Draw === undefined) {
+            console.error("Leaflet-draw non è stato caricato correttamente.");
+            return;
+        }
+
+        // Inizializza il controllo di disegno una sola volta
+        const drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+
+        const drawControl = new L.Control.Draw({
+            position: 'bottomright',
+            draw: {
+                polyline: false,
+                rectangle: false,
+                circle: false,
+                marker: false,
+                circlemarker: false,
+                polygon: true,
+            }
+        });
+
+        map.addControl(drawControl);
+        // Aggiungi un poligono disegnato al FeatureGroup e salva i suoi dati
+        map.on(L.Draw.Event.CREATED, (event) => {
+            const { layer } = event;
+            const latlngs = layer.getLatLngs(); // Ottieni i punti del poligono
+
+            // Aggiungi il poligono al gruppo di disegno
+            drawnItems.addLayer(layer);
+
+            // Salva il poligono nello stato
+            const newPolygon = latlngs[0].map((latlng) => [latlng.lat, latlng.lng]);
+            setPolygons((prevPolygons) => [...prevPolygons, newPolygon]);
+
+            // Aggiorna anche il localStorage
+            localStorage.setItem("polygons", JSON.stringify([...polygons, newPolygon]));
+        });
+
+        // Carica i poligoni salvati
+        polygons.forEach((polygonCoords) => {
+            const polygon = L.polygon(polygonCoords);
+            drawnItems.addLayer(polygon);
+        });
+
+        // Aggiungi il layer quando un nuovo poligono viene disegnato
+        map.on(L.Draw.Event.CREATED, (event) => {
+            const { layer } = event;
+            drawnItems.addLayer(layer);
+        });
+
+        // Pulisci il controllo quando il componente viene smontato
+        return () => {
+            map.removeControl(drawControl);
+        };
+    }, []);
+    return null;
+}*/
 
 function MapViewer(props) {
     const position = [67.8558, 20.2253];
@@ -45,6 +111,11 @@ function MapViewer(props) {
 
     const [selectedDoc, setSelectedDoc] = useState(null);
     const { BaseLayer } = LayersControl;
+    const [polygons, setPolygons] = useState(() => {
+        // Carica i poligoni salvati da localStorage
+        const savedPolygons = localStorage.getItem("polygons");
+        return savedPolygons ? JSON.parse(savedPolygons) : [];
+    });
 
     return (
         <div style={{ display: 'flex', flex: 1, position: 'relative', height: '90vh' }}>
@@ -70,9 +141,7 @@ function MapViewer(props) {
                         />
                     </BaseLayer>
                 </LayersControl>
-
-                
-
+                {/*<MapWithDraw polygons={polygons} setPolygons={setPolygons} />*/}
                 {documents.map(doc => (
                     <Marker key={doc.id} position={doc.coordinate} icon={customIcon} eventHandlers={{
                         click: () => {
@@ -92,12 +161,12 @@ function MapViewer(props) {
                     right: 20,
                     zIndex: 1000,
                 }}>
-                    <DocumentCard selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} />
+                    <DocumentCard selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} setShowAddLink={props.setShowAddLink} />
                 </div>
             )}
 
             {!selectedDoc && <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000 }}>
-                <Button variant="light" onClick={props.handleShow} style={{ border: '2px solid gray', display: 'flex', alignItems: 'center' }}>
+                <Button variant="light" onClick={() => props.setShowAddDocument(true)} style={{ border: '2px solid gray', display: 'flex', alignItems: 'center' }}>
                     <div style={{ textAlign: 'left' }}>
                         <span style={{ display: 'block', fontSize: '12px' }}>Add</span>
                         <span style={{ display: 'block', fontSize: '12px' }}>Document</span>
@@ -112,7 +181,7 @@ function MapViewer(props) {
     );
 }
 
-function DocumentCard({ selectedDoc, setSelectedDoc }) {
+function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink }) {
     return (
         <Card className="document-card">
             <Card.Body>
@@ -132,7 +201,21 @@ function DocumentCard({ selectedDoc, setSelectedDoc }) {
                             <li><strong>Scale:</strong> {selectedDoc.scale}</li>
                             <li><strong>Date:</strong> {selectedDoc.date}</li>
                             <li><strong>Type:</strong> {selectedDoc.type}</li>
-                            <li><strong>Connections:</strong> {selectedDoc.connections}</li>
+                            <li>
+                                <strong>Connections:</strong> {selectedDoc.connections}
+                                <a
+                                    href="#"
+                                    style={{
+                                        textDecoration: 'underline',
+                                        color: 'green',
+                                        marginLeft: '5px',
+                                        cursor: 'pointer'
+                                    }}
+                                    onClick={() => setShowAddLink(true)}
+                                >
+                                    <i className="bi bi-plus-circle-fill"></i>
+                                </a>
+                            </li>
                             <li><strong>Language:</strong> {selectedDoc.language}</li>
                             <li><strong>Coordinates:</strong> {selectedDoc.coordinate[0]} N, {selectedDoc.coordinate[1]} E </li>
                         </ul>

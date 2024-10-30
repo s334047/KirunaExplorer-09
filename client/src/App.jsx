@@ -13,15 +13,11 @@ import ListDocumentLink from './components/Link';
 
 
 function App() {
-  const [show, setShow] = useState(false); //state for showing the modal for adding a document description
-  const [showLink,setShowLink]=useState(false) //state for showing the modal for linking documents
+  const [showAddDocument, setShowAddDocument] = useState(false); //state for showing the modal for adding a document description
+  const [showAddLink,setShowAddLink]=useState(false) //state for showing the modal for linking documents
   const [documents,setDocument]=useState([]);
-  const [excludeDoc,setExcludeDoc]=useState("")
-  
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-  const handleCloseLink = () => setShowLink(false);
-  const handleShowLink = () => setShowLink(true);
+  const [excludeDoc,setExcludeDoc]=useState("");
+
   return (
     <Routes>
       <Route element={
@@ -33,9 +29,9 @@ function App() {
         </>
       }>
         <Route index element={<>
-          <MapViewer handleShow={handleShow}/>
-          <DescriptionComponent show={show} handleClose={handleClose}/>
-          <ListDocumentLink item={documents} title={excludeDoc} show={showLink} handleClose={handleCloseLink}/>
+          <MapViewer showAddDocument={showAddDocument} setShowAddDocument={setShowAddDocument} showAddLink={showAddLink} setShowAddLink={setShowAddLink} />
+          <DescriptionComponent show={showAddDocument} setShow={setShowAddDocument}/>
+          <ListDocumentLink item={documents} title={excludeDoc} show={showAddLink} setShow={setShowAddLink} />
           </>
         } />
       </Route>
