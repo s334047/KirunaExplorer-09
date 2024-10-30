@@ -1,7 +1,7 @@
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
-import Dao from './Dao/daoStory1.js';
+import Dao from './Dao/daoStory1-3.js';
 import { DocumentDescription } from './Components/DocumentDescription.js';
 
 const dao = new Dao();
@@ -24,6 +24,27 @@ app.post('/api/documents', async (req: any, res: any) => {
         const newDoc : DocumentDescription = req.body;
         dao.newDescription(newDoc.title, newDoc.stakeholder, newDoc.scale, newDoc.date, newDoc.type, newDoc.language, newDoc.page, newDoc.coordinate, newDoc.area, newDoc.description);
     }catch (error){
+        res.status(503).json({error: Error});
+    }
+})
+
+/** Story 3 routes */
+app.put('/api/documents/:id', async (req: any, res: any) => {
+    try{
+        console.log(req.params.id, req.body.coord, req.body.area)
+        dao.addGeoreference(req.params.id, req.body.coord, req.body.area);
+    }catch(error){
+        res.status(503).json({error: Error});
+    }
+});
+
+app.get('/api/areas', async (req: any, res: any) => {
+    try{
+        if(req.body.par===0)
+            dao.getAllAreas();
+        else(req.body.par===1)
+            dao.getAllCoordinates();
+    }catch(error){
         res.status(503).json({error: Error});
     }
 })
