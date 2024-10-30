@@ -1,34 +1,41 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState } from 'react';
+import './App.css';
+import { Routes, Route, Outlet } from 'react-router-dom';
+import { Container } from 'react-bootstrap';
+import NavHeader from './components/NavHeader';
+import MapViewer from './components/Map';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import 'leaflet/dist/leaflet.css';
 import './App.css'
+import { DescriptionComponent } from './components/AddDescription';
+import ListDocumentLink from './components/Link';
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [showAddDocument, setShowAddDocument] = useState(false); //state for showing the modal for adding a document description
+  const [showAddLink,setShowAddLink]=useState(false) //state for showing the modal for linking documents
+  const [documents,setDocument]=useState([]);
+  const [excludeDoc,setExcludeDoc]=useState("");
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <Routes>
+      <Route element={
+        <>
+          <NavHeader />
+          <Container fluid className='mt-3 justify-content-center'>
+            <Outlet />
+          </Container>
+        </>
+      }>
+        <Route index element={<>
+          <MapViewer showAddDocument={showAddDocument} setShowAddDocument={setShowAddDocument} showAddLink={showAddLink} setShowAddLink={setShowAddLink} />
+          <DescriptionComponent show={showAddDocument} setShow={setShowAddDocument}/>
+          <ListDocumentLink item={documents} title={excludeDoc} show={showAddLink} setShow={setShowAddLink} />
+          </>
+        } />
+      </Route>
+    </Routes>
   )
 }
 

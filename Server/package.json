@@ -1,8 +1,16 @@
 {
-  "name": "kirunaexplorer-09",
-  "version": "24.10.26",
-  "description": "KirunaExplorer is a project concerning the creation of a web app interface for Kiruna city and its process of transformation.",
-  "main": "index.js",
+  "name": "server",
+  "version": "0.0.0",
+  "main": "index.ts",
+  "type": "module",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "jest",
+    "dev": "nodemon --watch \"**/*.ts\" --exec node --loader ts-node/esm index.ts",
+    "build": "tsc"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/s334047/KirunaExplorer-09.git"
@@ -16,14 +24,19 @@
     "url": "https://github.com/s334047/KirunaExplorer-09/issues"
   },
   "homepage": "https://github.com/s334047/KirunaExplorer-09#readme",
+  "description": "",
   "devDependencies": {
-    "jest": "^29.7.0"
-  },
-  "scripts": {
-    "test": "jest"
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.8.2",
+    "jest": "^29.7.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
     "express": "^4.21.1",
     "morgan": "^1.10.0",
     "sqlite3": "^5.1.7"
