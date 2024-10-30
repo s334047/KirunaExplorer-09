@@ -1,105 +1,89 @@
 import { Modal, Button, Form } from 'react-bootstrap';
-import React, { useState } from 'react';
+import React, {  useState } from 'react';
+import API from '../../API.mjs';
 
-export function DescriptionComponent(props) {
-  const [errors, setErrors] = useState({});
-  const [formData, setFormData] = useState({
-    title: '',
-    stakeholders: '',
-    scale: '',
-    type: '',
-    language: '',
-    pages: '',
-    description: ''
-  });
+export function DescriptionComponent(props){
+    const [errors, setErrors] = useState({});
+      const [formData, setFormData] = useState({
+      title: '',
+      stakeholders: '',
+      scale: '',
+      issuanceDate: '',
+      type: '',
+      language: '',
+      pages: '',
+      description: ''
+    });
 
-  const [currentStep, setCurrentStep] = useState(1); // Step tracking state
+    const [currentStep, setCurrentStep] = useState(1); // Step tracking state
 
-  const closeModal = () => {
-    props.setShow(false);
-  };
-
-  const handleSave = () => {
-    const newErrors = {};
-
-    // Validate mandatory fields in the first step
-    if (currentStep === 1) {
+    const closeModal = () => {
+      props.setShow(false);
+    };
+  
+    const handleSave = () =>{
+      const newErrors = {};
+      // Validazione dei campi obbligatori
+      if (currentStep === 1) {
       if (!formData.title) newErrors.title = "The title is mandatory.";
       if (!formData.stakeholders) newErrors.stakeholders = "The stakeholders are mandatory.";
       if (!formData.scale) newErrors.scale = "The scale is mandatory.";
       if (!formData.type) newErrors.type = "The type is mandatory.";
-      if (!formData.issuanceDate) newErrors.issuanceDate = "The date is mandatory.";
-    } else {
-      // Validate description field in the second step
+      if (!formData.issuanceDate) newErrors.date = "The date is mandatory.";
+    }
+    else{
       if (!formData.description) newErrors.description = "The description is mandatory.";
     }
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length > 0) {
-      return; // Stop if there are validation errors
+      setErrors(newErrors);
+  
+      if (Object.keys(newErrors).length > 0) {
+        // Se ci sono errori, non proseguire
+        return;
+      }
+      if (currentStep === 1) {
+        setCurrentStep(2);
+      } else {
+        API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, null, null, formData.description);
+        props.setShow(false); // Close the modal
+      }
     }
-
-    // If on the first step, go to the next step
-    if (currentStep === 1) {
-      setCurrentStep(2);
-    } else {
-      // Handle final submission here
-      props.setShow(false); // Close the modal
-      // Optionally reset form data
+    // Handle form data changes
+    const handleChange = (e) => {
+      const { name, value } = e.target;
       setFormData({
-        title: '',
-        stakeholders: '',
-        scale: '',
-        issuanceDate: '',
-        type: '',
-        language: '',
-        pages: '',
-        description: ''
+        ...formData,
+        [name]: value,
       });
-      // Optionally provide user feedback here
-    }
-  };
+    };
 
-  // Handle form data changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  return (
-    <Modal show={props.show} onHide={closeModal} centered>
+    return(
+      <Modal show={props.show} onHide={closeModal} centered>
       <Modal.Header closeButton>
         <Modal.Title style={{color:"#154109"}}>Creating new document</Modal.Title>
       </Modal.Header>
       <Modal.Body className="p-4">
-        <Form>
-          {currentStep === 1 ? (
+            <Form>
+            {currentStep === 1 ? (
             // First step: General Information
             <>
-              <Form.Group className="mb-3">
-                <Form.Label className="custom-label-color"><strong>Title:</strong></Form.Label>
-                <Form.Control
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  isInvalid={!!errors.title}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.title}
-                </Form.Control.Feedback>
-              </Form.Group>
+                  <Form.Group className="mb-3">
+                  <Form.Label className="custom-label-color">Title:</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="title"
+                      onChange={handleChange}
+                      isInvalid={!!errors.title}
+                    />
+                   <Form.Control.Feedback type="invalid">
+                    {errors.title}
+                  </Form.Control.Feedback>
+                  </Form.Group>
 
               <Form.Group className="mb-3">
                 <Form.Label className="custom-label-color">Stakeholders:</Form.Label>
                 <Form.Control
                   type="text"
                   name="stakeholders"
-                  value={formData.stakeholders}
                   onChange={handleChange}
                   isInvalid={!!errors.stakeholders}
                 />
@@ -127,10 +111,10 @@ export function DescriptionComponent(props) {
                   type="date"
                   name="issuanceDate"
                   onChange={handleChange}
-                  isInvalid={!!errors.issuanceDate}
+                  isInvalid={!!errors.date}
                 />
                 <Form.Control.Feedback type="invalid">
-                  {errors.issuanceDate}
+                  {errors.date}
                 </Form.Control.Feedback>
               </Form.Group>
 
@@ -180,7 +164,9 @@ export function DescriptionComponent(props) {
                 name="description"
                 rows={7}
                 isInvalid={!!errors.description}
+                type="text"
                 onChange={handleChange}
+
               />
               <Form.Control.Feedback type="invalid">
                 {errors.description}

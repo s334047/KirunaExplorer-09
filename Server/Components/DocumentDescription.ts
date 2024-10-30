@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 class DocumentDescription{
     title: string
     stakeholder: string
@@ -14,7 +16,7 @@ class DocumentDescription{
         this.title = title,
         this.stakeholder = stakeholder,
         this.scale = scale,
-        this.date = date,
+        this.date = dayjs(date).format('DD-MM-YY').toString(),
         this.type = type,
         this.language = language,
         this.page = page,
