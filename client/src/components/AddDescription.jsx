@@ -1,5 +1,7 @@
 import { Modal, Button, Card, Form,Row,Col } from 'react-bootstrap';
 import React, {  useState } from 'react';
+import API from '../../API.mjs';
+
 export function DescriptionComponent(props){
     const [errors, setErrors] = useState({});
       const [formData, setFormData] = useState({
@@ -29,6 +31,7 @@ export function DescriptionComponent(props){
         // Se ci sono errori, non proseguire
         return;
       }
+      API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, null, null, formData.description);
       props.handleClose();
     }
     // Handle form data changes
@@ -146,7 +149,9 @@ export function DescriptionComponent(props){
                 as="textarea"
                 rows={5}
                 isInvalid={!!errors.description}
-
+                type="text"
+                name="description"
+                onChange={handleChange}
               />
               <Form.Control.Feedback type="invalid">
               {errors.description}
