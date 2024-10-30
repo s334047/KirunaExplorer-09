@@ -1,4 +1,4 @@
-import { db } from "../DB/db.js";
+import { db } from "../DB/db";
 
 export default class Dao {
     newDescription(title: string, sh: string, sc: string, date: string, type: string, lang: string, page: number, coord: string, area: string, descr: string){
