@@ -1,9 +1,11 @@
-import { Modal, Button, Form } from 'react-bootstrap';
+import { Modal, Button, Form, Container } from 'react-bootstrap';
 import React, {  useState } from 'react';
 import API from '../../API.mjs';
 
 export function DescriptionComponent(props){
     const [errors, setErrors] = useState({});
+    const [mode, setMode]=useState("normal");
+    const [item, setItem] = useState({ document: "", type: "" });
       const [formData, setFormData] = useState({
       title: '',
       stakeholders: '',
@@ -16,22 +18,36 @@ export function DescriptionComponent(props){
     });
 
     const [currentStep, setCurrentStep] = useState(1); // Step tracking state
-
+    const filteredItems = props.item;
     const closeModal = () => {
+      setCurrentStep(1);
+      setErrors({});
+      setFormData({
+        title: '',
+        stakeholders: '',
+        scale: '',
+        issuanceDate: '',
+        type: '',
+        language: '',
+        pages: '',
+        description: ''
+      })
       props.setShow(false);
+      setCurrentStep(1);
+      setMode("normal")
     };
   
     const handleSave = () =>{
       const newErrors = {};
       // Validazione dei campi obbligatori
-      if (currentStep === 1) {
+      if (currentStep === 1 && mode==="normal") {
       if (!formData.title) newErrors.title = "The title is mandatory.";
       if (!formData.stakeholders) newErrors.stakeholders = "The stakeholders are mandatory.";
       if (!formData.scale) newErrors.scale = "The scale is mandatory.";
       if (!formData.type) newErrors.type = "The type is mandatory.";
       if (!formData.issuanceDate) newErrors.date = "The date is mandatory.";
     }
-    else{
+    else if(currentStep === 2 && mode==="normal"){
       if (!formData.description) newErrors.description = "The description is mandatory.";
     }
       setErrors(newErrors);
@@ -40,11 +56,28 @@ export function DescriptionComponent(props){
         // Se ci sono errori, non proseguire
         return;
       }
-      if (currentStep === 1) {
+      if (currentStep === 1 && mode==="normal") {
         setCurrentStep(2);
-      } else {
+        setMode("link")
+      } 
+      else if(mode==="link"){
+        setMode("normal")
+      }
+      else {
         API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, null, null, formData.description);
         props.setShow(false); // Close the modal
+        setFormData({
+          title: '',
+          stakeholders: '',
+          scale: '',
+          issuanceDate: '',
+          type: '',
+          language: '',
+          pages: '',
+          description: ''
+        })
+        setErrors({});
+        setCurrentStep(1);
       }
     }
     // Handle form data changes
@@ -56,8 +89,16 @@ export function DescriptionComponent(props){
       });
     };
 
+    const handleChangeLink = (e) => {
+      const { name, value } = e.target;
+      setItem({
+        ...item,
+        [name]: value,
+      });
+    };
     return(
-      <Modal show={props.show} onHide={closeModal} centered>
+      <Container>
+     { mode==="normal" && <Modal show={props.show} onHide={closeModal} centered>
       <Modal.Header closeButton>
         <Modal.Title style={{color:"#154109"}}>Creating new document</Modal.Title>
       </Modal.Header>
@@ -182,12 +223,45 @@ export function DescriptionComponent(props){
           Close
         </Button>
         <Button
-          style={{ backgroundColor: "#154109" }}
+          style={{ backgroundColor: "#154109", borderColor:"#154109"}}
           onClick={handleSave}
         >
           {currentStep === 1 ? "Next" : "Add"}
         </Button>
       </Modal.Footer>
-    </Modal>
+      {/*Modal for linking*/}
+  </Modal>}
+  {mode==="link" && <Modal show={props.show} onHide={closeModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title style={{ color: "#154109" }}>Creating new document</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+         <strong>Add link</strong> 
+          <Form.Group className="mb-3">
+            <Form.Label><strong>Document:</strong></Form.Label>
+            <Form.Select name="document" onChange={handleChangeLink}>
+              <option value="">Select a document</option>
+              {filteredItems.map((item) => (
+                <option key={item.title} value={item.title}>{item.title}</option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label><strong>Type:</strong></Form.Label>
+            <Form.Select name="type" onChange={handleChangeLink}>
+              <option value="">Select a type</option>
+              <option value="Collateral Consequence">Collateral Consequence</option>
+              <option value="Direct Consequence">Direct Consequence</option>
+              <option value="Projection">Projection</option>
+              <option value="Update">Update</option>
+            </Form.Select>
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={closeModal}>Close</Button>
+          <Button style={{ backgroundColor: "#154109", border: "#154109" }} onClick={() => { handleSave() }}>Next</Button>
+        </Modal.Footer>
+      </Modal>}
+      </Container>
   );
 }

@@ -30,7 +30,7 @@ function App() {
       }>
         <Route index element={<>
           <MapViewer showAddDocument={showAddDocument} setShowAddDocument={setShowAddDocument} showAddLink={showAddLink} setShowAddLink={setShowAddLink} />
-          <DescriptionComponent show={showAddDocument} setShow={setShowAddDocument}/>
+          <DescriptionComponent show={showAddDocument} setShow={setShowAddDocument} item={documents}/>
           <ListDocumentLink item={documents} title={excludeDoc} show={showAddLink} setShow={setShowAddLink} />
           </>
         } />
