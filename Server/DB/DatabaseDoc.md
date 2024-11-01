@@ -32,9 +32,9 @@ This table represents a document: that is a single node of the diagram
   specifies the document's language
 - `Page`: integer not null  
   specifies the document's number of pages
-- `Coordinate`: text not null  
+- `Coordinate`: text  
   specifies the document's geolocation coordinates as a single point
-- `Area`: text not null  
+- `Area`: text  
   specifies the document's geolocation area
 - `Description`: text not null  
   specifies the document's description
