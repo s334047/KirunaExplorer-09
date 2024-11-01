@@ -32,20 +32,18 @@ app.post('/api/documents', async (req: any, res: any) => {
 })
 
 // Story KX2 routes
-
 app.post('/api/connections', async (req: any, res: any) => {
     try {
-        const NewConnection: Connection = req.body;
-        daoKX2.SetDocumentsConnection(NewConnection.SourceDocId, NewConnection.TargetDocId, NewConnection.Type);
+        const { SourceDoc, TargetDoc, Type } = req.body;
+        daoKX2.SetDocumentsConnection(SourceDoc, TargetDoc, Type);
     } catch (error) {
         res.status(503).json({ error: Error });
     }
 })
-
-app.get('/api/connections/:docId', async (req: any, res: any) => {
+app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
     try {
-        const { SourceDocId } = req.params;
-        const connections = daoKX2.GetDocumentConnections(SourceDocId);
+        const { SourceDoc } = req.params;
+        const connections = daoKX2.GetDocumentConnections(SourceDoc);
         res.json(connections);
     } catch (error) {
         res.status(503).json({ error: Error });
