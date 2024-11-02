@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Modal, Button, Form } from 'react-bootstrap';
+import {  Modal, Button, Form } from 'react-bootstrap';
 
 const ListDocumentLink = (props) => {
 
@@ -19,6 +19,8 @@ const ListDocumentLink = (props) => {
       // Se ci sono errori, non proseguire
       return;
     }
+    setErrors({});
+    setItem({ document: "", type: "" })
     props.handleClose();
   }
   const handleChange = (e) => {
@@ -30,6 +32,8 @@ const ListDocumentLink = (props) => {
   };
 
   const closeModal = () => {
+    setErrors({});
+    setItem({ document: "", type: "" })
     props.setShow(false);
   };
 

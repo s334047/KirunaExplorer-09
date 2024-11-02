@@ -32,9 +32,9 @@ This table represents a document: that is a single node of the diagram
   specifies the document's language
 - `Page`: integer not null  
   specifies the document's number of pages
-- `Coordinate`: text not null  
+- `Coordinate`: text  
   specifies the document's geolocation coordinates as a single point
-- `Area`: text not null  
+- `Area`: text  
   specifies the document's geolocation area
 - `Description`: text not null  
   specifies the document's description
@@ -71,6 +71,27 @@ This table represents a connection between two documents
 - `TargetDocId`: integer not null references Document(Id) on delete cascade  
   specifies the end of the connection: that is the target document
 - `unique`: (SourceDocId, TargetDocId)
+
+## Area
+
+This table represents a single geographic area
+
+- `Id`: integer primary key autoincrement not null
+- `Name`: text unique not null  
+  specifies the name of the area
+- `Vertex`: text not null  
+  specifies the vertex list of the area, in a json format
+  for example: `{ [20.5,35.4], [54.4,67.5], [37.2,18.5], [12.4,20.9] }`  
+
+## AreaDocLink
+
+This table represents every connection between a single document that belongs to a single area
+
+- `Id`: integer primary key autoincrement not null
+- `AreaId`: integer not null references Area(Id)  
+  specifies the area that include the document
+- `DocumentId`: integer not null references Document(Id)  
+  specifies the document linked to the belonged area
 
 ## User
 

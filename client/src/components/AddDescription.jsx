@@ -1,9 +1,11 @@
-import { Modal, Button, Form } from 'react-bootstrap';
+import { Modal, Button, Form, Container } from 'react-bootstrap';
 import React, {  useState } from 'react';
 import API from '../../API.mjs';
 
 export function DescriptionComponent(props){
     const [errors, setErrors] = useState({});
+    const [mode,setMode] = useState("")
+    const [item, setItem] = useState({ document: "", type: "" });
       const [formData, setFormData] = useState({
       title: '',
       stakeholders: '',
@@ -16,9 +18,24 @@ export function DescriptionComponent(props){
     });
 
     const [currentStep, setCurrentStep] = useState(1); // Step tracking state
-
+    const filteredItems = props.item;
     const closeModal = () => {
       props.setShow(false);
+      props.setMode("")
+      setCurrentStep(1);
+      setErrors({});
+      setFormData({
+        title: '',
+        stakeholders: '',
+        scale: '',
+        issuanceDate: '',
+        type: '',
+        language: '',
+        pages: '',
+        description: ''
+      })
+      setItem({ document: "", type: "" })
+      setMode("");
     };
   
     const handleSave = () =>{
@@ -31,8 +48,11 @@ export function DescriptionComponent(props){
       if (!formData.type) newErrors.type = "The type is mandatory.";
       if (!formData.issuanceDate) newErrors.date = "The date is mandatory.";
     }
-    else{
+    else if(currentStep === 2){
       if (!formData.description) newErrors.description = "The description is mandatory.";
+    }
+    else if(currentStep === 4){
+      if (!mode) newErrors.mode = "The mode is mandatory.";
     }
       setErrors(newErrors);
   
@@ -42,9 +62,32 @@ export function DescriptionComponent(props){
       }
       if (currentStep === 1) {
         setCurrentStep(2);
-      } else {
-        API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, null, null, formData.description);
+      } 
+      else if(currentStep === 2){
+        setCurrentStep(3);
+      }
+      else if(currentStep === 3){
+        setCurrentStep(4);
+      }
+      else {
         props.setShow(false); // Close the modal
+        props.setMode(mode)
+        props.setFormData(formData);
+        props.setFormLink(item)
+        setErrors({});
+        setFormData({
+          title: '',
+          stakeholders: '',
+          scale: '',
+          issuanceDate: '',
+          type: '',
+          language: '',
+          pages: '',
+          description: ''
+        })
+        setItem({ document: "", type: "" })
+        setMode("");
+        setCurrentStep(1);
       }
     }
     // Handle form data changes
@@ -56,14 +99,26 @@ export function DescriptionComponent(props){
       });
     };
 
+    const handleChangeLink = (e) => {
+      const { name, value } = e.target;
+      setItem({
+        ...item,
+        [name]: value,
+      });
+    };
+    const handleChangeMode = (e) =>{
+      const { _, value } = e.target;
+      setMode(value);
+    }
     return(
-      <Modal show={props.show} onHide={closeModal} centered>
+      <Container>
+       <Modal show={props.show} onHide={closeModal} centered>
       <Modal.Header closeButton>
         <Modal.Title style={{color:"#154109"}}>Creating new document</Modal.Title>
       </Modal.Header>
       <Modal.Body className="p-4">
             <Form>
-            {currentStep === 1 ? (
+            {currentStep === 1 && (
             // First step: General Information
             <>
                   <Form.Group className="mb-3">
@@ -127,10 +182,10 @@ export function DescriptionComponent(props){
                 >
                   <option value="">Select a type</option>
                   <option value="Technical document">Technical document</option>
-                  <option value="Report">Informative document</option>
-                  <option value="Manual">Prescriptive document</option>
-                  <option value="Guide">Material effect</option>
-                  <option value="Specification">Design document</option>
+                  <option value="Informative document">Informative document</option>
+                  <option value="Prescriptive document">Prescriptive document</option>
+                  <option value="Material effect">Material effect</option>
+                  <option value="Design document">Design document</option>
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
                   {errors.type}
@@ -155,7 +210,7 @@ export function DescriptionComponent(props){
                 />
               </Form.Group>
             </>
-          ) : (
+          )} {currentStep === 2 && (
             // Second step: Description
             <Form.Group className="mb-3">
               <Form.Label className="custom-label-color">Description:</Form.Label>
@@ -173,6 +228,43 @@ export function DescriptionComponent(props){
               </Form.Control.Feedback>
             </Form.Group>
           )}
+          { currentStep===3 && (<><div style={{ textAlign: 'center' }}>
+          <strong>Add Link</strong> 
+          </div>
+          <Form.Group className="mb-3">
+            <Form.Label><strong>Document:</strong></Form.Label>
+            <Form.Select name="document" onChange={handleChangeLink}>
+              <option value="">Select a document</option>
+              {filteredItems.map((item) => (
+                <option key={item.title} value={item.title}>{item.title}</option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label><strong>Type:</strong></Form.Label>
+            <Form.Select name="type" onChange={handleChangeLink}>
+              <option value="">Select a type</option>
+              <option value="Collateral Consequence">Collateral Consequence</option>
+              <option value="Direct Consequence">Direct Consequence</option>
+              <option value="Projection">Projection</option>
+              <option value="Update">Update</option>
+            </Form.Select>
+          </Form.Group></>)}
+          {currentStep === 4 && (<><div style={{ textAlign: 'center' }}>
+          <strong>Georeference</strong> 
+          </div>
+                      <Form.Group className="mb-3">
+                      <Form.Label><strong>Mode:</strong></Form.Label>
+                      <Form.Select name="type" onChange={handleChangeMode} isInvalid={!!errors.mode}>
+                        <option value="">Select a mode</option>
+                        <option value="Point">Point</option>
+                        <option value="Area">Area</option>
+                      </Form.Select>
+                      <Form.Control.Feedback type="invalid">
+                  {errors.mode}
+                </Form.Control.Feedback>
+                    </Form.Group>
+             </>)}
         </Form>
       </Modal.Body>
 
@@ -182,12 +274,14 @@ export function DescriptionComponent(props){
           Close
         </Button>
         <Button
-          style={{ backgroundColor: "#154109" }}
+          style={{ backgroundColor: "#154109", borderColor:"#154109"}}
           onClick={handleSave}
         >
-          {currentStep === 1 ? "Next" : "Add"}
+          Next
         </Button>
       </Modal.Footer>
-    </Modal>
+      {/*Modal for linking*/}
+  </Modal>
+      </Container>
   );
 }
