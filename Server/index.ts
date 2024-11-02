@@ -24,7 +24,7 @@ app.use(cors(corsOption));
 app.post('/api/documents', async (req: any, res: any) => {
     try {
         const newDoc: DocumentDescription = req.body;
-        dao.newDescription(newDoc.title, newDoc.stakeholder, newDoc.scale, newDoc.date, newDoc.type, newDoc.language, newDoc.page, newDoc.coordinate, newDoc.area, newDoc.description);
+        await dao.newDescription(newDoc.title, newDoc.stakeholder, newDoc.scale, newDoc.date, newDoc.type, newDoc.language, newDoc.page, newDoc.coordinate, newDoc.area, newDoc.description);
     } catch (error) {
         res.status(503).json({ error: Error });
     }
@@ -50,29 +50,30 @@ app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
 });
 
 /** Story 3 routes */
-app.put('/api/documents/:id', async (req: any, res: any) => {
+app.put('/api/documents/:id/area', async (req: any, res: any) => { //add an area/coordinate to a document
     try{
         console.log(req.params.id, req.body.coord, req.body.area)
-        dao.addGeoreference(req.params.id, req.body.coord, req.body.area);
+        await dao.addGeoreference(req.params.id, req.body.coord, req.body.area);
     }catch(error){
         res.status(503).json({error: Error});
     }
 });
 
-app.get('/api/areas', async (req: any, res: any) => {
+app.get('/api/areas', async (req: any, res: any) => {   //get all the areas in the db
     try{
-        if(req.body.par===0)
-            dao.getAllAreas();
-        else(req.body.par===1)
-            dao.getAllCoordinates();
+        const areas = await dao.getAllAreas();
+        res.json(areas);
     }catch(error){
         res.status(503).json({error: Error});
     }
 })
 
-//activate the server
-app.listen(port, () => {
-    console.log(`Server listening at http://localhost:${port}`)
+app.post('/api/areas', async (req: any, res: any) => { //add a new area in the db
+    try{
+        await dao.addArea(req.body.name, req.body.vertex);
+    }catch(error){
+        res.status(503).json({error: Error});
+    }
 });
 
 // Activate the server

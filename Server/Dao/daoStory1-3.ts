@@ -1,4 +1,6 @@
 import { db } from "../DB/db.js";
+import { Area } from "../Components/Area.js";
+import { resolve } from "path";
 
 export default class Dao {
 
@@ -32,18 +34,35 @@ export default class Dao {
         });
     };
 
-    getAllAreas(){  //BOZZA DI FUNZIONE!!! sta da creare la tabella eccetera
-        return new Promise<string>((resolve, reject) => {
+    getAllAreas(){
+        return new Promise<Area[]>((resolve, reject) => {
             const query = `SELECT *
                             FROM Area`;
-            db.all(query, [], (err: any, rows: any) => {
+            db.all(query, [], (err: any, rows: any[]) => {
                 if(err)
                     reject(err);
-                else
-                    resolve(rows);
+                else{
+                    const areas: Area[] = rows.map(row => new Area (row.Id, row.Name, row.Vertex));
+                    console.log(areas);
+                    resolve(areas);
+                }
             })
         })
     }
+
+    addArea(name: string, vertex: string){
+        return new Promise<void>((resolve, reject) => {
+            const query = `INSERT INTO Area
+                            (Name, Vertex)
+                            VALUES(?,?)`;
+            db.run(query, [name, vertex], function(err){
+                if(err)
+                    reject(err);
+                else
+                    resolve();
+            });
+        });
+    };
 
     getAllCoordinates(){  //BOZZA DI FUNZIONE!!! sta da creare la tabella eccetera
         return new Promise<string>((resolve, reject) => {

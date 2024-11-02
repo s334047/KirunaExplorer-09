@@ -12,6 +12,7 @@ async function addDocument(title, stakeholder, scale, date, type, language, page
     }).then(response => response.json())
 };
 
+/** API story 2 */
 async function SetDocumentsConnection(SourceDocument, TargetDocument, ConnectionType) { // all parameters are strings
     return await fetch(`${SERVER_URL}/connections`, {
         method: 'POST',
@@ -34,21 +35,39 @@ async function GetDocumentConnections(SourceDocument) { // SourceDocument is a s
 }
 
 /** API story 3 */
-async function addGeoreference(id, coordinate, area){
-    console.log(id, coordinate, area);
-    return await fetch(`${SERVER_URL}/documents/${id}`, {
+async function addGeoreference(id, coord, area){   //add an area/coordinate to a document
+    return await fetch(`${SERVER_URL}/documents/${id}/area`, {
         method: 'PUT',
-        body: JSON.stringify({coordinate, area})
+        headers: {
+            'Content-type': 'application/json'
+        },
+        //credentials: 'include'
+        body: JSON.stringify({coord, area})
+    }).then(response => response.json())
+};
+
+async function getAllAreas() {                  //get all the areas in the db
+    return await fetch(`${SERVER_URL}/areas`, {
+        method: 'GET',
+        headers: {
+            'Content-type': 'application/json'
+        },
+        //credentials: 'include'
+    }).then(response => response.json())
+}
+
+async function addArea(name, vertex){           //add a new area in the db
+    return await fetch(`${SERVER_URL}/areas`, {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json'
+        },
+        //credentials: 'include'
+        body: JSON.stringify({name, vertex})
     }).then(response => response.json())
 };
 
 
-const API = {addDocument, addGeoreference, SetDocumentsConnection, GetDocumentConnections}
-       
-if (!response.ok) {
-    throw new Error('Invalid username or password');
-}
-
-return await response.json();
+const API = {addDocument, SetDocumentsConnection, GetDocumentConnections, addGeoreference, getAllAreas, addArea};
 
 export default API;
