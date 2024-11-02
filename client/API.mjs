@@ -34,13 +34,10 @@ async function GetDocumentConnections(SourceDocument) { // SourceDocument is a s
 
 const API = { addDocument, SetDocumentsConnection };
 
-  if (!response.ok) {
+if (!response.ok) {
     throw new Error('Invalid username or password');
-  }
-
-  return await response.json();
 }
 
-const API = { addDocument, login };
+return await response.json();
 
 export default API;
