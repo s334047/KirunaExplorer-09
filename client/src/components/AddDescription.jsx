@@ -4,7 +4,7 @@ import API from '../../API.mjs';
 
 export function DescriptionComponent(props){
     const [errors, setErrors] = useState({});
-    const [mode, setMode]=useState("normal");
+    const [mode,setMode] = useState("")
     const [item, setItem] = useState({ document: "", type: "" });
       const [formData, setFormData] = useState({
       title: '',
@@ -20,6 +20,8 @@ export function DescriptionComponent(props){
     const [currentStep, setCurrentStep] = useState(1); // Step tracking state
     const filteredItems = props.item;
     const closeModal = () => {
+      props.setShow(false);
+      props.setMode("")
       setCurrentStep(1);
       setErrors({});
       setFormData({
@@ -32,23 +34,25 @@ export function DescriptionComponent(props){
         pages: '',
         description: ''
       })
-      props.setShow(false);
-      setCurrentStep(1);
-      setMode("normal")
+      setItem({ document: "", type: "" })
+      setMode("");
     };
   
     const handleSave = () =>{
       const newErrors = {};
       // Validazione dei campi obbligatori
-      if (currentStep === 1 && mode==="normal") {
+      if (currentStep === 1) {
       if (!formData.title) newErrors.title = "The title is mandatory.";
       if (!formData.stakeholders) newErrors.stakeholders = "The stakeholders are mandatory.";
       if (!formData.scale) newErrors.scale = "The scale is mandatory.";
       if (!formData.type) newErrors.type = "The type is mandatory.";
       if (!formData.issuanceDate) newErrors.date = "The date is mandatory.";
     }
-    else if(currentStep === 2 && mode==="normal"){
+    else if(currentStep === 2){
       if (!formData.description) newErrors.description = "The description is mandatory.";
+    }
+    else if(currentStep === 4){
+      if (!mode) newErrors.mode = "The mode is mandatory.";
     }
       setErrors(newErrors);
   
@@ -56,16 +60,21 @@ export function DescriptionComponent(props){
         // Se ci sono errori, non proseguire
         return;
       }
-      if (currentStep === 1 && mode==="normal") {
+      if (currentStep === 1) {
         setCurrentStep(2);
-        setMode("link")
       } 
-      else if(mode==="link"){
-        setMode("normal")
+      else if(currentStep === 2){
+        setCurrentStep(3);
+      }
+      else if(currentStep === 3){
+        setCurrentStep(4);
       }
       else {
-        API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, null, null, formData.description);
         props.setShow(false); // Close the modal
+        props.setMode(mode)
+        props.setFormData(formData);
+        props.setFormLink(item)
+        setErrors({});
         setFormData({
           title: '',
           stakeholders: '',
@@ -76,7 +85,8 @@ export function DescriptionComponent(props){
           pages: '',
           description: ''
         })
-        setErrors({});
+        setItem({ document: "", type: "" })
+        setMode("");
         setCurrentStep(1);
       }
     }
@@ -96,15 +106,19 @@ export function DescriptionComponent(props){
         [name]: value,
       });
     };
+    const handleChangeMode = (e) =>{
+      const { _, value } = e.target;
+      setMode(value);
+    }
     return(
       <Container>
-     { mode==="normal" && <Modal show={props.show} onHide={closeModal} centered>
+       <Modal show={props.show} onHide={closeModal} centered>
       <Modal.Header closeButton>
         <Modal.Title style={{color:"#154109"}}>Creating new document</Modal.Title>
       </Modal.Header>
       <Modal.Body className="p-4">
             <Form>
-            {currentStep === 1 ? (
+            {currentStep === 1 && (
             // First step: General Information
             <>
                   <Form.Group className="mb-3">
@@ -168,10 +182,10 @@ export function DescriptionComponent(props){
                 >
                   <option value="">Select a type</option>
                   <option value="Technical document">Technical document</option>
-                  <option value="Report">Informative document</option>
-                  <option value="Manual">Prescriptive document</option>
-                  <option value="Guide">Material effect</option>
-                  <option value="Specification">Design document</option>
+                  <option value="Informative document">Informative document</option>
+                  <option value="Prescriptive document">Prescriptive document</option>
+                  <option value="Material effect">Material effect</option>
+                  <option value="Design document">Design document</option>
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
                   {errors.type}
@@ -196,7 +210,7 @@ export function DescriptionComponent(props){
                 />
               </Form.Group>
             </>
-          ) : (
+          )} {currentStep === 2 && (
             // Second step: Description
             <Form.Group className="mb-3">
               <Form.Label className="custom-label-color">Description:</Form.Label>
@@ -214,29 +228,9 @@ export function DescriptionComponent(props){
               </Form.Control.Feedback>
             </Form.Group>
           )}
-        </Form>
-      </Modal.Body>
-
-      {/* Modal footer with buttons */}
-      <Modal.Footer>
-        <Button variant="secondary" onClick={closeModal}>
-          Close
-        </Button>
-        <Button
-          style={{ backgroundColor: "#154109", borderColor:"#154109"}}
-          onClick={handleSave}
-        >
-          {currentStep === 1 ? "Next" : "Add"}
-        </Button>
-      </Modal.Footer>
-      {/*Modal for linking*/}
-  </Modal>}
-  {mode==="link" && <Modal show={props.show} onHide={closeModal} centered>
-        <Modal.Header closeButton>
-          <Modal.Title style={{ color: "#154109" }}>Creating new document</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-         <strong>Add link</strong> 
+          { currentStep===3 && (<><div style={{ textAlign: 'center' }}>
+          <strong>Add Link</strong> 
+          </div>
           <Form.Group className="mb-3">
             <Form.Label><strong>Document:</strong></Form.Label>
             <Form.Select name="document" onChange={handleChangeLink}>
@@ -255,13 +249,39 @@ export function DescriptionComponent(props){
               <option value="Projection">Projection</option>
               <option value="Update">Update</option>
             </Form.Select>
-          </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={closeModal}>Close</Button>
-          <Button style={{ backgroundColor: "#154109", border: "#154109" }} onClick={() => { handleSave() }}>Next</Button>
-        </Modal.Footer>
-      </Modal>}
+          </Form.Group></>)}
+          {currentStep === 4 && (<><div style={{ textAlign: 'center' }}>
+          <strong>Georeference</strong> 
+          </div>
+                      <Form.Group className="mb-3">
+                      <Form.Label><strong>Mode:</strong></Form.Label>
+                      <Form.Select name="type" onChange={handleChangeMode} isInvalid={!!errors.mode}>
+                        <option value="">Select a mode</option>
+                        <option value="Point">Point</option>
+                        <option value="Area">Area</option>
+                      </Form.Select>
+                      <Form.Control.Feedback type="invalid">
+                  {errors.mode}
+                </Form.Control.Feedback>
+                    </Form.Group>
+             </>)}
+        </Form>
+      </Modal.Body>
+
+      {/* Modal footer with buttons */}
+      <Modal.Footer>
+        <Button variant="secondary" onClick={closeModal}>
+          Close
+        </Button>
+        <Button
+          style={{ backgroundColor: "#154109", borderColor:"#154109"}}
+          onClick={handleSave}
+        >
+          Next
+        </Button>
+      </Modal.Footer>
+      {/*Modal for linking*/}
+  </Modal>
       </Container>
   );
 }
