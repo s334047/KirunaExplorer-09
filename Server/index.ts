@@ -1,10 +1,12 @@
 import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
-import { DocumentDescription } from './Components/DocumentDescription.js';
 import Dao from './Dao/daoStory1.js';
+import DaoKX2 from './Dao/daoKX2.js';
+import { DocumentDescription } from './Components/DocumentDescription.js';
 
 const dao = new Dao();
+const daoKX2 = new DaoKX2();
 
 const app = express();
 const port = 3001;
@@ -22,10 +24,28 @@ app.use(cors(corsOption));
 app.post('/api/documents', async (req: any, res: any) => {
     try {
         const newDoc: DocumentDescription = req.body;
-        await dao.newDescription(newDoc.title, newDoc.stakeholder, newDoc.scale, newDoc.date, newDoc.type, newDoc.language, newDoc.page, newDoc.coordinate, newDoc.area, newDoc.description);
-        res.status(201).json({ message: "Document created successfully" });
+        dao.newDescription(newDoc.title, newDoc.stakeholder, newDoc.scale, newDoc.date, newDoc.type, newDoc.language, newDoc.page, newDoc.coordinate, newDoc.area, newDoc.description);
     } catch (error) {
-        res.status(503).json({ error: error.message });
+        res.status(503).json({ error: Error });
+    }
+})
+
+// Story KX2 routes
+app.post('/api/connections', async (req: any, res: any) => {
+    try {
+        const { SourceDoc, TargetDoc, Type } = req.body;
+        daoKX2.SetDocumentsConnection(SourceDoc, TargetDoc, Type);
+    } catch (error) {
+        res.status(503).json({ error: Error });
+    }
+})
+app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
+    try {
+        const { SourceDoc } = req.params;
+        const connections = daoKX2.GetDocumentConnections(SourceDoc);
+        res.json(connections);
+    } catch (error) {
+        res.status(503).json({ error: Error });
     }
 });
 
