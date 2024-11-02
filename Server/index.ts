@@ -4,10 +4,10 @@ import morgan from 'morgan';
 import passport from 'passport';
 import session from 'express-session';
 import LocalStrategy from 'passport-local';
-import Dao from './Dao/daoStory1.js';
 import DaoKX2 from './Dao/daoKX2.js';
-import { DocumentDescription } from './Components/DocumentDescription.js';
+import Dao from './Dao/daoStory1-3.js';
 import DaoUser from './Dao/daoUser.js'
+import { DocumentDescription } from './Components/DocumentDescription.js';
 
 const dao = new Dao();
 const daoKX2 = new DaoKX2();
@@ -15,6 +15,7 @@ const daoUser = new DaoUser();
 
 const app = express();
 const port = 3001;
+
 
 app.use(express.json());
 app.use(morgan('dev'));
@@ -64,7 +65,7 @@ app.use((req:any, res: any, next: any) => {
 app.post('/api/documents', async (req: any, res: any) => {
     try {
         const newDoc: DocumentDescription = req.body;
-        dao.newDescription(newDoc.title, newDoc.stakeholder, newDoc.scale, newDoc.date, newDoc.type, newDoc.language, newDoc.page, newDoc.coordinate, newDoc.area, newDoc.description);
+        await dao.newDescription(newDoc.title, newDoc.stakeholder, newDoc.scale, newDoc.date, newDoc.type, newDoc.language, newDoc.page, newDoc.coordinate, newDoc.area, newDoc.description);
     } catch (error) {
         res.status(503).json({ error: Error });
     }
@@ -88,6 +89,34 @@ app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
         res.status(503).json({ error: Error });
     }
 });
+/** Story 3 routes */
+app.put('/api/documents/:id/area', async (req: any, res: any) => { //add an area/coordinate to a document
+    try{
+        console.log(req.params.id, req.body.coord, req.body.area)
+        await dao.addGeoreference(req.params.id, req.body.coord, req.body.area);
+    }catch(error){
+        res.status(503).json({error: Error});
+    }
+});
+
+app.get('/api/areas', async (req: any, res: any) => {   //get all the areas in the db
+    try{
+        const areas = await dao.getAllAreas();
+        res.json(areas);
+    }catch(error){
+        res.status(503).json({error: Error});
+    }
+})
+
+app.post('/api/areas', async (req: any, res: any) => { //add a new area in the db
+    try{
+        await dao.addArea(req.body.name, req.body.vertex);
+    }catch(error){
+        res.status(503).json({error: Error});
+    }
+});
+
+//API AUTENTICATION
 
 app.post('/api/sessions', (req: any, res: any, next: any) => {
     passport.authenticate('local', (err: any, user: any, info: any) => {
@@ -107,7 +136,6 @@ app.post('/api/sessions', (req: any, res: any, next: any) => {
     })(req, res, next);
 });
 
-
 app.get('/api/sessions/current', (req: any, res: any) => {
     if (req.isAuthenticated()) {
         return res.json(req.user);
@@ -125,7 +153,6 @@ app.delete('/api/sessions/current', (req: any, res: any) => {
         return res.end();
     });
 });
-
 // Activate the server
 app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);

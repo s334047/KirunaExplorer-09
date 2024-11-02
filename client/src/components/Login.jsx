@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Alert, Button, Container, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
@@ -7,25 +8,34 @@ function Login({ setUser }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null); // Clear previous error
+    setError(null); 
+
+    // Input validation
+    if (!username || !password) {
+      setError('Please enter both username and password.');
+      return;
+    }
+
+    setLoading(true); 
 
     try {
       const response = await API.login(username, password);
       if (response.user) {
         setUser(response.user);
-        // Save user to session/local storage if needed
-        localStorage.setItem('user', JSON.stringify(response.user));
-        // Navigate to the home page (or another protected route)
+        sessionStorage.setItem('user', JSON.stringify(response.user));
         navigate('/');
       } else {
         setError('Unexpected error, please try again.');
       }
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false); 
     }
   };
 
@@ -56,8 +66,12 @@ function Login({ setUser }) {
           />
         </Form.Group>
 
-        <Button variant="primary" type="submit">
-          Login
+        <Button
+          variant="primary"
+          type="submit"
+          disabled={loading} 
+        >
+          {loading ? 'Logging in...' : 'Login'}
         </Button>
       </Form>
     </Container>

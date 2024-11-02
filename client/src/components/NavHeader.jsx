@@ -1,7 +1,7 @@
 import {Nav, Navbar, Container, Button } from 'react-bootstrap'
 import { Link, useLocation } from 'react-router-dom';
 
-function NavHeader(props) {
+function NavHeader() {
     const location = useLocation();
     return (
         <Navbar expand="lg" className="custom-navbar" style={{ borderBottom: '1px solid #dee2e6' }}>
@@ -18,10 +18,9 @@ function NavHeader(props) {
                         <Nav.Link>Diagram</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
-                </>}
-
-                {location.pathname !== '/login'&& !props.loggedIn && <Link to="/login" className="btn btn-outline-light">Login</Link>}
-                {props.loggedIn && <Button variant='outline-light' onClick={props.logout}>Logout</Button>}
+            </>}
+            {location.pathname !== '/login'&& !props.loggedIn && <Link to="/login" className="btn btn-outline-light">Login</Link>}
+            {props.loggedIn && <Button variant='outline-light' onClick={props.logout}>Logout</Button>}
             </Container>
         </Navbar>
     );
