@@ -10,8 +10,7 @@ CREATE TABLE Document (
     Type TEXT NOT NULL,
     Language TEXT NOT NULL,
     Page INTEGER NOT NULL,
-    Coordinate TEXT NOT NULL,
-    Area TEXT NOT NULL,
+    Coordinate TEXT,
     Description TEXT NOT NULL
 );
 INSERT INTO Document (Title, Stakeholder, Scale, Date, Type, Language, Page, Coordinate, Area, Description)
