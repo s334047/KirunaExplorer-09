@@ -2,7 +2,7 @@ import { Modal, Button, Form, Container } from 'react-bootstrap';
 import React, {  useState } from 'react';
 import API from '../../API.mjs';
 
-export function DescriptionComponent(props){
+function DescriptionComponent(props){
     const [errors, setErrors] = useState({});
     const [mode,setMode] = useState("")
     const [item, setItem] = useState({ document: "", type: "" });
@@ -285,3 +285,4 @@ export function DescriptionComponent(props){
       </Container>
   );
 }
+export default DescriptionComponent;

@@ -384,11 +384,11 @@ function MapViewer(props) {
                     right: 20,
                     zIndex: 1000,
                 }}>
-                    <DocumentCard selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} setShowAddLink={props.setShowAddLink} />
+                    <DocumentCard selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} setShowAddLink={props.setShowAddLink} user={props.user} />
                 </div>
             )}
-
-            {!selectedDoc && drawingMode===false && !props.mode && <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000 }}>
+            {/*Only a Urban Planner can add a document, see props.user.role*/}
+            {!selectedDoc && drawingMode===false && !props.mode && props.user.role === 'Urban Planner' &&  <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000 }}>
                 <Button variant="light" onClick={() => props.setShowAddDocument(true)} style={{ border: '2px solid gray', display: 'flex', alignItems: 'center' }}>
                     <div style={{ textAlign: 'left' }}>
                         <span style={{ display: 'block', fontSize: '12px' }}>Add</span>
@@ -397,7 +397,7 @@ function MapViewer(props) {
                     <img src="file.png" alt="Add" style={{ width: '30px', height: '30px', marginLeft: '10px' }} />
                 </Button>
             </div>}
-            {!selectedDoc && drawingMode===false && !props.mode && <div style={{ position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000 }}>
+            {!selectedDoc && drawingMode===false && !props.mode && props.user.role === 'Urban Planner' && <div style={{ position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000 }}>
                 <Button variant="light" onClick={() => setDrawingMode(true)} style={{ border: '2px solid gray', display: 'flex', alignItems: 'center', width:"120px" }}>
                     <div style={{ textAlign: 'left' }}>
                         <span style={{ display: 'block', fontSize: '12px' }}>Draw</span>
@@ -413,7 +413,7 @@ function MapViewer(props) {
     );
 }
 
-function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink }) {
+function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user }) {
     return (
         <Card className="document-card">
             <Card.Body>
@@ -435,7 +435,7 @@ function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink }) {
                             <li><strong>Type:</strong> {selectedDoc.type}</li>
                             <li>
                                 <strong>Connections:</strong> {selectedDoc.connections}
-                                <a
+                                {user.role === 'Urban Planner' && <a
                                     href="#"
                                     style={{
                                         textDecoration: 'underline',
@@ -446,7 +446,7 @@ function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink }) {
                                     onClick={() => setShowAddLink(true)}
                                 >
                                     <i className="bi bi-plus-circle-fill"></i>
-                                </a>
+                                </a>}
                             </li>
                             <li><strong>Language:</strong> {selectedDoc.language}</li>
                             <li><strong>Coordinates:</strong> {selectedDoc.coordinate[0]} N, {selectedDoc.coordinate[1]} E </li>

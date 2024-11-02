@@ -32,12 +32,47 @@ async function GetDocumentConnections(SourceDocument) { // SourceDocument is a s
     }).then(response => response.json())
 }
 
-const API = { addDocument, SetDocumentsConnection };
+// NEW
+const logIn = async (credentials) => {
+    const response = await fetch(`${SERVER_URL}/sessions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(credentials),
+    });
+    if (response.ok) {
+      const user = await response.json();
+      return user;
+    }
+    else {
+      const errDetails = await response.text();
+      throw errDetails;
+    }
+  };
+  
+  const getUserInfo = async () => {
+    const res = await fetch(`${SERVER_URL}/sessions/current`, {
+      credentials: 'include',
+    });
+    const user = await res.json();
+    if (res.ok) {
+      return user;
+    } else {
+      throw user;  // an object with the error coming from the server
+    }
+  };
+  
+  const logOut = async () => {
+    const res = await fetch(`${SERVER_URL}/sessions/current`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    if (res.ok)
+      return null;
+  }
 
-if (!response.ok) {
-    throw new Error('Invalid username or password');
-}
-
-return await response.json();
+const API = { addDocument, SetDocumentsConnection, logIn, getUserInfo, logOut };
 
 export default API;

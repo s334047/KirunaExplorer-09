@@ -1,12 +1,17 @@
 import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
+import passport from 'passport';
+import session from 'express-session';
+import LocalStrategy from 'passport-local';
 import Dao from './Dao/daoStory1.js';
 import DaoKX2 from './Dao/daoKX2.js';
 import { DocumentDescription } from './Components/DocumentDescription.js';
+import DaoUser from './Dao/daoUser.js'
 
 const dao = new Dao();
 const daoKX2 = new DaoKX2();
+const daoUser = new DaoUser();
 
 const app = express();
 const port = 3001;
@@ -19,6 +24,41 @@ const corsOption = {
     credentials: true,
 };
 app.use(cors(corsOption));
+
+passport.use(new LocalStrategy(async function verify(username, password, cb) {
+    const user = await daoUser.getUser(username, password);
+    if (!user)
+        return cb(null, false, 'Incorrect username or password.');
+
+    return cb(null, user);
+}));
+
+passport.serializeUser((user, cb) => cb(null, user));
+passport.deserializeUser((user, cb) => cb(null, user));
+
+// authentication middleware
+const isLoggedIn = (req: any , res: any, next: any) => {
+    if (req.isAuthenticated()) {
+      return next();
+    }
+    return res.status(401).json({ error: 'Not authorized' });
+  }
+
+  // session setup
+const secret = "SECRETTTTTTT"
+app.use(session({
+  secret: secret,
+  resave: false,
+  saveUninitialized: false,
+}));
+app.use(passport.authenticate('session'));
+
+app.use((req:any, res: any, next: any) => {
+  if (!req.session.memePoints) {
+    req.session.memePoints = {};
+  }
+  next();
+});
 
 /** Story 1 routes */
 app.post('/api/documents', async (req: any, res: any) => {
@@ -47,6 +87,43 @@ app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
     } catch (error) {
         res.status(503).json({ error: Error });
     }
+});
+
+app.post('/api/sessions', (req: any, res: any, next: any) => {
+    passport.authenticate('local', (err: any, user: any, info: any) => {
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            return res.status(401).send(info);
+        }
+
+        req.login(user, (err: any) => {
+            if (err) {
+                return next(err);
+            }
+            return res.status(201).json(req.user);
+        });
+    })(req, res, next);
+});
+
+
+app.get('/api/sessions/current', (req: any, res: any) => {
+    if (req.isAuthenticated()) {
+        return res.json(req.user);
+    } else {
+        return res.status(401).json({ error: 'Not authenticated' });
+    }
+});
+
+
+app.delete('/api/sessions/current', (req: any, res: any) => {
+    req.logout((err: any) => {
+        if (err) {
+            return res.status(500).send({ error: 'Logout failed' });
+        }
+        return res.end();
+    });
 });
 
 // Activate the server
