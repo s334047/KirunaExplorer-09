@@ -5,6 +5,7 @@ CREATE TABLE Connection (
     Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     SourceDocId INTEGER NOT NULL REFERENCES Document(Id) ON DELETE CASCADE,
     TargetDocId INTEGER NOT NULL REFERENCES Document(Id) ON DELETE CASCADE,
+    Type TEXT NOT NULL,
     UNIQUE (SourceDocId, TargetDocId)
 );
 INSERT INTO Connection (SourceDocId, TargetDocId) VALUES (1, 2);
