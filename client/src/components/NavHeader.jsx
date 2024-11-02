@@ -1,7 +1,7 @@
 import {Nav, Navbar, Container, Button } from 'react-bootstrap'
 import { Link, useLocation } from 'react-router-dom';
 
-function NavHeader() {
+function NavHeader(props) {
     const location = useLocation();
     return (
         <Navbar expand="lg" className="custom-navbar" style={{ borderBottom: '1px solid #dee2e6' }}>

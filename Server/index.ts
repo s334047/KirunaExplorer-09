@@ -6,7 +6,7 @@ import session from 'express-session';
 import LocalStrategy from 'passport-local';
 import DaoKX2 from './Dao/daoKX2.js';
 import Dao from './Dao/daoStory1-3.js';
-import DaoUser from './Dao/daoUser.js'
+import DaoUser from './Dao/daoUser.js';
 import { DocumentDescription } from './Components/DocumentDescription.js';
 
 const dao = new Dao();
