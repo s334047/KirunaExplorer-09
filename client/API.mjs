@@ -1,5 +1,27 @@
 const SERVER_URL = "http://localhost:3001/api";
-
+async function login(username, password) {
+    const response = await fetch(`${SERVER_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+      credentials: 'include',
+    });
+  
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Invalid username or password');
+      } else {
+        throw new Error('Unexpected server error');
+      }
+    }
+  
+    return await response.json();
+  }
+  
+  
+  
 /** API story 1 */
 async function addDocument(title, stakeholder, scale, date, type, language, page, coordinate, area, description) {
     return await fetch(`${SERVER_URL}/documents`, {
@@ -68,6 +90,6 @@ async function addArea(name, vertex){           //add a new area in the db
 };
 
 
-const API = {addDocument, SetDocumentsConnection, GetDocumentConnections, addGeoreference, getAllAreas, addArea};
+const API = {login, addDocument, SetDocumentsConnection, GetDocumentConnections, addGeoreference, getAllAreas, addArea};
 
 export default API;

@@ -1,15 +1,20 @@
+import bcrypt from 'bcrypt';
+import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
-import cors from 'cors';
-import Dao from './Dao/daoStory1-3.js';
-import DaoKX2 from './Dao/daoKX2.js';
 import { DocumentDescription } from './Components/DocumentDescription.js';
+import DaoKX2 from './Dao/daoKX2.js';
+import Dao from './Dao/daoStory1-3.js';
+import UserDAO from './Dao/DAOuser.js';
+import { db } from './DB/db.js';
 
 const dao = new Dao();
 const daoKX2 = new DaoKX2();
+const userDAO = new UserDAO(db);
 
 const app = express();
 const port = 3001;
+
 
 app.use(express.json());
 app.use(morgan('dev'));
@@ -75,6 +80,41 @@ app.post('/api/areas', async (req: any, res: any) => { //add a new area in the d
         res.status(503).json({error: Error});
     }
 });
+/** Authentication Route */
+app.post('/api/auth/login', async (req: any, res: any) => {
+    try {
+        const { username, password } = req.body;
+
+        console.log(`Login attempt for username: ${username}`);
+
+        
+        const user: any = await userDAO.findUserByUsername(username);
+
+        if (!user) {
+            console.error(`User not found for username: ${username}`);
+            return res.status(401).json({ error: 'Invalid username or password' });
+        }
+
+        console.log(`User found in database: ${JSON.stringify(user)}`);
+
+        
+        const match = await bcrypt.compare(password, user.Password);
+
+        console.log("Password comparison result:", match);
+
+        if (match) {
+            console.log(`Password match for user: ${username}`);
+            return res.status(200).json({ user: { username: user.Username, role: user.Role } });
+        } else {
+            console.error(`Password mismatch for user: ${username}`);
+            return res.status(401).json({ error: 'Invalid username or password' });
+        }
+    } catch (error) {
+        console.error("Unexpected server error during login:", error);
+        return res.status(500).json({ error: 'Unexpected server error' });
+    }
+});
+
 
 // Activate the server
 app.listen(port, () => {
