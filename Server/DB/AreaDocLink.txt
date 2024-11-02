@@ -1,0 +1,11 @@
+-- database: ./db.db
+
+DROP TABLE AreaDocLink;
+CREATE TABLE AreaDocLink (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    AreaId INTEGER NOT NULL REFERENCES Area(Id),
+    DocumentId INTEGER NOT NULL REFERENCES Document(Id)
+);
+INSERT INTO AreaDocLink (AreaId, DocumentId) VALUES (1, 1);
+INSERT INTO AreaDocLink (AreaId, DocumentId) VALUES (2, 2);
+INSERT INTO AreaDocLink (AreaId, DocumentId) VALUES (3, 3);
