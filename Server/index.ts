@@ -62,10 +62,11 @@ app.use((req:any, res: any, next: any) => {
 });
 
 /** Story 1 routes */
-app.post('/api/documents', async (req: any, res: any) => {
+app.post('/api/documents', isLoggedIn, async (req: any, res: any) => {
     try {
         const newDoc: DocumentDescription = req.body;
-        await dao.newDescription(newDoc.title, newDoc.stakeholder, newDoc.scale, newDoc.date, newDoc.type, newDoc.language, newDoc.page, newDoc.coordinate, newDoc.area, newDoc.description);
+        console.log(newDoc.coordinate)
+        await dao.newDescription(newDoc.title, newDoc.stakeholder, newDoc.scale, newDoc.date, newDoc.type, newDoc.language, newDoc.page, newDoc.coordinate, newDoc.description);
     } catch (error) {
         res.status(503).json({ error: Error });
     }
@@ -89,11 +90,13 @@ app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
         res.status(503).json({ error: Error });
     }
 });
+
 /** Story 3 routes */
-app.put('/api/documents/:id/area', async (req: any, res: any) => { //add an area/coordinate to a document
+app.put('/api/documents/area', async (req: any, res: any) => { //add an existing area to a document
     try{
-        console.log(req.params.id, req.body.coord, req.body.area)
-        await dao.addGeoreference(req.params.id, req.body.coord, req.body.area);
+        const areaId = await dao.getAreaIdFromName(req.body.area);
+        const documentId = await dao.getDocumentIdFromTitle(req.body.title);
+        await dao.addAreaToDoc(areaId, documentId);
     }catch(error){
         res.status(503).json({error: Error});
     }
@@ -108,9 +111,10 @@ app.get('/api/areas', async (req: any, res: any) => {   //get all the areas in t
     }
 })
 
-app.post('/api/areas', async (req: any, res: any) => { //add a new area in the db
+app.post('/api/areas', isLoggedIn, async (req: any, res: any) => { //add a new area in the db
     try{
         await dao.addArea(req.body.name, req.body.vertex);
+        res.status(201).json({message: 'Area add successfully'});
     }catch(error){
         res.status(503).json({error: Error});
     }
