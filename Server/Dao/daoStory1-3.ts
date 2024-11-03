@@ -1,16 +1,17 @@
 import { db } from "../DB/db.js";
-import { Area } from "../Components/Area.js";
 import { resolve } from "path";
-
+import { Area, Coordinates } from "../Components/Georeference.js";
 export default class Dao {
 
     /**story 1 */
-    newDescription(title: string, sh: string, sc: string, date: string, type: string, lang: string, page: number, coord: string, area: string, descr: string){
+    newDescription(title: string, sh: string, sc: string, date: string, type: string, lang: string, page: number, coord: Coordinates, descr: string){
         return new Promise<void>((resolve, reject) => {
+            const coordTemp: string = '[ '+coord[0]+', '+coord[1]+' ]'
+            console.log(coordTemp);
             const query = `INSERT INTO Document 
-                            (Title, Stakeholder, Scale, Date, Type, Language, Page, Coordinate, Area, Description)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-            db.run(query, [title, sh, sc, date, type, lang, page, coord, area, descr], function(err){
+                            (Title, Stakeholder, Scale, Date, Type, Language, Page, Coordinate, Description)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            db.run(query, [title, sh, sc, date, type, lang, page, coordTemp, descr], function(err){
                 if(err)
                     reject(err);
                 else
@@ -20,12 +21,12 @@ export default class Dao {
     };
 
     /**story 3 */
-    addGeoreference(id: number, coord: string, area: string){
+    addAreaToDoc(areaId: number, documentId: number){
         return new Promise<void>((resolve, reject) => {
-            const query = `UPDATE Document 
-                            SET Coordinate = ?, Area = ?
-                            WHERE Id = ?`;
-            db.run(query, [coord, area, id], function(err){
+            const query = `INSERT INTO AreaDocLink
+                            (AreaId, DocumentId)
+                            VALUES(?,?)`;
+            db.run(query, [areaId, documentId], function(err){
                 if(err)
                     reject(err);
                 else
@@ -33,6 +34,7 @@ export default class Dao {
             });
         });
     };
+
     getAllAreas(){
         return new Promise<Area[]>((resolve, reject) => {
             const query = `SELECT *
@@ -41,20 +43,33 @@ export default class Dao {
                 if(err)
                     reject(err);
                 else{
-                    const areas: Area[] = rows.map(row => new Area (row.Id, row.Name, row.Vertex));
+                    let areas: Area[] = rows.map(row => new Area(row.Id, row.Name, JSON.parse(row.Vertex.replace(/\]\s*\[/g, '],[')
+                    .replace(/'/g, '"')
+                    .replace(/(\[\s*)/g, '[')
+                    .replace(/(\s*\])/g, ']'))));
                     console.log(areas);
                     resolve(areas);
                 }
             })
         })
     }
+    
 
-    addArea(name: string, vertex: string){
+    //-------------------------------------------
+
+    addArea(name: string, vertex: Coordinates[]){      
+        console.log('sono in dao, vertex: ', vertex);
+        let vertexTemp = '[ ';
+        for(let i=0; i<vertex.length; i++){
+            vertexTemp = vertexTemp + '[ '+vertex[i]+ ' ]';
+        }
+        vertexTemp = vertexTemp+' ]';
+        console.log(vertexTemp);
         return new Promise<void>((resolve, reject) => {
             const query = `INSERT INTO Area
                             (Name, Vertex)
                             VALUES(?,?)`;
-            db.run(query, [name, vertex], function(err){
+            db.run(query, [name, vertexTemp], function(err){
                 if(err)
                     reject(err);
                 else
@@ -62,6 +77,34 @@ export default class Dao {
             });
         });
     };
+
+    getAreaIdFromName(name : string){
+        return new Promise<number>((resolve, reject) => {
+            const query = `SELECT Id
+                            FROM Area
+                            WHERE Name = ?`;
+            db.get(query, [name], (err: any, row: number) => {
+                if(err)
+                    reject(err);
+                else
+                    resolve(row);
+            })
+        })
+    }
+
+    getDocumentIdFromTitle(title : string){
+        return new Promise<number>((resolve, reject) => {
+            const query = `SELECT Id
+                            FROM Document
+                            WHERE Title = ?`;
+            db.get(query, [title], (err: any, row: number) => {
+                if(err)
+                    reject(err);
+                else
+                    resolve(row);
+            })
+        })
+    }
 
     getAllCoordinates(){  //BOZZA DI FUNZIONE!!! sta da creare la tabella eccetera
         return new Promise<string>((resolve, reject) => {

@@ -31,11 +31,13 @@ function App() {
 
   const handleSaveNew = () => {
     if(selectedArea == null){
+      console.log(formData.title,formData.stakeholders,formData.scale,formData.issuanceDate,formData.type,formData.language,formData.pages,selectedPoint,formData.description)
       API.addDocument(formData.title,formData.stakeholder,formData.scale,formData.issuanceDate,formData.type,formData.language,formData.pages,selectedPoint,formData.description)
     }
     else if(selectedArea!=null){
-      API.addDocument(formData.title,formData.stakeholder,formData.scale,formData.issuanceDate,formData.type,formData.language,formData.pages,selectedPoint,formData.description)
-      API.addGeoreference(formData.title,selectedArea.nome)
+      API.addDocument(formData.title,formData.stakeholders,formData.scale,formData.issuanceDate,formData.type,formData.language,formData.pages,selectedPoint,formData.description)
+      console.log(formData.title, selectedArea.nome);
+      API.addAreaToDoc(formData.title,selectedArea.nome)
     }
     setFormData(null);
     setFormLink(null);
