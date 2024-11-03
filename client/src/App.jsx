@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import { Routes, Route, Outlet, Navigate, useNavigate } from 'react-router-dom';
 import { Container, Row, Alert } from 'react-bootstrap';
@@ -25,7 +25,7 @@ function App() {
   const [selectedPoint, setSelectedPoint] = useState(null)
   const[message, setMessage] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
-  const [user, setUser] = useState('');
+  const [user, setUser] = useState('')
 
   const nav = useNavigate();
 
@@ -42,6 +42,20 @@ function App() {
     setSelectedArea(null)
     setSelectedPoint(null)
   }
+
+  useEffect(() => {
+    API.getUserInfo()
+        .then(user => {
+            setLoggedIn(true);
+            setUser(user); 
+        }).catch(e => {
+            if(loggedIn)
+                setFeedbackFromError(e);
+            setLoggedIn(false); s
+            setUser('');
+        }); 
+}, []);
+
 
   const handleLogin = async (credentials) => {
     try {

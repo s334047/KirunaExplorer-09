@@ -391,21 +391,21 @@ function MapViewer(props) {
             )}
             {/*Only a Urban Planner can add a document, see props.user.role*/}
             {!selectedDoc && drawingMode===false && !props.mode && props.user.role === 'Urban Planner' &&  <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000 }}>
-                <Button variant="light" onClick={() => props.setShowAddDocument(true)} style={{ border: '2px solid gray', display: 'flex', alignItems: 'center' }}>
+                <Button variant="light" onClick={() => props.setShowAddDocument(true)} style={{ border: '2px solid gray', display: 'flex',justifyContent: 'center', alignItems: 'center', width:"100px" }}>
                     <div style={{ textAlign: 'left' }}>
                         <span style={{ display: 'block', fontSize: '12px' }}>Add</span>
-                        <span style={{ display: 'block', fontSize: '12px' }}>Document</span>
+                        <span style={{ display: 'block', fontSize: '12px' }}>Doc</span>
                     </div>
                     <img src="file.png" alt="Add" style={{ width: '30px', height: '30px', marginLeft: '10px' }} />
                 </Button>
             </div>}
             {!selectedDoc && drawingMode===false && !props.mode && props.user.role === 'Urban Planner' && <div style={{ position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000 }}>
-                <Button variant="light" onClick={() => setDrawingMode(true)} style={{ border: '2px solid gray', display: 'flex', alignItems: 'center', width:"120px" }}>
+                <Button variant="light" onClick={() => setDrawingMode(true)} style={{ border: '2px solid gray', display: 'flex', justifyContent: 'center', alignItems: 'center', width:"100px" }}>
                     <div style={{ textAlign: 'left' }}>
                         <span style={{ display: 'block', fontSize: '12px' }}>Draw</span>
                         <span style={{ display: 'block', fontSize: '12px' }}>Area</span>
                     </div>
-                    <img src="drawing.png" alt="Draw" style={{ width: '30px', height: '30px', marginLeft: '10px' }} />
+                    <img src="drawing.svg" alt="Draw" style={{ width: '30px', height: '30px', marginLeft: '10px' }} />
                 </Button>
             </div>}
 
