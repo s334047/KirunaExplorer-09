@@ -32,7 +32,7 @@ function App() {
   const handleSaveNew = () => {
     if(selectedArea == null){
       console.log(formData.title,formData.stakeholders,formData.scale,formData.issuanceDate,formData.type,formData.language,formData.pages,selectedPoint,formData.description)
-      API.addDocument(formData.title,formData.stakeholder,formData.scale,formData.issuanceDate,formData.type,formData.language,formData.pages,selectedPoint,formData.description)
+      API.addDocument(formData.title,formData.stakeholders,formData.scale,formData.issuanceDate,formData.type,formData.language,formData.pages,selectedPoint,formData.description)
     }
     else if(selectedArea!=null){
       API.addDocument(formData.title,formData.stakeholders,formData.scale,formData.issuanceDate,formData.type,formData.language,formData.pages,selectedPoint,formData.description)
@@ -53,7 +53,7 @@ function App() {
         }).catch(e => {
             if(loggedIn)
                 setFeedbackFromError(e);
-            setLoggedIn(false); s
+            setLoggedIn(false); 
             setUser('');
         }); 
 }, []);

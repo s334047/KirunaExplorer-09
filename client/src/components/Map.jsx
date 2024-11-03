@@ -148,7 +148,9 @@ function MapViewer(props) {
     const handleDrawCreated = (e) =>{
         const layer = e.layer;
         if (layer instanceof L.Marker) {
-            setSelectedPoint(layer.getLatLng())
+            const latlng=layer.getLatLng()
+            setSelectedPoint(latlng)
+            props.setSelectedPoint([latlng.lat,latlng.lng])
         };
         if (layer instanceof L.Polygon) {
             const latlngs = layer.getLatLngs();
@@ -160,6 +162,8 @@ function MapViewer(props) {
     // this function close the mode for selecting an area or a point for a new document resetting all parameters
     const handleCloseSelectArea = ()=>{
         props.setMode("")
+        props.setSelectedPoint(null)
+        props.setSelectedArea(null)
         setSelectedArea(null)
         setSelectedPoint(null)
         setResetDrawing(true);
@@ -203,17 +207,16 @@ function MapViewer(props) {
         const selectedNome = e.target.value;
         const foundArea = aree.find(area => area.nome === selectedNome);
         setSelectedArea(foundArea);
+        props.setSelectedArea(foundArea)
     }
       // this function saves an area for a new document
     const handleSaveArea = ()=>{
-        props.setSelectedArea(selectedArea);
         setSelectedArea(null)
         props.handleSaveNew()
         props.setMode(null)
     }
     // this function saves a point for a new document
     const handleSavePoint = () =>{
-        props.setSelectedPoint(selectedPoint);
         props.handleSaveNew()
         props.setMode(null)
         setSelectedPoint(null)
