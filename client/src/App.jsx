@@ -30,10 +30,10 @@ function App() {
   const nav = useNavigate();
 
   const handleSaveNew = () => {
-    console.log(formData)
-    console.log(formLink)
-    console.log(selectedArea)
-    console.log(selectedPoint)
+    setFormData(null);
+    setFormLink(null);
+    setSelectedArea(null)
+    setSelectedPoint(null)
   }
 
   const handleLogin = async (credentials) => {
@@ -49,6 +49,13 @@ function App() {
   };
   const handleLogout = async () => {
     await API.logOut();
+    setFormData(null);
+    setFormLink(null);
+    setSelectedArea(null)
+    setSelectedPoint(null)
+    setMode("")
+    setShowAddDocument(false)
+    setShowAddLink(false)
     setUser('');
     setLoggedIn(false);
     setMessage('');

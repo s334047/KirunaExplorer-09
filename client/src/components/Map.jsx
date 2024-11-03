@@ -221,7 +221,7 @@ function MapViewer(props) {
     }
     // this function handle the change of a name for a new area
     const handleChangeName=(e)=>{
-        setAreaName(e.value);
+        setAreaName(e.target.value);
     }
     // this function saves the name and the coordinates for a new area
     const handleSaveName = () =>{

@@ -33,7 +33,6 @@ export default class Dao {
             });
         });
     };
-
     getAllAreas(){
         return new Promise<Area[]>((resolve, reject) => {
             const query = `SELECT *
