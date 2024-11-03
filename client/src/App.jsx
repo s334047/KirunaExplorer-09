@@ -30,6 +30,13 @@ function App() {
   const nav = useNavigate();
 
   const handleSaveNew = () => {
+    if(selectedArea == null){
+      API.addDocument(formData.title,formData.stakeholder,formData.scale,formData.issuanceDate,formData.type,formData.language,formData.pages,selectedPoint,formData.description)
+    }
+    else if(selectedArea!=null){
+      API.addDocument(formData.title,formData.stakeholder,formData.scale,formData.issuanceDate,formData.type,formData.language,formData.pages,selectedPoint,formData.description)
+      API.addGeoreference(formData.title,selectedArea.nome)
+    }
     setFormData(null);
     setFormLink(null);
     setSelectedArea(null)

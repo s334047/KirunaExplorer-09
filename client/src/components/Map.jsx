@@ -5,6 +5,7 @@ import L from 'leaflet';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { Card, Button, Row, Col, Form } from 'react-bootstrap';
+import API from '../../API.mjs';
 
 
 /*function MapWithDraw({ polygons, setPolygons }) {
@@ -226,6 +227,7 @@ function MapViewer(props) {
     // this function saves the name and the coordinates for a new area
     const handleSaveName = () =>{
         setDrawingMode(false);
+        API.addArea(areaName,selectedArea);
         setSelectedArea(null)
         setAreaName(null)
         setResetDrawing(true);
