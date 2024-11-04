@@ -74,7 +74,7 @@ export default class DaoKX2 {
                     reject(err);
                     return false;
                 } else {
-                    resolve(row.Id);
+                    resolve(row.Id as Number);
                     return true;
                 }
             });

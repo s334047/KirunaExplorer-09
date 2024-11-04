@@ -4,11 +4,11 @@ import morgan from 'morgan';
 import passport from 'passport';
 import session from 'express-session';
 import LocalStrategy from 'passport-local';
-import DaoKX2 from './Dao/daoKX2.js';
-import Dao from './Dao/daoStory1-3.js';
-import DaoUser from './Dao/daoUser.js';
-import { DocumentDescription } from './Components/DocumentDescription.js';
-import DaoStory4 from './Dao/daoStory4.js';
+import DaoKX2 from './Dao/daoKX2.ts';
+import Dao from './Dao/daoStory1-3.ts';
+import DaoUser from './Dao/daoUser.ts';
+import { DocumentDescription } from './Components/DocumentDescription.ts';
+import DaoStory4 from './Dao/daoStory4.ts';
 
 const dao = new Dao();
 const daoKX2 = new DaoKX2();
@@ -68,7 +68,7 @@ app.post('/api/documents', async (req: any, res: any) => {
     try {
         const newDoc: DocumentDescription = req.body;
         console.log(newDoc.coordinate)
-         dao.newDescription(newDoc.title, newDoc.stakeholder, newDoc.scale, newDoc.date, newDoc.type, newDoc.language, newDoc.page, newDoc.coordinate, newDoc.description);
+        await dao.newDescription(newDoc.title, newDoc.stakeholder, newDoc.scale, newDoc.date, newDoc.type, newDoc.language, newDoc.page, newDoc.coordinate, newDoc.description);
     } catch (error) {
         res.status(503).json({ error: Error });
     }
