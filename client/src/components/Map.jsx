@@ -83,6 +83,7 @@ function MapViewer(props) {
         [68, 21]
     ];
     const aree=props.areas;
+    const docs= props.documents;
       
     const customIcon = new L.Icon({
         iconUrl: 'file.png',
@@ -316,8 +317,8 @@ function MapViewer(props) {
                             attribution='&copy; <a href="https://www.esri.com/">Esri</a>, Sources: Esri, Garmin, GEBCO, NOAA NGDC, and other contributors'
                         />}
                 {/*<MapWithDraw polygons={polygons} setPolygons={setPolygons} />*/}
-                {drawingMode===false && !props.mode && documents.map(doc => (
-                    <Marker key={doc.id} position={doc.coordinate} icon={customIcon} eventHandlers={{
+                {drawingMode===false && !props.mode && docs.filter(doc=>doc.coordinate!=null).map(doc => (
+                   <Marker key={doc.title} position={doc.coordinate} icon={customIcon} eventHandlers={{
                         click: () => {
                             setSelectedDoc(doc);
                         },
@@ -335,7 +336,7 @@ function MapViewer(props) {
                     right: 20,
                     zIndex: 1000,
                 }}>
-                    <DocumentCard selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} setShowAddLink={props.setShowAddLink} user={props.user} />
+                    <DocumentCard selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} setShowAddLink={props.setShowAddLink} user={props.user} excludeTitle={props.setTitle} />
                 </div>
             )}
             {/*Only a Urban Planner can add a document, see props.user.role*/}
@@ -364,7 +365,7 @@ function MapViewer(props) {
     );
 }
 
-function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user }) {
+function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user,excludeTitle }) {
     return (
         <Card className="document-card">
             <Card.Body>
@@ -394,7 +395,10 @@ function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user }) {
                                         marginLeft: '5px',
                                         cursor: 'pointer'
                                     }}
-                                    onClick={() => setShowAddLink(true)}
+                                    onClick={() => {
+                                        setShowAddLink(true);
+                                        excludeTitle(selectedDoc.title)
+                                    }}
                                 >
                                     <i className="bi bi-plus-circle-fill"></i>
                                 </a>}

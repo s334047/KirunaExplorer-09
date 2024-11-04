@@ -11,19 +11,7 @@ export default class daoStory4{
                 if(err)
                     reject(err);
                 else{
-                    let docs=[];
-                    for(let row of rows){
-                        if(!row.coordinate){
-                            docs.push(new DocumentDescription(row.Title,row.Stakeholder,row.Scale,row.Date,row.Type,row.Language,row.Page,row.Coordinate,row.Description))
-                        }
-                        else{
-                            const coord = row.Coordinate
-                            .replace(/\[|\]/g, "")     
-                            .split(",")
-                            .map(num => parseFloat(num.trim()));
-                            docs.push(new DocumentDescription(row.Title,row.Stakeholder,row.Scale,row.Date,row.Type,row.Language,row.Page,new Coordinates(coord[0],coord[1]),row.Description))
-                        }
-                    }
+                    let docs:DocumentDescription[]=rows.map(row=>new DocumentDescription(row.Title,row.Stakeholder,row.Scale,row.Date,row.Type,row.Language,row.Page,JSON.parse(row.Coordinate),row.Description))
                     resolve(docs)
                 }
             })

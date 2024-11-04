@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {  Modal, Button, Form } from 'react-bootstrap';
+import API from '../../API.mjs';
 
 const ListDocumentLink = (props) => {
 
@@ -19,9 +20,10 @@ const ListDocumentLink = (props) => {
       // Se ci sono errori, non proseguire
       return;
     }
+    API.SetDocumentsConnection(props.title,item.document,item.type);
     setErrors({});
     setItem({ document: "", type: "" })
-    props.handleClose();
+    props.setShow(false)
   }
   const handleChange = (e) => {
     const { name, value } = e.target;
