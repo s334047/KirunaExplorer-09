@@ -1,5 +1,5 @@
 import { Connection } from "../Components/Connection.js";
-import { db } from "../DB/db.js";
+import { db } from "../DB/db.ts";
 
 export default class DaoKX2 {
     /* Dao functions */
