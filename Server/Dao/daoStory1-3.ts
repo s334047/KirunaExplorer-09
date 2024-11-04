@@ -59,7 +59,7 @@ export default class Dao {
 
     //-------------------------------------------
 
-    addArea(name: string, vertex: Coordinates[]){      
+    addArea(name: string, vertex: number[][]){      
         console.log('sono in dao, vertex: ', vertex);
         let vertexTemp = '[ ';
         for(let i=0; i<vertex.length; i++){
