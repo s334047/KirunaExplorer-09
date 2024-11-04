@@ -1,5 +1,5 @@
-import { db } from "../DB/db.js";
-import { User, UserRole } from "../Components/User.js";
+import { db } from "../DB/db.ts";
+import { User, UserRole } from "../Components/User.ts";
 import crypto from "crypto";
 
 export default class UserDao {

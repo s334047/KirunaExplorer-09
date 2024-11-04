@@ -1,16 +1,13 @@
-import { db } from "../DB/db.js";
+import { db } from "../DB/db.ts";
 import { resolve } from "path";
-import { Area, Coordinates } from "../Components/Georeference.js";
+import { Area, Coordinates } from "../Components/Georeference.ts";
 export default class Dao {
 
     /**story 1 */
     newDescription(title: string, sh: string, sc: string, date: string, type: string, lang: string, page: number, coord: Coordinates, descr: string){
         return new Promise<void>((resolve, reject) => {
-            const coordTemp: string = null;
-            if(coord!=null){
-                const coordTemp = '[ '+coord[0]+', '+coord[1]+' ]'
-                console.log(coordTemp);
-            }
+            const coordTemp: string = '[ '+coord[0]+', '+coord[1]+' ]'
+            console.log(coordTemp);
             const query = `INSERT INTO Document 
                             (Title, Stakeholder, Scale, Date, Type, Language, Page, Coordinate, Description)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -86,11 +83,11 @@ export default class Dao {
             const query = `SELECT Id
                             FROM Area
                             WHERE Name = ?`;
-            db.get(query, [name], (err: any, row: any) => {
+            db.get(query, [name], (err: any, row: number) => {
                 if(err)
                     reject(err);
-                else{
-                    resolve(row.Id);}
+                else
+                    resolve(row);
             })
         })
     }
@@ -100,11 +97,11 @@ export default class Dao {
             const query = `SELECT Id
                             FROM Document
                             WHERE Title = ?`;
-            db.get(query, [title], (err: any, row: any) => {
+            db.get(query, [title], (err: any, row: number) => {
                 if(err)
                     reject(err);
                 else
-                    resolve(row.Id);
+                    resolve(row);
             })
         })
     }

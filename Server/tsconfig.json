@@ -6,7 +6,10 @@
     "sourceMap": true,
     "outDir": "./dist",
     "esModuleInterop": true,
-    "skipLibCheck": true  //"strict": true
-  }
-  // "include": ["./**/*.ts"],
+    "skipLibCheck": true,
+    // "strict": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "include": ["./**/*.ts"],
 }
