@@ -6,9 +6,8 @@ import { describe, test, expect, jest, afterEach, } from "@jest/globals";
 
 const daoKX2 = new DaoKX2;
 
-jest.setTimeout(100000);
 jest.mock('sqlite3');
-
+/*
 jest.mock("../../DB/db.ts", () => ({
     db: {
         run: jest.fn(),
@@ -16,7 +15,7 @@ jest.mock("../../DB/db.ts", () => ({
         get: jest.fn()
     },
 }));
-
+*/
 afterEach(() => {
     jest.clearAllMocks();
     jest.restoreAllMocks();
@@ -112,20 +111,20 @@ describe("Class DaoKX2, function GetDocumentConnections", () => {
         const connection1 = new Connection(1,2, "type1");
         const connection2 = new Connection(1,3, "type1");
         const connection3 = new Connection(1,5, "type2");
-        const mockConnections : Connection[] = [connection1, connection2, connection3];
+        const mockConnections = [connection1, connection2, connection3];
 
         const spySourceDocId = jest.spyOn(daoKX2, "GetDocumentsId")
         .mockResolvedValueOnce(sourceDocIdMock);
     
-        const dbAllMock = jest.spyOn(db, "all").mockImplementation((query, params, callback) => {
-            callback(null, mockConnections);
+        const dbGetMock = jest.spyOn(db, "get").mockImplementation((query, params, callback) => {
+            callback(null, {n : 3});
             return {} as Database;
         });
     
         const result = await daoKX2.GetDocumentConnections(sourceDocMock);
-        expect(result).toBe(mockConnections);
-        expect(dbAllMock).toBeCalledWith(`SELECT * FROM Connection WHERE SourceDocId = ?`,
-            [sourceDocIdMock], expect.any(Function));
+        expect(result).toBe(mockConnections.length);
+        expect(dbGetMock).toBeCalledWith(`SELECT  COUNT(*) as n FROM Connection WHERE SourceDocId = ? OR TargetDocId = ?`,
+            [sourceDocIdMock, sourceDocIdMock], expect.any(Function));
         expect(spySourceDocId).toHaveBeenCalledTimes(1);
     });
 
@@ -137,15 +136,15 @@ describe("Class DaoKX2, function GetDocumentConnections", () => {
         const spySourceDocId = jest.spyOn(daoKX2, "GetDocumentsId")
         .mockResolvedValueOnce(sourceDocIdMock);
     
-        const dbAllMock = jest.spyOn(db, "all").mockImplementation((query, params, callback) => {
+        const dbGetMock = jest.spyOn(db, "get").mockImplementation((query, params, callback) => {
             callback(mockError);
             return {} as Database;
         });
     
         await expect(daoKX2.GetDocumentConnections(sourceDocMock)).rejects.toEqual(mockError);
         expect(spySourceDocId).toHaveBeenCalledTimes(1);
-        expect(dbAllMock).toBeCalledWith(`SELECT * FROM Connection WHERE SourceDocId = ?`,
-            [sourceDocIdMock], expect.any(Function));
+        expect(dbGetMock).toBeCalledWith(`SELECT  COUNT(*) as n FROM Connection WHERE SourceDocId = ? OR TargetDocId = ?`,
+            [sourceDocIdMock, sourceDocIdMock], expect.any(Function));
     });
 
     test("it should return false if the document doesn't exist", async() => {

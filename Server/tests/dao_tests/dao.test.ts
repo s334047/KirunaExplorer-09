@@ -47,7 +47,6 @@ describe("DaoStory1 Test", () => {
                 return db;
             });
             const result = await daoS1.newDescription("Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, coordinate, "Test Description");
-            console.log("result: " + result);
             expect(result).toBe(undefined);
             expect(mockRun).toHaveBeenCalled();
             expect(mockRun).toHaveBeenCalledWith(

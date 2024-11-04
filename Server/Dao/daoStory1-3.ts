@@ -49,7 +49,6 @@ export default class Dao {
                     .replace(/'/g, '"')
                     .replace(/(\[\s*)/g, '[')
                     .replace(/(\s*\])/g, ']'))));
-                    console.log(areas);
                     resolve(areas);
                 }
             })
@@ -60,13 +59,11 @@ export default class Dao {
     //-------------------------------------------
 
     addArea(name: string, vertex: number[][]){      
-        console.log('sono in dao, vertex: ', vertex);
         let vertexTemp = '[ ';
         for(let i=0; i<vertex.length; i++){
             vertexTemp = vertexTemp + '[ '+vertex[i]+ ' ]';
         }
         vertexTemp = vertexTemp+' ]';
-        console.log(vertexTemp);
         return new Promise<void>((resolve, reject) => {
             const query = `INSERT INTO Area
                             (Name, Vertex)
