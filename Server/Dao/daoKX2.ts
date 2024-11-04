@@ -13,7 +13,8 @@ export default class DaoKX2 {
     SetDocumentsConnection = async (SourceDoc: String, TargetDoc: String, Type: String): Promise<Boolean> => {
         return new Promise(async (resolve, reject) => {
             const SourceDocId = await this.GetDocumentsId(SourceDoc);
-            const TargetDocId = await this.GetDocumentsId(TargetDoc)
+            const TargetDocId = await this.GetDocumentsId(TargetDoc);
+            console.log(SourceDocId+" "+TargetDocId)
             if (SourceDocId && TargetDocId) { // If both Documents Id exist, then we can create the connection
                 if (await this.FindDuplicatedDocument(SourceDocId, TargetDocId)) { //without duplicates
                     const query = `INSERT INTO Connection (SourceDocId, TargetDocId, Type) VALUES (?, ?, ?)`;
@@ -68,12 +69,12 @@ export default class DaoKX2 {
      */
     GetDocumentsId = async (Title: String): Promise<Number> => {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT Id FROM Document WHERE Title = ?`, [Title], (err, row) => {
+            db.get(`SELECT Id FROM Document WHERE Title = ?`, [Title], (err, row:any) => {
                 if (err) {
                     reject(err);
                     return false;
                 } else {
-                    resolve(row as Number);
+                    resolve(row.Id);
                     return true;
                 }
             });

@@ -24,7 +24,6 @@ async function login(username, password) {
   
 /** API story 1 */
 async function addDocument(title, stakeholder, scale, date, type, language, page, coordinate, description) {
-  console.log(title,stakeholder, scale, date, type, language, page, coordinate, description)
     return await fetch(`${SERVER_URL}/documents`, {
         method: 'POST',
         headers: {
@@ -89,7 +88,16 @@ async function addArea(name, vertex){           //add a new area in the db
         body: JSON.stringify({name, vertex})
     }).then(response => response.json())
 };
-
+/**API STory 4 */
+async function getAllDocs() {                  //get all the areas in the db
+  return await fetch(`${SERVER_URL}/documents`, {
+      method: 'GET',
+      headers: {
+          'Content-type': 'application/json'
+      },
+      //credentials: 'include'
+  }).then(response => response.json())
+}
 // NEW
 const logIn = async (credentials) => {
     const response = await fetch(`${SERVER_URL}/sessions`, {
@@ -132,7 +140,7 @@ const logIn = async (credentials) => {
   }
 
 
-const API = {addDocument, SetDocumentsConnection, GetDocumentConnections, addAreaToDoc, getAllAreas, addArea, logIn, getUserInfo, logOut};
+const API = {addDocument, SetDocumentsConnection, GetDocumentConnections, addAreaToDoc, getAllAreas, addArea,getAllDocs, logIn, getUserInfo, logOut};
 
 
 export default API;

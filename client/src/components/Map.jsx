@@ -82,61 +82,7 @@ function MapViewer(props) {
         [67, 20],
         [68, 21]
     ];
-    const aree = [
-        {
-            nome: "Area 1",
-            vertici: [
-                [67.8565, 20.2250],
-                [67.8570, 20.2270],
-                [67.8550, 20.2275],
-                [67.8545, 20.2260],
-                [67.8550, 20.2245],
-            ]
-        },
-        {
-            nome: "Area 2",
-            vertici: [
-                [67.8580, 20.2240],
-                [67.8585, 20.2260],
-                [67.8570, 20.2275],
-                [67.8560, 20.2265],
-                [67.8555, 20.2255],
-                [67.8560, 20.2240],
-            ]
-        },
-        {
-            nome: "Area 3",
-            vertici: [
-                [67.8555, 20.2230],
-                [67.8555, 20.2255],
-                [67.8540, 20.2265],
-                [67.8535, 20.2245],
-                [67.8540, 20.2230],
-            ]
-        },
-        {
-            nome: "Area 4",
-            vertici: [
-                [67.8570, 20.2265],
-                [67.8580, 20.2280],
-                [67.8565, 20.2290],
-                [67.8555, 20.2280],
-                [67.8555, 20.2270],
-            ]
-        },
-        {
-            nome: "Area 5",
-            vertici: [
-                [67.8535, 20.2230],
-                [67.8530, 20.2250],
-                [67.8520, 20.2250],
-                [67.8525, 20.2235],
-                [67.8535, 20.2225],
-            ]
-        }
-    ];
-    
-      useEffect(()=>{console.log(selectedArea)},[selectedArea,selectedPoint])
+    const aree=props.areas;
       
     const customIcon = new L.Icon({
         iconUrl: 'file.png',
@@ -205,7 +151,7 @@ function MapViewer(props) {
     // this function handle the change in selecting an area for a new document
     const handleChangeArea = (e) =>{
         const selectedNome = e.target.value;
-        const foundArea = aree.find(area => area.nome === selectedNome);
+        const foundArea = aree.find(area => area.name === selectedNome);
         setSelectedArea(foundArea);
         props.setSelectedArea(foundArea)
     }
@@ -228,9 +174,9 @@ function MapViewer(props) {
         setAreaName(e.target.value);
     }
     // this function saves the name and the coordinates for a new area
-    const handleSaveName = () =>{
+    const handleSaveName = async() =>{
         setDrawingMode(false);
-        API.addArea(areaName,selectedArea);
+        await API.addArea(areaName,selectedArea);
         setSelectedArea(null)
         setAreaName(null)
         setResetDrawing(true);
@@ -274,7 +220,7 @@ function MapViewer(props) {
                 >
                   <option value="">Select an area</option>
                   {aree.map((item) => (
-                <option key={item.nome} value={item.nome}>{item.nome}</option>
+                <option key={item.id} value={item.name}>{item.name}</option>
               ))}
                 </Form.Select>
               </Form.Group>
@@ -378,7 +324,7 @@ function MapViewer(props) {
                     }}>
                     </Marker>
                 ))}
-                {props.mode ==="Area"  && selectedArea && <Polygon positions={selectedArea.vertici}></Polygon>}
+                {props.mode ==="Area"  && selectedArea && <Polygon positions={selectedArea.vertex}></Polygon>}
             </MapContainer>
 
             {selectedDoc && (

@@ -8,10 +8,12 @@ import DaoKX2 from './Dao/daoKX2.js';
 import Dao from './Dao/daoStory1-3.js';
 import DaoUser from './Dao/daoUser.js';
 import { DocumentDescription } from './Components/DocumentDescription.js';
+import DaoStory4 from './Dao/daoStory4.js';
 
 const dao = new Dao();
 const daoKX2 = new DaoKX2();
 const daoUser = new DaoUser();
+const daoStory4 = new  DaoStory4();
 
 const app = express();
 const port = 3001;
@@ -62,11 +64,11 @@ app.use((req:any, res: any, next: any) => {
 });
 
 /** Story 1 routes */
-app.post('/api/documents', isLoggedIn, async (req: any, res: any) => {
+app.post('/api/documents', async (req: any, res: any) => {
     try {
         const newDoc: DocumentDescription = req.body;
         console.log(newDoc.coordinate)
-        await dao.newDescription(newDoc.title, newDoc.stakeholder, newDoc.scale, newDoc.date, newDoc.type, newDoc.language, newDoc.page, newDoc.coordinate, newDoc.description);
+         dao.newDescription(newDoc.title, newDoc.stakeholder, newDoc.scale, newDoc.date, newDoc.type, newDoc.language, newDoc.page, newDoc.coordinate, newDoc.description);
     } catch (error) {
         res.status(503).json({ error: Error });
     }
@@ -75,8 +77,11 @@ app.post('/api/documents', isLoggedIn, async (req: any, res: any) => {
 // Story KX2 routes
 app.post('/api/connections', async (req: any, res: any) => {
     try {
-        const { SourceDoc, TargetDoc, Type } = req.body;
-        daoKX2.SetDocumentsConnection(SourceDoc, TargetDoc, Type);
+        console.log(req.body)
+        const SourceDoc=req.body.SourceDocument;
+        const TargetDoc=req.body.TargetDocument;
+        const Type=req.body.ConnectionType;
+        await daoKX2.SetDocumentsConnection(SourceDoc, TargetDoc, Type);
     } catch (error) {
         res.status(503).json({ error: Error });
     }
@@ -84,7 +89,7 @@ app.post('/api/connections', async (req: any, res: any) => {
 app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
     try {
         const { SourceDoc } = req.params;
-        const connections = daoKX2.GetDocumentConnections(SourceDoc);
+        const connections = await daoKX2.GetDocumentConnections(SourceDoc);
         res.json(connections);
     } catch (error) {
         res.status(503).json({ error: Error });
@@ -120,6 +125,15 @@ app.post('/api/areas', isLoggedIn, async (req: any, res: any) => { //add a new a
     }
 });
 
+/** Story 4 routes */
+app.get('/api/documents',async (req: any, res: any)=>{
+    try{
+        const docs = await daoStory4.getAllDoc();
+        res.json(docs);
+    }catch(error){
+        res.status(503).json({error: Error});
+    }
+})
 //API AUTENTICATION
 
 app.post('/api/sessions', (req: any, res: any, next: any) => {

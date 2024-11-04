@@ -6,8 +6,10 @@ export default class Dao {
     /**story 1 */
     newDescription(title: string, sh: string, sc: string, date: string, type: string, lang: string, page: number, coord: Coordinates, descr: string){
         return new Promise<void>((resolve, reject) => {
-            const coordTemp: string = '[ '+coord[0]+', '+coord[1]+' ]'
-            console.log(coordTemp);
+            let coordTemp:string=null;
+            if(coord!=null){
+                  coordTemp = '[ '+coord[0]+', '+coord[1]+' ]'
+            }
             const query = `INSERT INTO Document 
                             (Title, Stakeholder, Scale, Date, Type, Language, Page, Coordinate, Description)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -83,11 +85,11 @@ export default class Dao {
             const query = `SELECT Id
                             FROM Area
                             WHERE Name = ?`;
-            db.get(query, [name], (err: any, row: number) => {
+            db.get(query, [name], (err: any, row: any) => {
                 if(err)
                     reject(err);
                 else
-                    resolve(row);
+                    resolve(row.Id);
             })
         })
     }
@@ -97,11 +99,11 @@ export default class Dao {
             const query = `SELECT Id
                             FROM Document
                             WHERE Title = ?`;
-            db.get(query, [title], (err: any, row: number) => {
+            db.get(query, [title], (err: any, row: any) => {
                 if(err)
                     reject(err);
                 else
-                    resolve(row);
+                    resolve(row.Id);
             })
         })
     }

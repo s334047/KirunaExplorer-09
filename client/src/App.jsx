@@ -17,6 +17,7 @@ function App() {
   const [showAddDocument, setShowAddDocument] = useState(false); //state for showing the modal for adding a document description
   const [showAddLink, setShowAddLink] = useState(false) //state for showing the modal for linking documents
   const [documents, setDocument] = useState([]);
+  const [areas,setAreas]=useState([]);
   const [excludeDoc, setExcludeDoc] = useState("");
   const [mode, setMode] = useState("") // state for assigning an area or a point to a new document
   const [formLink, setFormLink] = useState(null);
@@ -29,21 +30,38 @@ function App() {
 
   const nav = useNavigate();
 
-  const handleSaveNew = () => {
-    if(selectedArea == null){
-      console.log(formData.title,formData.stakeholders,formData.scale,formData.issuanceDate,formData.type,formData.language,formData.pages,selectedPoint,formData.description)
-      API.addDocument(formData.title,formData.stakeholders,formData.scale,formData.issuanceDate,formData.type,formData.language,formData.pages,selectedPoint,formData.description)
+  const handleSaveNew = async () => {
+    try {
+      console.log("Inizio handleSaveNew");
+      if (selectedArea == null) {
+        console.log("Chiamata API.addDocument senza selectedArea...");
+        API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, selectedPoint, formData.description);
+        console.log("API.addDocument completata senza selectedArea");
+      } else {
+        console.log("Chiamata API.addDocument con selectedArea...");
+         API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, selectedPoint, formData.description);
+        console.log("API.addDocument completata con selectedArea");
+        API.addAreaToDoc(formData.title, selectedArea.name);
+        console.log("API.addAreaToDoc completata");
+      }
+      if (formLink.document != '' || formLink.type != '') {
+        console.log("Chiamata API.SetDocumentsConnection...");
+        API.SetDocumentsConnection(formData.title, formLink.document, formLink.type);
+        console.log("API.SetDocumentsConnection completata");
+      }
+  
+      // Reset degli stati
+      setFormData(null);
+      setFormLink(null);
+      setSelectedArea(null);
+      setSelectedPoint(null);
+      console.log("Stati resettati");
+  
+    } catch (error) {
+      console.error("Errore catturato in handleSaveNew:", error);
     }
-    else if(selectedArea!=null){
-      API.addDocument(formData.title,formData.stakeholders,formData.scale,formData.issuanceDate,formData.type,formData.language,formData.pages,selectedPoint,formData.description)
-      console.log(formData.title, selectedArea.nome);
-      API.addAreaToDoc(formData.title,selectedArea.nome)
-    }
-    setFormData(null);
-    setFormLink(null);
-    setSelectedArea(null)
-    setSelectedPoint(null)
-  }
+  };
+  
 
   useEffect(() => {
     API.getUserInfo()
@@ -55,7 +73,14 @@ function App() {
                 setFeedbackFromError(e);
             setLoggedIn(false); 
             setUser('');
-        }); 
+        });
+        const getDocsandAreas= async()=>{
+          let docs= await API.getAllDocs();
+          setDocument(docs)
+          let areas= await API.getAllAreas();
+          setAreas(areas)
+        }
+        getDocsandAreas();
 }, []);
 
 
@@ -99,7 +124,7 @@ function App() {
         </>
       }>
         <Route index element={<>
-          <MapViewer user={user} showAddDocument={showAddDocument} setShowAddDocument={setShowAddDocument} showAddLink={showAddLink} setShowAddLink={setShowAddLink} mode={mode} setMode={setMode} setSelectedArea={setSelectedArea} setSelectedPoint={setSelectedPoint} handleSaveNew={handleSaveNew} />
+          <MapViewer user={user} showAddDocument={showAddDocument} setShowAddDocument={setShowAddDocument} showAddLink={showAddLink} setShowAddLink={setShowAddLink} mode={mode} setMode={setMode} setSelectedArea={setSelectedArea} setSelectedPoint={setSelectedPoint} handleSaveNew={handleSaveNew} areas={areas}/>
           <DescriptionComponent show={showAddDocument} setShow={setShowAddDocument} item={documents} setMode={setMode} setFormData={setFormData} setFormLink={setFormLink} />
           <ListDocumentLink item={documents} title={excludeDoc} show={showAddLink} setShow={setShowAddLink} />
         </>
