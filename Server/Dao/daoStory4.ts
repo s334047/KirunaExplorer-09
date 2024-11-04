@@ -17,4 +17,20 @@ export default class daoStory4{
             })
         })
     }
+ 
+    getAllDocOfArea(id:number){
+        return new Promise<string[]>((resolve, reject) => {
+            const query = `SELECT title
+                            FROM AreaDocLink A, Document  D
+                            WHERE D.Id = A.DocumentId AND A.AreaId = ?`;
+            db.all(query, [id], (err: any, rows: any[]) => {
+                if(err)
+                    reject(err);
+                else{
+                    let docs=rows.map(row=>row.Title);
+                    resolve(docs)
+                }
+            })
+        })
+    }
 }

@@ -94,8 +94,9 @@ app.post('/api/connections', async (req: any, res: any) => {
 app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
     try {
         const { SourceDoc } = req.params;
-        const connections = await daoKX2.GetDocumentConnections(SourceDoc);
-        res.json(connections);
+        console.log(SourceDoc)
+        //const connections = await daoKX2.GetDocumentConnections(SourceDoc);
+        //res.json(connections);
     } catch (error) {
         res.status(503).json({ error: Error });
     }
@@ -140,11 +141,13 @@ app.get('/api/documents',async (req: any, res: any)=>{
     }
 })
 
-app.get('/api/n_connection/:name',async (req: any, res: any)=>{
+
+app.get('/api/area/docs/:name',async (req: any, res: any)=>{
     try{
-        const id=req.params.name;
-        const n = await daoKX2.GetDocumentConnections(id)
-        res.json(n);
+        const name=req.params.name;
+        const id=await dao.getAreaIdFromName(name);
+        const docs=await daoStory4.getAllDocOfArea(id);
+        res.json(docs);
     }catch(error){
         res.status(503).json({error: Error});
     }

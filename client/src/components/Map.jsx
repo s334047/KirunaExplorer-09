@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, LayersControl, useMap,FeatureGroup, Polygon } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, LayersControl, Popup,FeatureGroup, Polygon } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import L from 'leaflet';
 import 'leaflet-draw';
@@ -76,6 +76,7 @@ function MapViewer(props) {
     const [selectedArea,setSelectedArea] = useState(null)
     const [selectedPoint,setSelectedPoint]=useState(null)
     const [areaName,setAreaName]=useState(null);
+    const [areaToDraw,setAreaToDraw]=useState(null);
     const [resetDrawing, setResetDrawing] = useState(false); 
     const position = [67.8558, 20.2253];
     const bounds = [
@@ -91,6 +92,13 @@ function MapViewer(props) {
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
     });
+    const areaIcon = new L.Icon({
+        iconUrl: 'drawing.svg',
+        iconSize: [35, 35],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+    });
+    
     // this function create the area or the marker
     const handleDrawCreated = (e) =>{
         const layer = e.layer;
@@ -116,32 +124,6 @@ function MapViewer(props) {
         setResetDrawing(true);
         setTimeout(() => setResetDrawing(false), 0);
     }
-    //FAKE DOCUMENT, USE THE API that get docuemnts with coordinates or areas, to put them on the map
-    const documents = [
-        {
-            id: 1,
-            title: 'Detail plan for square and commercial ',
-            coordinate: [67.8558, 20.2253],
-            stakeholder: "Kiruna kommun",
-            scale: "1 : 1,000",
-            date: "22/06/2016",
-            type: "Prescriptive document",
-            connections: "7",
-            language: "Swedish",
-            description: `This plan, approved in July 2016, is the first detailed
-                            plan to be implemented from the new masterplan
-                            (Adjusted development plan). The document
-                            defines the entire area near the town hall, comprising
-                            a total of 9 blocks known for their density.
-                            Among these are the 6 buildings that will face the
-                            main square. The functions are mixed, both public
-                            and private, with residential being prominent, as
-                            well as the possibility of incorporating accommodation
-                            facilities such as hotels. For all buildings in this
-                            plan, the only height limit is imposed by air traffic.`,
-        }
-    ];
-
     const [selectedDoc, setSelectedDoc] = useState(null);
     const { BaseLayer } = LayersControl;
     const [polygons, setPolygons] = useState(() => {
@@ -325,6 +307,16 @@ function MapViewer(props) {
                     }}>
                     </Marker>
                 ))}
+                {drawingMode===false && !props.mode && aree.map(area => (
+                   <Marker key={area.name} position={L.polygon(area.vertex).getBounds().getCenter()} icon={areaIcon} eventHandlers={{
+                        click: () => {
+                            setAreaToDraw(area);
+                        },
+                    }}>
+                    {areaToDraw!=null && <PopUpAea area={areaToDraw} documents={docs} setSelectedDoc={setSelectedDoc}></PopUpAea>}
+                    </Marker>
+                ))}
+                {areaToDraw != null && <Polygon positions={areaToDraw.vertex}></Polygon>}
                 {props.mode ==="Area"  && selectedArea && <Polygon positions={selectedArea.vertex}></Polygon>}
             </MapContainer>
 
@@ -336,7 +328,7 @@ function MapViewer(props) {
                     right: 20,
                     zIndex: 1000,
                 }}>
-                    <DocumentCard selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} setShowAddLink={props.setShowAddLink} user={props.user} excludeTitle={props.setTitle} />
+                    <DocumentCard selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} setShowAddLink={props.setShowAddLink} user={props.user} excludeTitle={props.setTitle} setArea={setAreaToDraw}/>
                 </div>
             )}
             {/*Only a Urban Planner can add a document, see props.user.role*/}
@@ -365,7 +357,7 @@ function MapViewer(props) {
     );
 }
 
-function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user,excludeTitle }) {
+function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user,excludeTitle,setArea }) {
     const [n,setN]=useState(0);
     useEffect(()=>{
         const getNConnection= async()=>{
@@ -381,7 +373,9 @@ function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user,exclud
                     <div style={{ flex: 1 }} />
                     <button
                         className="btn btn-close"
-                        onClick={() => setSelectedDoc(null)}
+                        onClick={() => {setSelectedDoc(null);
+                            setArea(null)
+                        }}
                         aria-label="Close"
                     />
                 </div>
@@ -412,7 +406,7 @@ function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user,exclud
                                 </a>}
                             </li>
                             <li><strong>Language:</strong> {selectedDoc.language}</li>
-                            <li><strong>Coordinates:</strong> {selectedDoc.coordinate[0]} N, {selectedDoc.coordinate[1]} E </li>
+                            {selectedDoc.coordinate != null && <li><strong>Coordinates:</strong> {selectedDoc.coordinate[0]} N, {selectedDoc.coordinate[1]} E </li>}
                         </ul>
                     </Col>
                     <Col md={6}>
@@ -424,6 +418,37 @@ function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user,exclud
             </Card.Body>
         </Card>
     );
+}
+function PopUpAea ({area,documents, setSelectedDoc}){
+    const [docs,setDocs]=useState([]);
+    useEffect(()=>{
+        const getAreaDocs= async()=>{
+            const doc=await API.getAreasDoc(area.name);
+            setDocs(doc)
+        }
+        getAreaDocs();
+    },[area])
+    const handleChange=(e)=>{
+        const doc=e.target.value;
+        const filtered=documents.filter(item=>item.title==doc);
+        setSelectedDoc(filtered[0])
+    }
+    return(
+        <Popup className="area-popup" closeButton={false}>
+            <Form.Group className="mb-3">
+                <Form.Label className="custom-label-color" style={{ fontWeight: 'bold' }}>Docs:</Form.Label>
+                <Form.Select
+                  name="docs"
+                  onChange={handleChange}
+                >
+                  <option value="">Select a doc</option>
+                  {docs.map((item) => (
+                <option key={item} value={item}>{item}</option>
+              ))}
+                </Form.Select>
+              </Form.Group>
+      </Popup>
+    )
 }
 
 export default MapViewer;

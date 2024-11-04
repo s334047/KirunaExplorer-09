@@ -47,7 +47,7 @@ async function SetDocumentsConnection(SourceDocument, TargetDocument, Connection
 };
 
 async function GetDocumentConnections(SourceDocument) { // SourceDocument is a string
-    return await fetch(`${SERVER_URL}/connections/${SourceDocument}`, {
+    return await fetch(`${SERVER_URL}/connections/${encodeURIComponent(SourceDocument)}`, {
         method: 'GET',
         headers: {
             'Content-type': 'application/json'
@@ -98,8 +98,9 @@ async function getAllDocs() {                  //get all the docs in the db
       //credentials: 'include'
   }).then(response => response.json())
 }
-async function getDocConnections(name) {                  //get n of doc connections
-  return await fetch(`${SERVER_URL}/n_connections/${name}`, {
+
+async function getAreasDoc(name) {                  //get docs of an area
+  return await fetch(`${SERVER_URL}/area/docs/${encodeURIComponent(name)}`, {
       method: 'GET',
       headers: {
           'Content-type': 'application/json'
@@ -149,7 +150,7 @@ const logIn = async (credentials) => {
   }
 
 
-const API = {addDocument, SetDocumentsConnection, GetDocumentConnections, addAreaToDoc, getAllAreas, addArea,getAllDocs, logIn, getUserInfo, logOut};
+const API = {addDocument, SetDocumentsConnection, GetDocumentConnections, addAreaToDoc, getAllAreas, addArea,getAllDocs,getAreasDoc, logIn, getUserInfo, logOut};
 
 
 export default API;
