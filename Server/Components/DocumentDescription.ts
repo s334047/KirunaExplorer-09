@@ -2,18 +2,18 @@ import dayjs from 'dayjs';
 import { Coordinates } from './Georeference.js';
 
 class DocumentDescription{
-    title: string
-    stakeholder: string
-    scale: string
-    date: string
-    type: string
-    language: string
-    page: number
-    coordinate: Coordinates
-    area: string
-    description: string
+    title: String
+    stakeholder: String
+    scale: String
+    date: String
+    type: String
+    language: String
+    page: Number
+    coordinate: Number[]
+    area: String
+    description: String
 
-    constructor(title: string, stakeholder: string, scale: string, date: string, type: string, language: string, page: number, coordinate: Coordinates, description: string){
+    constructor(title: String, stakeholder: String, scale: String, date: string, type: String, language: String, page: Number, coordinate: Number[], description: String){
         this.title = title,
         this.stakeholder = stakeholder,
         this.scale = scale,

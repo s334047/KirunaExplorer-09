@@ -5,15 +5,16 @@ import { describe, test, expect, jest, beforeEach, afterEach, } from "@jest/glob
 
 
 // database mock
-jest.mock("../../DB/db.ts", () => ({
-    db: {
-        run: jest.fn(),
-    },
-}));
+// jest.mock("../../DB/db.ts", () => ({
+//     db: {
+//         run: jest.fn(),
+//     },
+// }));
 
 describe("DaoStory1 Test", () => {
     let daoS1: Dao;
     // let mockUser: User;
+    const coordinate = [123, 456];
 
     beforeEach(() => {
         daoS1 = new Dao();
@@ -44,15 +45,13 @@ describe("DaoStory1 Test", () => {
                 callback(null); // Simulate a successful insertion
                 return db;
             });
-            const result = await daoS1.newDescription("Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, new Coordinates(123, 456), "Test Description");
+            const result = await daoS1.newDescription("Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, coordinate, "Test Description");
+            console.log("result: " + result);
             expect(result).toBe(undefined);
-
-            await expect(daoS1.newDescription("Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, new Coordinates(123, 456), "Test Description"))
-                .resolves.not.toThrow();
-
+            expect(mockRun).toHaveBeenCalled();
             expect(mockRun).toHaveBeenCalledWith(
                 expect.any(String), // SQL query
-                ["Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, '[ 123, 456 ]', "Test Description"],
+                ["Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, "[ 123, 456 ]", "Test Description"],
                 expect.any(Function) // Callback function
             );
         });
@@ -63,7 +62,7 @@ describe("DaoStory1 Test", () => {
                 return db;
             });
 
-            await expect(daoS1.newDescription("Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, new Coordinates(123, 456), "Test Description"))
+            await expect(daoS1.newDescription("Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, [123, 456], "Test Description"))
                 .rejects.toThrow("Database error");
 
             expect(mockRun).toHaveBeenCalled();

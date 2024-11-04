@@ -4,7 +4,7 @@ import { Area, Coordinates } from "../Components/Georeference.ts";
 export default class Dao {
 
     /**story 1 */
-    newDescription(title: string, sh: string, sc: string, date: string, type: string, lang: string, page: number, coord: Coordinates, descr: string){
+    newDescription(title: string, sh: string, sc: string, date: string, type: string, lang: string, page: number, coord: Number[], descr: string){
         return new Promise<void>((resolve, reject) => {
             let coordTemp:string=null;
             if(coord!=null){
