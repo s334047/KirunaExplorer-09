@@ -3,12 +3,13 @@ import express from 'express';
 import morgan from 'morgan';
 import passport from 'passport';
 import session from 'express-session';
-import LocalStrategy from 'passport-local';
+import * as LocalStrategy from 'passport-local';
 import DaoKX2 from './Dao/daoKX2.ts';
 import Dao from './Dao/daoStory1-3.ts';
 import DaoUser from './Dao/daoUser.ts';
 import { DocumentDescription } from './Components/DocumentDescription.ts';
 import DaoStory4 from './Dao/daoStory4.ts';
+
 
 const dao = new Dao();
 const daoKX2 = new DaoKX2();
@@ -28,12 +29,16 @@ const corsOption = {
 };
 app.use(cors(corsOption));
 
-passport.use(new LocalStrategy(async function verify(username, password, cb) {
-    const user = await daoUser.getUser(username, password);
-    if (!user)
-        return cb(null, false, 'Incorrect username or password.');
-
-    return cb(null, user);
+passport.use(new LocalStrategy.Strategy(async function verify(username, password, cb) {
+    try {
+        const user = await daoUser.getUser(username, password);
+        if (!user) {
+            return cb(null, false, new Error('Incorrect username or password.'));
+        }
+        return cb(null, user);
+    } catch (err) {
+        return cb(err);
+    }
 }));
 
 passport.serializeUser((user, cb) => cb(null, user));

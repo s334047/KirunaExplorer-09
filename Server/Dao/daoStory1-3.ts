@@ -4,7 +4,7 @@ import { Area, Coordinates } from "../Components/Georeference.ts";
 export default class Dao {
 
     /**story 1 */
-    newDescription(title: string, sh: string, sc: string, date: string, type: string, lang: string, page: number, coord: Coordinates, descr: string){
+    newDescription(title: string, sh: string, sc: string, date: string, type: string, lang: string, page: number, coord: Number[], descr: string){
         return new Promise<void>((resolve, reject) => {
             let coordTemp:string=null;
             if(coord!=null){
@@ -49,7 +49,6 @@ export default class Dao {
                     .replace(/'/g, '"')
                     .replace(/(\[\s*)/g, '[')
                     .replace(/(\s*\])/g, ']'))));
-                    console.log(areas);
                     resolve(areas);
                 }
             })
@@ -59,14 +58,12 @@ export default class Dao {
 
     //-------------------------------------------
 
-    addArea(name: string, vertex: Coordinates[]){      
-        console.log('sono in dao, vertex: ', vertex);
+    addArea(name: string, vertex: number[][]){      
         let vertexTemp = '[ ';
         for(let i=0; i<vertex.length; i++){
             vertexTemp = vertexTemp + '[ '+vertex[i]+ ' ]';
         }
         vertexTemp = vertexTemp+' ]';
-        console.log(vertexTemp);
         return new Promise<void>((resolve, reject) => {
             const query = `INSERT INTO Area
                             (Name, Vertex)

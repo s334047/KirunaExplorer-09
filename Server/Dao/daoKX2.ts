@@ -1,5 +1,5 @@
-import { Connection } from "../Components/Connection.js";
-import { db } from "../DB/db.js";
+import { Connection } from "../Components/Connection.ts";
+import { db } from "../DB/db.ts";
 
 export default class DaoKX2 {
     /* Dao functions */
@@ -14,7 +14,6 @@ export default class DaoKX2 {
         return new Promise(async (resolve, reject) => {
             const SourceDocId = await this.GetDocumentsId(SourceDoc);
             const TargetDocId = await this.GetDocumentsId(TargetDoc);
-            console.log(SourceDocId+" "+TargetDocId)
             if (SourceDocId && TargetDocId) { // If both Documents Id exist, then we can create the connection
                 if (await this.FindDuplicatedDocument(SourceDocId, TargetDocId)) { //without duplicates
                     const query = `INSERT INTO Connection (SourceDocId, TargetDocId, Type) VALUES (?, ?, ?)`;
@@ -45,7 +44,6 @@ export default class DaoKX2 {
     GetDocumentConnections = async (SourceDoc: String): Promise<Number> => {
         return new Promise(async (resolve, reject) => {
             const SourceDocId = await this.GetDocumentsId(SourceDoc);
-            console.log(SourceDocId)
             if (SourceDocId) {
                 db.get(`SELECT  COUNT(*) as n FROM Connection WHERE SourceDocId = ? OR TargetDocId = ?`, [SourceDocId,SourceDocId], (err, row:any) => {
                     if (err) {

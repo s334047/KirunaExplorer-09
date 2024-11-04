@@ -9,11 +9,11 @@ class DocumentDescription{
     type: string
     language: string
     page: number
-    coordinate: Coordinates
+    coordinate: number[]
     area: string
     description: string
 
-    constructor(title: string, stakeholder: string, scale: string, date: string, type: string, language: string, page: number, coordinate: Coordinates, description: string){
+    constructor(title: string, stakeholder: string, scale: string, date: string, type: string, language: string, page: number, coordinate: number[], description: string){
         this.title = title,
         this.stakeholder = stakeholder,
         this.scale = scale,

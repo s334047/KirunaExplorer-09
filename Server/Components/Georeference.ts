@@ -10,9 +10,9 @@ class Coordinates{
 class Area{
    id: number
    name: string
-   vertex: Coordinates[];
+   vertex: Number[][];
 
-    constructor(id: number, name: string, vertex: Coordinates[]){
+    constructor(id: number, name: string, vertex: number[][]){
         this.id = id,
         this.name = name,
         this.vertex = vertex;        
