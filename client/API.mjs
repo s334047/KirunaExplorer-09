@@ -89,8 +89,17 @@ async function addArea(name, vertex){           //add a new area in the db
     }).then(response => response.json())
 };
 /**API STory 4 */
-async function getAllDocs() {                  //get all the areas in the db
+async function getAllDocs() {                  //get all the docs in the db
   return await fetch(`${SERVER_URL}/documents`, {
+      method: 'GET',
+      headers: {
+          'Content-type': 'application/json'
+      },
+      //credentials: 'include'
+  }).then(response => response.json())
+}
+async function getDocConnections(name) {                  //get n of doc connections
+  return await fetch(`${SERVER_URL}/n_connections/${name}`, {
       method: 'GET',
       headers: {
           'Content-type': 'application/json'

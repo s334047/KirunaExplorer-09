@@ -134,6 +134,16 @@ app.get('/api/documents',async (req: any, res: any)=>{
         res.status(503).json({error: Error});
     }
 })
+
+app.get('/api/n_connection/:name',async (req: any, res: any)=>{
+    try{
+        const id=req.params.name;
+        const n = await daoKX2.GetDocumentConnections(id)
+        res.json(n);
+    }catch(error){
+        res.status(503).json({error: Error});
+    }
+})
 //API AUTENTICATION
 
 app.post('/api/sessions', (req: any, res: any, next: any) => {

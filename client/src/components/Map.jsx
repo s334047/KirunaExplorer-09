@@ -366,6 +366,14 @@ function MapViewer(props) {
 }
 
 function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user,excludeTitle }) {
+    const [n,setN]=useState(0);
+    useEffect(()=>{
+        const getNConnection= async()=>{
+            const n=await API.GetDocumentConnections(selectedDoc.title);
+            setN(n);
+        }
+        getNConnection();
+    },[selectedDoc])
     return (
         <Card className="document-card">
             <Card.Body>
@@ -386,7 +394,7 @@ function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user,exclud
                             <li><strong>Date:</strong> {selectedDoc.date}</li>
                             <li><strong>Type:</strong> {selectedDoc.type}</li>
                             <li>
-                                <strong>Connections:</strong> {selectedDoc.connections}
+                                <strong>Connections:</strong> {n}
                                 {user.role === 'Urban Planner' && <a
                                     href="#"
                                     style={{

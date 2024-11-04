@@ -42,16 +42,17 @@ export default class DaoKX2 {
      * @param SourceDocId 
      * @returns all Connection[] from a SourceDocId
      */
-    GetDocumentConnections = async (SourceDoc: String): Promise<Connection[]> => {
+    GetDocumentConnections = async (SourceDoc: String): Promise<Number> => {
         return new Promise(async (resolve, reject) => {
             const SourceDocId = await this.GetDocumentsId(SourceDoc);
+            console.log(SourceDocId)
             if (SourceDocId) {
-                db.all(`SELECT * FROM Connection WHERE SourceDocId = ?`, [SourceDocId], (err, rows) => {
+                db.get(`SELECT  COUNT(*) as n FROM Connection WHERE SourceDocId = ? OR TargetDocId = ?`, [SourceDocId,SourceDocId], (err, row:any) => {
                     if (err) {
                         reject(err);
                         return false;
                     } else {
-                        resolve(rows as Connection[]);
+                        resolve(row.n as Number);
                         return true;
                     }
                 });
