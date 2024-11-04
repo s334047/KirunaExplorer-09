@@ -134,5 +134,51 @@ describe("DaoStory3 Test",() =>{
             expect(response).toStrictEqual([new Area(12,"Area 1",[[12,12],[13,13]]),new Area(13,"Area 2",[[14,14],[15,15]])])
             expect(mockRun).toHaveBeenCalled();
         })
+        test("should return error",async()=>{
+            const mockRun = jest.spyOn(db,"all").mockImplementation((query, params, callback) => {
+                callback(new Error("Database Error"));
+                return db;
+            });
+            await expect(daoS1.getAllAreas()).rejects.toThrow('Database Error');;
+            expect(mockRun).toHaveBeenCalled();
+        }) 
+    })
+    describe("getAreaIdFromName",()=>{
+        test("should get id of the area",async()=>{
+            const mockRun = jest.spyOn(db,"get").mockImplementation((query, params, callback) => {
+                callback(null,{Id:12});
+                return db;
+            });
+            const response=await  daoS1.getAreaIdFromName("Area 1");
+            expect(response).toStrictEqual(12)
+            expect(mockRun).toHaveBeenCalled();
+        })
+        test("should return error",async()=>{
+            const mockRun = jest.spyOn(db,"get").mockImplementation((query, params, callback) => {
+                callback(new Error("Database Error"));
+                return db;
+            });
+            await expect(daoS1.getAreaIdFromName("Area 1")).rejects.toThrow('Database Error');;
+            expect(mockRun).toHaveBeenCalled();
+        }) 
+    })
+    describe("getDocumentIdFromTitle",()=>{
+        test("should get id of the doc",async()=>{
+            const mockRun = jest.spyOn(db,"get").mockImplementation((query, params, callback) => {
+                callback(null,{Id:12});
+                return db;
+            });
+            const response=await  daoS1.getDocumentIdFromTitle("Title 1");
+            expect(response).toStrictEqual(12)
+            expect(mockRun).toHaveBeenCalled();
+        })
+        test("should return error",async()=>{
+            const mockRun = jest.spyOn(db,"get").mockImplementation((query, params, callback) => {
+                callback(new Error("Database Error"));
+                return db;
+            });
+            await expect(daoS1.getAreaIdFromName("Title 1")).rejects.toThrow('Database Error');;
+            expect(mockRun).toHaveBeenCalled();
+        }) 
     })
 })
