@@ -8,69 +8,6 @@ import { Card, Button, Row, Col, Form } from 'react-bootstrap';
 import API from '../../API.mjs';
 
 
-/*function MapWithDraw({ polygons, setPolygons }) {
-    const map = useMap();
-
-    useEffect(() => {
-        // Controlla se leaflet-draw è stato caricato correttamente
-        if (L.Control.Draw === undefined) {
-            console.error("Leaflet-draw non è stato caricato correttamente.");
-            return;
-        }
-
-        // Inizializza il controllo di disegno una sola volta
-        const drawnItems = new L.FeatureGroup();
-        map.addLayer(drawnItems);
-
-        const drawControl = new L.Control.Draw({
-            position: 'bottomright',
-            draw: {
-                polyline: false,
-                rectangle: false,
-                circle: false,
-                marker: false,
-                circlemarker: false,
-                polygon: true,
-            }
-        });
-
-        map.addControl(drawControl);
-        // Aggiungi un poligono disegnato al FeatureGroup e salva i suoi dati
-        map.on(L.Draw.Event.CREATED, (event) => {
-            const { layer } = event;
-            const latlngs = layer.getLatLngs(); // Ottieni i punti del poligono
-
-            // Aggiungi il poligono al gruppo di disegno
-            drawnItems.addLayer(layer);
-
-            // Salva il poligono nello stato
-            const newPolygon = latlngs[0].map((latlng) => [latlng.lat, latlng.lng]);
-            setPolygons((prevPolygons) => [...prevPolygons, newPolygon]);
-
-            // Aggiorna anche il localStorage
-            localStorage.setItem("polygons", JSON.stringify([...polygons, newPolygon]));
-        });
-
-        // Carica i poligoni salvati
-        polygons.forEach((polygonCoords) => {
-            const polygon = L.polygon(polygonCoords);
-            drawnItems.addLayer(polygon);
-        });
-
-        // Aggiungi il layer quando un nuovo poligono viene disegnato
-        map.on(L.Draw.Event.CREATED, (event) => {
-            const { layer } = event;
-            drawnItems.addLayer(layer);
-        });
-
-        // Pulisci il controllo quando il componente viene smontato
-        return () => {
-            map.removeControl(drawControl);
-        };
-    }, []);
-    return null;
-}*/
-
 function MapViewer(props) {
     const [drawingMode,setDrawingMode]=useState(false)
     const [selectedArea,setSelectedArea] = useState(null)
@@ -309,14 +246,21 @@ function MapViewer(props) {
                 ))}
                 {drawingMode===false && !props.mode && aree.map(area => (
                    <Marker key={area.name} position={L.polygon(area.vertex).getBounds().getCenter()} icon={areaIcon} eventHandlers={{
+                        /*click: async () => {
+                            setAreaToDraw(area);
+                            const docTitle = await API.getAreasDoc(area.name);
+                            const doc = docs.find(item=>item.title == docTitle);
+                            setSelectedDoc(doc)
+                        },*/
                         click: () => {
                             setAreaToDraw(area);
                         },
+                        
                     }}>
                     {areaToDraw!=null && <PopUpAea area={areaToDraw} documents={docs} setSelectedDoc={setSelectedDoc}></PopUpAea>}
                     </Marker>
                 ))}
-                {areaToDraw != null && <Polygon positions={areaToDraw.vertex}></Polygon>}
+                {areaToDraw != null && <Polygon positions={areaToDraw.vertex} color="red"></Polygon>}
                 {props.mode ==="Area"  && selectedArea && <Polygon positions={selectedArea.vertex}></Polygon>}
             </MapContainer>
 
@@ -336,18 +280,19 @@ function MapViewer(props) {
                 <Button variant="light" onClick={() => props.setShowAddDocument(true)} style={{ border: '2px solid gray', display: 'flex',justifyContent: 'center', alignItems: 'center', width:"100px" }}>
                     <div style={{ textAlign: 'left' }}>
                         <span style={{ display: 'block', fontSize: '12px' }}>Add</span>
-                        <span style={{ display: 'block', fontSize: '12px' }}>Doc</span>
+                        <span style={{ display: 'block', fontSize: '12px' }}>doc</span>
                     </div>
-                    <img src="file.png" alt="Add" style={{ width: '30px', height: '30px', marginLeft: '10px' }} />
+                    <i className="bi bi-file-earmark-plus fs-3" style={{ marginLeft: '15px' }}></i>
                 </Button>
             </div>}
             {!selectedDoc && drawingMode===false && !props.mode && props.user.role === 'Urban Planner' && <div style={{ position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000 }}>
                 <Button variant="light" onClick={() => setDrawingMode(true)} style={{ border: '2px solid gray', display: 'flex', justifyContent: 'center', alignItems: 'center', width:"100px" }}>
                     <div style={{ textAlign: 'left' }}>
                         <span style={{ display: 'block', fontSize: '12px' }}>Draw</span>
-                        <span style={{ display: 'block', fontSize: '12px' }}>Area</span>
+                        <span style={{ display: 'block', fontSize: '12px' }}>area</span>
                     </div>
-                    <img src="drawing.svg" alt="Draw" style={{ width: '30px', height: '30px', marginLeft: '10px' }} />
+                    
+                    <i className="bi bi-bounding-box-circles fs-3" style={{ marginLeft: '15px' }}></i>
                 </Button>
             </div>}
 
@@ -449,6 +394,11 @@ function PopUpAea ({area,documents, setSelectedDoc}){
               </Form.Group>
       </Popup>
     )
+}
+
+function showCardForArea(area, setSelectedDoc){
+    const doc = API.getAreasDoc(area.name);
+    setSelectedDoc(doc);
 }
 
 export default MapViewer;
