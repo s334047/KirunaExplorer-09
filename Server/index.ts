@@ -89,7 +89,7 @@ app.post('/api/connections', isLoggedIn, async (req: any, res: any) => {
         res.status(503).json({ error: Error });
     }
 })
-app.get('/api/connections/:SourceDoc', isLoggedIn, async (req: any, res: any) => {
+app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
     try {
         const { SourceDoc } = req.params;
         const connections = await daoKX2.GetDocumentConnections(SourceDoc);
