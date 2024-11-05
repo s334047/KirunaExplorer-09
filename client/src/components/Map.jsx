@@ -258,7 +258,7 @@ function MapViewer(props) {
                         },
                         
                     }}>
-                    {areaToDraw!=null && <PopUpAea area={areaToDraw} documents={docs} setSelectedDoc={setSelectedDoc}></PopUpAea>}
+                    {<PopUpAea area={areaToDraw} documents={docs} setSelectedDoc={setSelectedDoc}></PopUpAea>}
                     </Marker>
                 ))}
                 {areaToDraw != null && <Polygon positions={areaToDraw.vertex} color="red"></Polygon>}
@@ -369,8 +369,10 @@ function PopUpAea ({area,documents, setSelectedDoc}){
     const [docs,setDocs]=useState([]);
     useEffect(()=>{
         const getAreaDocs= async()=>{
-            const doc=await API.getAreasDoc(area.name);
-            setDocs(doc)
+            if(area){
+                const doc=await API.getAreasDoc(area.name);
+                setDocs(doc)
+            }
         }
         getAreaDocs();
     },[area])
