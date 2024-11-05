@@ -1,6 +1,5 @@
 import { db } from "../DB/db.js";
 import { DocumentDescription } from "../Components/DocumentDescription.js";
-import { Coordinates } from "../Components/Georeference.ts";
 
 export default class daoStory4{
     getAllDoc(){
@@ -11,7 +10,7 @@ export default class daoStory4{
                 if(err)
                     reject(err);
                 else{
-                    let docs:DocumentDescription[]=rows.map(row=>new DocumentDescription(row.Title,row.Stakeholder,row.Scale,row.Date,row.Type,row.Language,row.Page,JSON.parse(row.Coordinate),row.Description))
+                    let docs:DocumentDescription[]=rows.map(row=>new DocumentDescription(row.Id, row.Title,row.Stakeholder,row.Scale,row.Date,row.Type,row.Language,row.Page,JSON.parse(row.Coordinate),row.Description))
                     resolve(docs)
                 }
             })
