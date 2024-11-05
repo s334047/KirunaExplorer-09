@@ -94,9 +94,8 @@ app.post('/api/connections', async (req: any, res: any) => {
 app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
     try {
         const { SourceDoc } = req.params;
-        console.log(SourceDoc)
-        //const connections = await daoKX2.GetDocumentConnections(SourceDoc);
-        //res.json(connections);
+        const connections = await daoKX2.GetDocumentConnections(SourceDoc);
+        res.json(connections);
     } catch (error) {
         res.status(503).json({ error: Error });
     }
