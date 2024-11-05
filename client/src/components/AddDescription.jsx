@@ -39,14 +39,22 @@ function DescriptionComponent(props){
     };
   
     const handleSave = () =>{
+      const allowedScales = ["blueprint/effects", "concept"]; // sostituisci con le stringhe consentite
+      const scaleRegex = /^1:\d+$/;
       const newErrors = {};
       // Validazione dei campi obbligatori
       if (currentStep === 1) {
       if (!formData.title) newErrors.title = "The title is mandatory.";
       if (!formData.stakeholders) newErrors.stakeholders = "The stakeholders are mandatory.";
       if (!formData.scale) newErrors.scale = "The scale is mandatory.";
+      if (!scaleRegex.test(formData.scale) && !allowedScales.includes(formData.scale)) newErrors.scale = "The format is not correct.";
       if (!formData.type) newErrors.type = "The type is mandatory.";
       if (!formData.issuanceDate) newErrors.date = "The date is mandatory.";
+      if (formData.pages !== undefined && formData.pages !== null) {
+        if (isNaN(Number(formData.pages))) {
+          newErrors.pages = "The field must be a number.";
+        }
+      }
     }
     else if(currentStep === 2){
       if (!formData.description) newErrors.description = "The description is mandatory.";
@@ -183,8 +191,8 @@ function DescriptionComponent(props){
                   <option value="">Select a type</option>
                   <option value="Technical document">Technical document</option>
                   <option value="Informative document">Informative document</option>
+                  <option value="Material Effect">Material effect</option>
                   <option value="Prescriptive document">Prescriptive document</option>
-                  <option value="Material effect">Material effect</option>
                   <option value="Design document">Design document</option>
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
@@ -207,7 +215,11 @@ function DescriptionComponent(props){
                   type="text"
                   name="pages"
                   onChange={handleChange}
+                  isInvalid={!!errors.pages}
                 />
+                  <Form.Control.Feedback type="invalid">
+                  {errors.pages}
+                </Form.Control.Feedback>
               </Form.Group>
             </>
           )} {currentStep === 2 && (
