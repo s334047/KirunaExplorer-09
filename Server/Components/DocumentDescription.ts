@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
-import { Coordinates } from './Georeference.js';
 
 class DocumentDescription{
+    id: number
     title: string
     stakeholder: string
     scale: string
@@ -13,7 +13,8 @@ class DocumentDescription{
     area: string
     description: string
 
-    constructor(title: string, stakeholder: string, scale: string, date: string, type: string, language: string, page: number, coordinate: number[], description: string){
+    constructor(id: number, title: string, stakeholder: string, scale: string, date: string, type: string, language: string, page: number, coordinate: number[], description: string){
+        this.id = id;
         this.title = title,
         this.stakeholder = stakeholder,
         this.scale = scale,

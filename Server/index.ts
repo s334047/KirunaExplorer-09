@@ -7,7 +7,6 @@ import * as LocalStrategy from 'passport-local';
 import DaoKX2 from './Dao/daoKX2.ts';
 import Dao from './Dao/daoStory1-3.ts';
 import DaoUser from './Dao/daoUser.ts';
-import { DocumentDescription } from './Components/DocumentDescription.ts';
 import DaoStory4 from './Dao/daoStory4.ts';
 
 
@@ -71,16 +70,15 @@ app.use((req:any, res: any, next: any) => {
 /** Story 1 routes */
 app.post('/api/documents', async (req: any, res: any) => {
     try {
-        const newDoc: DocumentDescription = req.body;
-        console.log(newDoc.coordinate)
-        await dao.newDescription(newDoc.title, newDoc.stakeholder, newDoc.scale, newDoc.date, newDoc.type, newDoc.language, newDoc.page, newDoc.coordinate, newDoc.description);
+        await dao.newDescription(req.body.title, req.body.stakeholder, req.body.scale, req.body.date, req.body.type, req.body.language, req.body.page, req.body.coordinate, req.body.description);
+        res.status(200).json({message: 'Document add successfully'});
     } catch (error) {
         res.status(503).json({ error: Error });
     }
 })
 
 // Story KX2 routes
-app.post('/api/connections', async (req: any, res: any) => {
+app.post('/api/connections', isLoggedIn, async (req: any, res: any) => {
     try {
         console.log(req.body)
         const SourceDoc=req.body.SourceDocument;
@@ -102,7 +100,7 @@ app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
 });
 
 /** Story 3 routes */
-app.put('/api/documents/area', async (req: any, res: any) => { //add an existing area to a document
+app.put('/api/documents/area', isLoggedIn, async (req: any, res: any) => { //add an existing area to a document
     try{
         const areaId = await dao.getAreaIdFromName(req.body.area);
         const documentId = await dao.getDocumentIdFromTitle(req.body.title);

@@ -29,7 +29,7 @@ async function addDocument(title, stakeholder, scale, date, type, language, page
         headers: {
             'Content-type': 'application/json'
         },
-        credentials: 'include',
+        //credentials: 'include',
         body: JSON.stringify({ title, stakeholder, scale, date, type, language, page, coordinate, description })
     }).then(response => response.json())
 };
