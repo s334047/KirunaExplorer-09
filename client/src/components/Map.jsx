@@ -239,6 +239,7 @@ function MapViewer(props) {
                 {drawingMode===false && !props.mode && docs.filter(doc=>doc.coordinate!=null).map(doc => (
                    <Marker key={doc.title} position={doc.coordinate} icon={customIcon} eventHandlers={{
                         click: () => {
+                            setAreaToDraw(null);
                             setSelectedDoc(doc);
                         },
                     }}>
