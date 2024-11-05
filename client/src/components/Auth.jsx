@@ -1,5 +1,5 @@
-import {useState} from 'react';
-import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
+import { useState } from 'react';
+import { Container, Row, Col, Card, Button, Form, Modal } from 'react-bootstrap';
 
 function LoginComponent(props) {
 
@@ -15,48 +15,69 @@ function LoginComponent(props) {
     };
 
     return (
-        <Container className="d-flex justify-content-center align-items-center">
-            <Card style={{ width: '78%' }}>
+        <Modal show={props.show} onHide={() => props.setShow(false)} size="lg" backdropClassName="custom-backdrop" centered>
+            <Modal.Body className="p-0">
                 <Row>
-                    <Col md={7}>
+
+                    <Col md={6}>
                         <img
                             src="Kiruna.jpg"
                             alt="login form"
-                            className="w-100"
+                            className="w-100 h-100 login-image"
                             style={{ borderTopLeftRadius: '0.25rem', borderBottomLeftRadius: '0.25rem' }}
                         />
                     </Col>
 
-                    <Col md={5} className="d-flex align-items-center">
-                        <Card.Body className="w-100">
-
-                            <div>
-                                <i className="fas fa-cubes fa-3x me-3" style={{ color: '#ff6219' }}></i>
-                                <h1 className="fw-bold mb-0" style={{ color: "#154109" }}>Kiruna Explorer</h1>
+                    <Col md={6} className="d-flex flex-column justify-content-center align-items-center p-4">
+                        <div>
+                            <div className="text-center">
+                                <h1 className="fw-bold" style={{ color: "#154109" }}>Kiruna Explorer</h1>
                             </div>
 
-                            <h5 className="fw-normal my-4 pb-3 text-center" style={{ letterSpacing: '1px' }}>Sign into your account</h5>
+                            <h5 className="fw-normal my-4 text-center" style={{ letterSpacing: '1px' }}>
+                                Sign into your account
+                            </h5>
 
-                            <Form onSubmit={handleSubmit}>
+                            <Form onSubmit={handleSubmit} className="flex-column align-items-center">
                                 <Form.Group className="mb-3" controlId="formUsername">
                                     <Form.Label>Username:</Form.Label>
-                                    <Form.Control type="text" value={username} onChange={ev => setUsername(ev.target.value)} required={true} size="lg" placeholder="Enter your username" />
+                                    <Form.Control
+                                        type="text"
+                                        value={username}
+                                        onChange={ev => setUsername(ev.target.value)}
+                                        className="mx-auto"
+                                        required
+                                        placeholder="Enter your username"
+                                    />
                                 </Form.Group>
 
                                 <Form.Group className="mb-3" controlId="formPassword">
                                     <Form.Label>Password:</Form.Label>
-                                    <Form.Control type="password"  onChange={ev => setPassword(ev.target.value)} required={true} size="lg" placeholder="Enter your password" />
+                                    <Form.Control
+                                        type="password"
+                                        value={password}
+                                        onChange={ev => setPassword(ev.target.value)}
+                                        className="mx-auto"
+                                        required
+                                        placeholder="Enter your password"
+                                    />
                                 </Form.Group>
 
-                                <Button type='submit' variant="dark" size="lg" style={{ backgroundColor: "#154109", borderColor: "#154109" }} className="w-100 mb-4">LOGIN</Button>
+                                <Button
+                                    type="submit"
+                                    variant="dark"
+                                    className="w-100 mb-4"
+                                    style={{ backgroundColor: "#154109", borderColor: "#154109" }}
+                                >
+                                    LOGIN
+                                </Button>
                             </Form>
-
-                        </Card.Body>
+                        </div>
                     </Col>
-
                 </Row>
-            </Card>
-        </Container>
+            </Modal.Body>
+        </Modal>
+       
     );
 }
 

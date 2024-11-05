@@ -133,7 +133,7 @@ function MapViewer(props) {
                 boxShadow: '0 0 10px rgba(0,0,0,0.1)' // Optional: shadow effect
             }}>
             <Form.Group className="mb-3">
-                <Form.Label className="custom-label-color" style={{ fontWeight: 'bold' }}>Area:</Form.Label>
+                <Form.Label className="custom-label-color" style={{ fontWeight: 'bold' }}>Areas already created:</Form.Label>
                 <Form.Select
                   name="area"
                   onChange={handleChangeArea}
@@ -179,7 +179,7 @@ function MapViewer(props) {
                 boxShadow: '0 0 10px rgba(0,0,0,0.1)' // Optional: shadow effect
             }}>
                 <Form.Group className="mb-3">
-                <Form.Label className="custom-label-color">Name:</Form.Label>
+                <Form.Label className="custom-label-color">Insert the name for the new area:</Form.Label>
                 <Form.Control
                   type="text"
                   name="scale"

@@ -27,6 +27,7 @@ function App() {
   const[message, setMessage] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState('')
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const nav = useNavigate();
 
@@ -88,6 +89,7 @@ function App() {
     try {
       const user = await API.logIn(credentials);
       setLoggedIn(true);
+      setShowLoginModal(false);
       setMessage({ msg: `Benvenuto, ${user.username}!`, type: 'success' });
       setUser(user);
     } catch (err) {
@@ -114,7 +116,7 @@ function App() {
     <Routes>
       <Route element={
         <>
-          <NavHeader loggedIn={loggedIn} logout={handleLogout}/>
+          <NavHeader loggedIn={loggedIn} logout={handleLogout} setShow={() => setShowLoginModal(true)}/>
           <Container fluid className='mt-3 justify-content-center align-items-center'>
           {message && <Row>
             <Alert variant={message.type} onClose={() => setMessage('')} dismissible>{message.msg}</Alert>
@@ -127,13 +129,14 @@ function App() {
           <MapViewer user={user} showAddDocument={showAddDocument} setTitle={setExcludeDoc} setShowAddDocument={setShowAddDocument} showAddLink={showAddLink} setShowAddLink={setShowAddLink} mode={mode} setMode={setMode} setSelectedArea={setSelectedArea} setSelectedPoint={setSelectedPoint} handleSaveNew={handleSaveNew} areas={areas} documents={documents}/>
           <DescriptionComponent show={showAddDocument} setShow={setShowAddDocument} item={documents} setMode={setMode} setFormData={setFormData} setFormLink={setFormLink} />
           <ListDocumentLink item={documents} title={excludeDoc} show={showAddLink} setShow={setShowAddLink} />
+          <LoginComponent login={handleLogin} show={showLoginModal} setShow={setShowLoginModal}/>
         </>
         }
         >
         </Route>
-        <Route path='/login' element={
+        {/*<Route path='/login' element={
           loggedIn ? <Navigate replace to='/' /> : <LoginComponent login={handleLogin} />
-        } />
+        } />*/}
       </Route>
     </Routes>
   );
