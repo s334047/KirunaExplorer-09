@@ -8,6 +8,8 @@
   },
   "scripts": {
     "test": "jest",
+    "coverage": "jest --coverage",
+    "all": "jest --coverage --watchAll --verbose",
     "dev": "nodemon --watch \"**/*.ts\" --exec node --loader ts-node/esm index.ts",
     "build": "tsc"
   },
