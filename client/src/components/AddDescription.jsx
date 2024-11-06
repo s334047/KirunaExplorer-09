@@ -74,6 +74,11 @@ function DescriptionComponent(props) {
     else if (currentStep === 2) {
       if (!formData.description) newErrors.description = "The description is mandatory.";
     }
+    else if(currentStep === 3){
+      if ((!item.document && item.type)) newErrors.linkTitle = "All two field are mandatoriy.";
+      if ((item.document && !item.type)) newErrors.linkType = "All two field are mandatoriy.";
+
+    }
     else if (currentStep === 4) {
       if (!mode) newErrors.mode = "The mode is mandatory.";
     }
@@ -282,22 +287,28 @@ function DescriptionComponent(props) {
             </div>
               <Form.Group className="mb-3">
                 <Form.Label style={{ color: "#154109" }}><strong>Document to link:</strong></Form.Label>
-                <Form.Select name="document" onChange={handleChangeLink}>
+                <Form.Select name="document" onChange={handleChangeLink} isInvalid={!!errors.linkTitle}>
                   <option value="">Select a document</option>
                   {filteredItems.map((item) => (
                     <option key={item.title} value={item.title}>{item.title}</option>
                   ))}
                 </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {errors.linkTitle}
+                </Form.Control.Feedback>
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label style={{ color: "#154109" }}><strong>Type of link:</strong></Form.Label>
-                <Form.Select name="type" onChange={handleChangeLink}>
+                <Form.Select name="type" onChange={handleChangeLink} isInvalid={!!errors.linkType}>
                   <option value="">Select a type</option>
                   <option value="Collateral Consequence">Collateral Consequence</option>
                   <option value="Direct Consequence">Direct Consequence</option>
                   <option value="Projection">Projection</option>
                   <option value="Update">Update</option>
                 </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {errors.linkType}
+                </Form.Control.Feedback>
               </Form.Group></>)}
             {currentStep === 4 && (<><div style={{ textAlign: 'center' }}>
             </div>
