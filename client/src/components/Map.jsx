@@ -255,6 +255,7 @@ function MapViewer(props) {
                         },*/
                         click: () => {
                             setAreaToDraw(area);
+                            setSelectedDoc(null);
                         },
                         
                     }}>
