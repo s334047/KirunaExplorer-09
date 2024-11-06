@@ -41,7 +41,7 @@ async function SetDocumentsConnection(SourceDocument, TargetDocument, Connection
         headers: {
             'Content-type': 'application/json'
         },
-        //credentials: 'include',
+        credentials: 'include',
         body: JSON.stringify({ SourceDocument, TargetDocument, ConnectionType })
     }).then(response => response.json())
 };
@@ -63,7 +63,7 @@ async function addAreaToDoc(title, area){   //add an area to a document
         headers: {
             'Content-type': 'application/json'
         },
-        //credentials: 'include',
+        credentials: 'include',
         body: JSON.stringify({title, area})
     }).then(response => response.json())
 };
