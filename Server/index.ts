@@ -44,7 +44,7 @@ passport.serializeUser((user, cb) => cb(null, user));
 passport.deserializeUser((user, cb) => cb(null, user));
 
 // authentication middleware
-const isLoggedIn = (req: any , res: any, next: any) => {
+export const isLoggedIn = (req: any , res: any, next: any) => {
     if (req.isAuthenticated()) {
       return next();
     }

@@ -1,5 +1,5 @@
-import { db } from "../DB/db.js";
-import { DocumentDescription } from "../Components/DocumentDescription.js";
+import { db } from "../DB/db.ts";
+import { DocumentDescription } from "../Components/DocumentDescription.ts";
 
 export default class daoStory4{
     getAllDoc(){

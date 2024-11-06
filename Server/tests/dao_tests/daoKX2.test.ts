@@ -7,15 +7,7 @@ import { describe, test, expect, jest, afterEach, } from "@jest/globals";
 const daoKX2 = new DaoKX2;
 
 jest.mock('sqlite3');
-/*
-jest.mock("../../DB/db.ts", () => ({
-    db: {
-        run: jest.fn(),
-        all: jest.fn(),
-        get: jest.fn()
-    },
-}));
-*/
+
 afterEach(() => {
     jest.clearAllMocks();
     jest.restoreAllMocks();

@@ -10,8 +10,8 @@ export default class DaoKX2 {
      * @param Type 
      * @returns Boolean
      */
-    SetDocumentsConnection = async (SourceDoc: String, TargetDoc: String, Type: String): Promise<Boolean> => {
-        return new Promise(async (resolve, reject) => {
+    SetDocumentsConnection(SourceDoc: String, TargetDoc: String, Type: String){
+        return new Promise<boolean>(async (resolve, reject) => {
             const SourceDocId = await this.GetDocumentsId(SourceDoc);
             const TargetDocId = await this.GetDocumentsId(TargetDoc);
             if (SourceDocId && TargetDocId) { // If both Documents Id exist, then we can create the connection
