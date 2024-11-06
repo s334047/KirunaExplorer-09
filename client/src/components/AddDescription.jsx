@@ -54,7 +54,7 @@ function DescriptionComponent(props) {
   };
 
   const handleSave = () => {
-    const allowedScales = ["blueprint/effects", "concept"]; // sostituisci con le stringhe consentite
+    const allowedScales = ["blueprint/effects", "concept","text"]; // sostituisci con le stringhe consentite
     const scaleRegex = /^1:\d+$/;
     const newErrors = {};
     // Validazione dei campi obbligatori
@@ -234,11 +234,17 @@ function DescriptionComponent(props) {
 
                 <Form.Group className="mb-3">
                   <Form.Label className="custom-label-color">Language:</Form.Label>
-                  <Form.Control
-                    type="text"
+                  <Form.Select
                     name="language"
                     onChange={handleChange}
-                  />
+                  >
+                    <option value="">Select a language</option>
+                    <option value="English">English</option>
+                    <option value="Swedish">Swedish</option>
+                    <option value="Italian">Italian</option>
+                    <option value="French">French</option>
+                    <option value="German">German</option>
+                  </Form.Select>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
