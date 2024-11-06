@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, LayersControl, Popup,FeatureGroup, Polygon } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import L from 'leaflet';
@@ -258,7 +258,7 @@ function MapViewer(props) {
                         },
                         
                     }}>
-                    {<PopUpAea area={areaToDraw} documents={docs} setSelectedDoc={setSelectedDoc}></PopUpAea>}
+                    {<PopUpAea area={areaToDraw} documents={docs} setSelectedDoc={setSelectedDoc} setArea={setAreaToDraw}></PopUpAea>}
                     </Marker>
                 ))}
                 {areaToDraw != null && <Polygon positions={areaToDraw.vertex} color="red"></Polygon>}
@@ -365,7 +365,7 @@ function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user,exclud
         </Card>
     );
 }
-function PopUpAea ({area,documents, setSelectedDoc}){
+function PopUpAea ({area,documents, setSelectedDoc,setArea}){
     const [docs,setDocs]=useState([]);
     useEffect(()=>{
         const getAreaDocs= async()=>{
@@ -376,13 +376,15 @@ function PopUpAea ({area,documents, setSelectedDoc}){
         }
         getAreaDocs();
     },[area])
+
     const handleChange=(e)=>{
         const doc=e.target.value;
         const filtered=documents.filter(item=>item.title==doc);
         setSelectedDoc(filtered[0])
     }
+
     return(
-        <Popup className="area-popup" closeButton={false}>
+        <Popup  className="area-popup" closeButton={false} eventHandlers={{remove:()=>{setArea(null)}}}>
             <Form.Group className="mb-3">
                 <Form.Label className="custom-label-color" style={{ fontWeight: 'bold' }}>Docs:</Form.Label>
                 <Form.Select
