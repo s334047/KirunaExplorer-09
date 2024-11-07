@@ -118,9 +118,9 @@ function App() {
         <>
           <NavHeader loggedIn={loggedIn} logout={handleLogout} setShow={() => setShowLoginModal(true)}/>
           <Container fluid className='mt-3 justify-content-center align-items-center'>
-          {message && <Row>
+          {/*message && <Row>
             <Alert variant={message.type} onClose={() => setMessage('')} dismissible>{message.msg}</Alert>
-          </Row>}
+          </Row>*/}
             <Outlet />
           </Container>
         </>
