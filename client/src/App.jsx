@@ -11,6 +11,7 @@ import 'leaflet/dist/leaflet.css';
 import DescriptionComponent from './components/AddDescription';
 import ListDocumentLink from './components/Link';
 import LoginComponent from './components/Auth';
+import AddArea from './components/AddArea';
 import API from '../API.mjs'
 
 function App() {
@@ -33,22 +34,14 @@ function App() {
 
   const handleSaveNew = async () => {
     try {
-      console.log("Inizio handleSaveNew");
       if (selectedArea == null) {
-        console.log("Chiamata API.addDocument senza selectedArea...");
         API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, selectedPoint, formData.description);
-        console.log("API.addDocument completata senza selectedArea");
       } else {
-        console.log("Chiamata API.addDocument con selectedArea...");
          API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, selectedPoint, formData.description);
-        console.log("API.addDocument completata con selectedArea");
         API.addAreaToDoc(formData.title, selectedArea.name);
-        console.log("API.addAreaToDoc completata");
       }
       if (formLink.document != '' || formLink.type != '') {
-        console.log("Chiamata API.SetDocumentsConnection...");
         API.SetDocumentsConnection(formData.title, formLink.document, formLink.type);
-        console.log("API.SetDocumentsConnection completata");
       }
   
       // Reset degli stati
@@ -56,7 +49,6 @@ function App() {
       setFormLink(null);
       setSelectedArea(null);
       setSelectedPoint(null);
-      console.log("Stati resettati");
   
     } catch (error) {
       console.error("Errore catturato in handleSaveNew:", error);
@@ -137,6 +129,7 @@ function App() {
         {/*<Route path='/login' element={
           loggedIn ? <Navigate replace to='/' /> : <LoginComponent login={handleLogin} />
         } />*/}
+        <Route path='/addArea' element={<AddArea/>}/>
       </Route>
     </Routes>
   );

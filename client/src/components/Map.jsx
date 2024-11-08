@@ -6,6 +6,7 @@ import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { Card, Button, Row, Col, Form } from 'react-bootstrap';
 import API from '../../API.mjs';
+import { useNavigate } from 'react-router-dom';
 
 
 function MapViewer(props) {
@@ -15,6 +16,7 @@ function MapViewer(props) {
     const [areaName, setAreaName] = useState(null);
     const [areaToDraw, setAreaToDraw] = useState(null);
     const [resetDrawing, setResetDrawing] = useState(false);
+    const navigate=useNavigate();
     const position = [67.8558, 20.2253];
     const bounds = [
         [67, 20],
@@ -166,31 +168,6 @@ function MapViewer(props) {
                     <Button variant="secondary" onClick={handleCloseSelectArea} style={{ flexGrow: 1 }}>Close</Button>
                 </div>
             </div>}
-            {drawingMode && <div style={{
-                position: 'absolute',
-                top: '20px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 1000,
-                width: '300px',
-                backgroundColor: 'white', // Add a background for better visibility
-                padding: '10px',
-                borderRadius: '5px',
-                boxShadow: '0 0 10px rgba(0,0,0,0.1)' // Optional: shadow effect
-            }}>
-                <Form.Group className="mb-3">
-                    <Form.Label className="custom-label-color">Insert the name for the new area:</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="scale"
-                        onChange={handleChangeName}
-                    />
-                </Form.Group>
-                <div style={{ display: 'flex', marginTop: '10px', gap: "5px" }}>
-                    <Button variant="primary" onClick={handleSaveName} disabled={areaName === null || selectedArea === null} style={{ backgroundColor: "#154109", borderColor: "#154109", flexGrow: 1 }}>Confirm</Button>{' '}
-                    <Button variant="secondary" onClick={handleCloseName} style={{ flexGrow: 1 }}>Close</Button>
-                </div>
-            </div>}
             <MapContainer
                 center={position}
                 minZoom={12}
@@ -199,24 +176,6 @@ function MapViewer(props) {
                 style={{ flex: 1, height: "100%", width: "100%", borderRadius: '10px' }}
                 scrollWheelZoom={false}
             >
-                <FeatureGroup key={resetDrawing ? 'reset' : 'normal'}>
-                    {(drawingMode === true || props.mode === "Point") && <EditControl
-                        position="topright"
-                        onCreated={handleDrawCreated}
-                        onDeleted={handleDeleteDraw}
-                        draw={{
-                            rectangle: false,
-                            polyline: false,
-                            circle: false,
-                            circlemarker: false,
-                            marker: props.mode === "Point" && selectedPoint == null,
-                            polygon: drawingMode && selectedArea == null
-                        }}
-                        edit={{
-                            edit: false
-                        }}
-                    />}
-                </FeatureGroup >
                 {drawingMode === false && !props.mode && <LayersControl position="topright">
                     <BaseLayer name="Street">
                         <TileLayer
@@ -231,11 +190,6 @@ function MapViewer(props) {
                         />
                     </BaseLayer>
                 </LayersControl>}
-                {(drawingMode === true || props.mode) && <TileLayer
-                    url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                    attribution='&copy; <a href="https://www.esri.com/">Esri</a>, Sources: Esri, Garmin, GEBCO, NOAA NGDC, and other contributors'
-                />}
-                {/*<MapWithDraw polygons={polygons} setPolygons={setPolygons} />*/}
                 {drawingMode === false && !props.mode && docs.filter(doc => doc.coordinate != null).map(doc => (
                     <Marker key={doc.title} position={doc.coordinate} icon={customIcon} eventHandlers={{
                         click: () => {
@@ -288,7 +242,7 @@ function MapViewer(props) {
                 </Button>
             </div>}
             {!selectedDoc && drawingMode === false && !props.mode && props.user.role === 'Urban Planner' && <div style={{ position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000 }}>
-                <Button variant="light" onClick={() => { setDrawingMode(true); setAreaToDraw(null) }} style={{ border: '2px solid gray', display: 'flex', justifyContent: 'center', alignItems: 'center', width: "100px" }}>
+                <Button variant="light" onClick={() => {setAreaToDraw(null);navigate("/addArea") }} style={{ border: '2px solid gray', display: 'flex', justifyContent: 'center', alignItems: 'center', width: "100px" }}>
                     <div style={{ textAlign: 'left' }}>
                         <span style={{ display: 'block', fontSize: '12px' }}>Draw</span>
                         <span style={{ display: 'block', fontSize: '12px' }}>area</span>
