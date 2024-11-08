@@ -1,9 +1,8 @@
 import { Modal, Button, Form, Container } from 'react-bootstrap';
 import React, { useState } from 'react';
-import API from '../../API.mjs';
-
+import { useNavigate } from 'react-router-dom';
 function DescriptionComponent(props) {
-
+  const navigate= useNavigate();
   const [errors, setErrors] = useState({});
   const [mode, setMode] = useState("")
   const [item, setItem] = useState({ document: "", type: "" });
@@ -35,22 +34,7 @@ function DescriptionComponent(props) {
   const [currentStep, setCurrentStep] = useState(1); // Step tracking state
   const filteredItems = props.item;
   const closeModal = () => {
-    props.setShow(false);
-    props.setMode("")
-    setCurrentStep(1);
-    setErrors({});
-    setFormData({
-      title: '',
-      stakeholders: '',
-      scale: '',
-      issuanceDate: '',
-      type: '',
-      language: '',
-      pages: '',
-      description: ''
-    })
-    setItem({ document: "", type: "" })
-    setMode("");
+    navigate("/")
   };
 
   const handleSave = () => {
@@ -98,24 +82,10 @@ function DescriptionComponent(props) {
       setCurrentStep(4);
     }
     else {
-      props.setShow(false); // Close the modal
       props.setMode(mode)
       props.setFormData(formData);
       props.setFormLink(item)
-      setErrors({});
-      setFormData({
-        title: '',
-        stakeholders: '',
-        scale: '',
-        issuanceDate: '',
-        type: '',
-        language: '',
-        pages: '',
-        description: ''
-      })
-      setItem({ document: "", type: "" })
-      setMode("");
-      setCurrentStep(1);
+      props.setShow(false); // Close the modal
     }
   }
   // Handle form data changes
@@ -246,9 +216,6 @@ function DescriptionComponent(props) {
                     <option value="">Select a language</option>
                     <option value="English">English</option>
                     <option value="Swedish">Swedish</option>
-                    <option value="Italian">Italian</option>
-                    <option value="French">French</option>
-                    <option value="German">German</option>
                   </Form.Select>
                 </Form.Group>
 

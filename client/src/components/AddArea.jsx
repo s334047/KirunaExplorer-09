@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, LayersControl, Popup, FeatureGroup, Polygon } from 'react-leaflet';
+import React, { useState } from 'react';
+import { MapContainer, TileLayer, FeatureGroup} from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import L from 'leaflet';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
-import { Card, Button, Row, Col, Form } from 'react-bootstrap';
+import {  Button,  Form } from 'react-bootstrap';
 import API from '../../API.mjs';
 import { useNavigate } from 'react-router-dom';
 

@@ -10,12 +10,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 function MapViewer(props) {
-    const [drawingMode, setDrawingMode] = useState(false)
-    const [selectedArea, setSelectedArea] = useState(null)
-    const [selectedPoint, setSelectedPoint] = useState(null)
-    const [areaName, setAreaName] = useState(null);
     const [areaToDraw, setAreaToDraw] = useState(null);
-    const [resetDrawing, setResetDrawing] = useState(false);
     const navigate=useNavigate();
     const position = [67.8558, 20.2253];
     const bounds = [
@@ -37,137 +32,10 @@ function MapViewer(props) {
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
     });
-
-    // this function create the area or the marker
-    const handleDrawCreated = (e) => {
-        const layer = e.layer;
-        if (layer instanceof L.Marker) {
-            const latlng = layer.getLatLng()
-            setSelectedPoint(latlng)
-            props.setSelectedPoint([latlng.lat, latlng.lng])
-        };
-        if (layer instanceof L.Polygon) {
-            const latlngs = layer.getLatLngs();
-            const newPolygon = latlngs[0].map((latlng) => [latlng.lat, latlng.lng]);
-            setSelectedArea(newPolygon);
-        }
-
-    }
-    // this function close the mode for selecting an area or a point for a new document resetting all parameters
-    const handleCloseSelectArea = () => {
-        props.setMode("")
-        props.setSelectedPoint(null)
-        props.setSelectedArea(null)
-        setSelectedArea(null)
-        setSelectedPoint(null)
-        setResetDrawing(true);
-        setTimeout(() => setResetDrawing(false), 0);
-    }
     const [selectedDoc, setSelectedDoc] = useState(null);
     const { BaseLayer } = LayersControl;
-    const [polygons, setPolygons] = useState(() => {
-        // Carica i poligoni salvati da localStorage
-        const savedPolygons = localStorage.getItem("polygons");
-        return savedPolygons ? JSON.parse(savedPolygons) : [];
-    });
-    // this function handle the change in selecting an area for a new document
-    const handleChangeArea = (e) => {
-        const selectedNome = e.target.value;
-        const foundArea = aree.find(area => area.name === selectedNome);
-        setSelectedArea(foundArea);
-        props.setSelectedArea(foundArea)
-    }
-    // this function saves an area for a new document
-    const handleSaveArea = () => {
-        setSelectedArea(null)
-        props.handleSaveNew()
-        props.setMode(null)
-    }
-    // this function saves a point for a new document
-    const handleSavePoint = () => {
-        props.handleSaveNew()
-        props.setMode(null)
-        setSelectedPoint(null)
-        setResetDrawing(true);
-        setTimeout(() => setResetDrawing(false), 0);
-    }
-    // this function handle the change of a name for a new area
-    const handleChangeName = (e) => {
-        setAreaName(e.target.value);
-    }
-    // this function saves the name and the coordinates for a new area
-    const handleSaveName = async () => {
-        setDrawingMode(false);
-        await API.addArea(areaName, selectedArea);
-        setSelectedArea(null)
-        setAreaName(null)
-        setResetDrawing(true);
-        setTimeout(() => setResetDrawing(false), 0);
-    }
-    // this function close the mode for drawing an area resetting all paramaters
-    const handleCloseName = () => {
-        setDrawingMode(false);
-        setSelectedArea(null)
-        setAreaName(null)
-        setResetDrawing(true);
-        setTimeout(() => setResetDrawing(false), 0);
-    }
-    //this function reset the parameter when cleaning a point or area for inserting a new one
-    const handleDeleteDraw = () => {
-        setSelectedArea(null)
-        setSelectedPoint(null)
-        setResetDrawing(true);
-        setTimeout(() => setResetDrawing(false), 0);
-
-    }
     return (
         <div style={{ display: 'flex', flex: 1, position: 'relative', height: '90vh' }}>
-            {props.mode === "Area" && <div style={{
-                position: 'absolute',
-                top: '20px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 1000,
-                width: '300px',
-                backgroundColor: 'white', // Add a background for better visibility
-                padding: '10px',
-                borderRadius: '5px',
-                boxShadow: '0 0 10px rgba(0,0,0,0.1)' // Optional: shadow effect
-            }}>
-                <Form.Group className="mb-3">
-                    <Form.Label className="custom-label-color" style={{ fontWeight: 'bold' }}>Areas already created:</Form.Label>
-                    <Form.Select
-                        name="area"
-                        onChange={handleChangeArea}
-                    >
-                        <option value="">Select an area</option>
-                        {aree.map((item) => (
-                            <option key={item.id} value={item.name}>{item.name}</option>
-                        ))}
-                    </Form.Select>
-                </Form.Group>
-                <div style={{ display: 'flex', marginTop: '10px', gap: "5px" }}>
-                    <Button variant="primary" onClick={handleSaveArea} disabled={!selectedArea} style={{ backgroundColor: "#154109", borderColor: "#154109", flexGrow: 1 }}>Confirm</Button>{' '}
-                    <Button variant="secondary" onClick={handleCloseSelectArea} style={{ flexGrow: 1 }}>Close</Button>
-                </div>
-            </div>}
-            {props.mode === "Point" && <div style={{
-                position: 'absolute',
-                top: '20px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 1000,
-                width: '300px',
-                backgroundColor: 'white', // Add a background for better visibility
-                padding: '10px',
-                borderRadius: '5px',
-                boxShadow: '0 0 10px rgba(0,0,0,0.1)' // Optional: shadow effect
-            }}>
-                <div style={{ display: 'flex', marginTop: '10px', gap: "5px" }}>
-                    <Button variant="primary" onClick={handleSavePoint} disabled={!selectedPoint} style={{ backgroundColor: "#154109", borderColor: "#154109", flexGrow: 1 }}>Confirm</Button>{' '}
-                    <Button variant="secondary" onClick={handleCloseSelectArea} style={{ flexGrow: 1 }}>Close</Button>
-                </div>
-            </div>}
             <MapContainer
                 center={position}
                 minZoom={12}
@@ -176,7 +44,7 @@ function MapViewer(props) {
                 style={{ flex: 1, height: "100%", width: "100%", borderRadius: '10px' }}
                 scrollWheelZoom={false}
             >
-                {drawingMode === false && !props.mode && <LayersControl position="topright">
+                 <LayersControl position="topright">
                     <BaseLayer name="Street">
                         <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -189,8 +57,8 @@ function MapViewer(props) {
                             attribution='&copy; <a href="https://www.esri.com/">Esri</a>, Sources: Esri, Garmin, GEBCO, NOAA NGDC, and other contributors'
                         />
                     </BaseLayer>
-                </LayersControl>}
-                {drawingMode === false && !props.mode && docs.filter(doc => doc.coordinate != null).map(doc => (
+                </LayersControl>
+                 {docs.filter(doc => doc.coordinate != null).map(doc => (
                     <Marker key={doc.title} position={doc.coordinate} icon={customIcon} eventHandlers={{
                         click: () => {
                             setAreaToDraw(null);
@@ -199,7 +67,7 @@ function MapViewer(props) {
                     }}>
                     </Marker>
                 ))}
-                {drawingMode === false && !props.mode && aree.map(area => (
+                {aree.map(area => (
                     <Marker key={area.name} position={L.polygon(area.vertex).getBounds().getCenter()} icon={areaIcon} eventHandlers={{
                         /*click: async () => {
                             setAreaToDraw(area);
@@ -217,7 +85,6 @@ function MapViewer(props) {
                     </Marker>
                 ))}
                 {areaToDraw != null && <Polygon positions={areaToDraw.vertex} color="red"></Polygon>}
-                {props.mode === "Area" && selectedArea && <Polygon positions={selectedArea.vertex}></Polygon>}
             </MapContainer>
 
             {selectedDoc && (
@@ -232,8 +99,8 @@ function MapViewer(props) {
                 </div>
             )}
             {/*Only a Urban Planner can add a document, see props.user.role*/}
-            {!selectedDoc && drawingMode === false && !props.mode && props.user.role === 'Urban Planner' && <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000 }}>
-                <Button variant="light" onClick={() => { props.setShowAddDocument(true); setAreaToDraw(null) }} style={{ border: '2px solid gray', display: 'flex', justifyContent: 'center', alignItems: 'center', width: "100px" }}>
+            {!selectedDoc && !props.mode && props.user.role === 'Urban Planner' && <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000 }}>
+                <Button variant="light" onClick={() => { navigate("/addDoc") }} style={{ border: '2px solid gray', display: 'flex', justifyContent: 'center', alignItems: 'center', width: "100px" }}>
                     <div style={{ textAlign: 'left' }}>
                         <span style={{ display: 'block', fontSize: '12px' }}>Add</span>
                         <span style={{ display: 'block', fontSize: '12px' }}>doc</span>
@@ -241,7 +108,7 @@ function MapViewer(props) {
                     <i className="bi bi-file-earmark-plus fs-3" style={{ marginLeft: '15px' }}></i>
                 </Button>
             </div>}
-            {!selectedDoc && drawingMode === false && !props.mode && props.user.role === 'Urban Planner' && <div style={{ position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000 }}>
+            {!selectedDoc  && !props.mode && props.user.role === 'Urban Planner' && <div style={{ position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000 }}>
                 <Button variant="light" onClick={() => {setAreaToDraw(null);navigate("/addArea") }} style={{ border: '2px solid gray', display: 'flex', justifyContent: 'center', alignItems: 'center', width: "100px" }}>
                     <div style={{ textAlign: 'left' }}>
                         <span style={{ display: 'block', fontSize: '12px' }}>Draw</span>
