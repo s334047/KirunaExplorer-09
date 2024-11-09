@@ -10,7 +10,6 @@ import { useNavigate } from 'react-router-dom';
 
 
 function MapViewer(props) {
-    const [areaToDraw, setAreaToDraw] = useState(null);
     const navigate=useNavigate();
     const position = [67.8558, 20.2253];
     const bounds = [
@@ -32,6 +31,32 @@ function MapViewer(props) {
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
     });
+    const documentsByArea = new Map();
+
+    docs.filter(doc => doc.coordinate == null).forEach((doc) => {
+        const areaKey = JSON.stringify(doc.area);
+        if (!documentsByArea.has(areaKey)) {
+            documentsByArea.set(areaKey, []);
+        }
+        documentsByArea.get(areaKey)?.push(doc);
+    });
+    function generateNonOverlappingPositions(vertices, count) {
+        const bounds = L.latLngBounds(vertices);
+        const positions = [];
+        const padding = 0.0001; // Distanza minima tra i marker
+    
+        for (let i = 0; i < count; i++) {
+            // Posizionamento radiale per evitare sovrapposizioni
+            const angle = (i / count) * 2 * Math.PI;
+            const offsetX = padding * Math.cos(angle);
+            const offsetY = padding * Math.sin(angle);
+            const center = bounds.getCenter();
+            
+            positions.push([center.lat + offsetX, center.lng + offsetY]);
+        }
+    
+        return positions;
+    }
     const [selectedDoc, setSelectedDoc] = useState(null);
     const { BaseLayer } = LayersControl;
     return (
@@ -61,30 +86,31 @@ function MapViewer(props) {
                  {docs.filter(doc => doc.coordinate != null).map(doc => (
                     <Marker key={doc.title} position={doc.coordinate} icon={customIcon} eventHandlers={{
                         click: () => {
-                            setAreaToDraw(null);
                             setSelectedDoc(doc);
                         },
                     }}>
                     </Marker>
                 ))}
-                {aree.map(area => (
-                    <Marker key={area.name} position={L.polygon(area.vertex).getBounds().getCenter()} icon={areaIcon} eventHandlers={{
-                        /*click: async () => {
-                            setAreaToDraw(area);
-                            const docTitle = await API.getAreasDoc(area.name);
-                            const doc = docs.find(item=>item.title == docTitle);
-                            setSelectedDoc(doc)
-                        },*/
-                        click: () => {
-                            setAreaToDraw(area);
-                            setSelectedDoc(null);
-                        },
+  {Array.from(documentsByArea.entries()).map(([areaKey, areaDocuments]) => {
+    const areaVertices = JSON.parse(areaKey);
 
-                    }}>
-                        {<PopUpAea area={areaToDraw} documents={docs} setSelectedDoc={setSelectedDoc} setArea={setAreaToDraw}></PopUpAea>}
-                    </Marker>
-                ))}
-                {areaToDraw != null && <Polygon positions={areaToDraw.vertex} color="red"></Polygon>}
+    // Crea posizioni per i documenti nell'area in modo da non sovrapporli
+    const positions = generateNonOverlappingPositions(areaVertices, areaDocuments.length);
+
+    return (
+        <React.Fragment key={areaKey}>
+            {areaDocuments.map((document, index) => (
+                <Marker key={document.id} position={positions[index]} icon={customIcon} eventHandlers={{
+                    click: () => {
+                        setSelectedDoc(document);
+                    },
+                }}>
+                </Marker>
+            ))}
+        </React.Fragment>
+    );
+    })}
+                {selectedDoc && selectedDoc.area && <Polygon positions={selectedDoc.area} color="red"></Polygon>}
             </MapContainer>
 
             {selectedDoc && (
@@ -95,11 +121,11 @@ function MapViewer(props) {
                     right: 20,
                     zIndex: 1000,
                 }}>
-                    <DocumentCard selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} setShowAddLink={props.setShowAddLink} user={props.user} excludeTitle={props.setTitle} setArea={setAreaToDraw} />
+                    <DocumentCard selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} setShowAddLink={props.setShowAddLink} user={props.user} excludeTitle={props.setTitle} />
                 </div>
             )}
             {/*Only a Urban Planner can add a document, see props.user.role*/}
-            {!selectedDoc && !props.mode && props.user.role === 'Urban Planner' && <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000 }}>
+            {!selectedDoc  && props.user.role === 'Urban Planner' && <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000 }}>
                 <Button variant="light" onClick={() => { navigate("/addDoc") }} style={{ border: '2px solid gray', display: 'flex', justifyContent: 'center', alignItems: 'center', width: "100px" }}>
                     <div style={{ textAlign: 'left' }}>
                         <span style={{ display: 'block', fontSize: '12px' }}>Add</span>
@@ -108,8 +134,8 @@ function MapViewer(props) {
                     <i className="bi bi-file-earmark-plus fs-3" style={{ marginLeft: '15px' }}></i>
                 </Button>
             </div>}
-            {!selectedDoc  && !props.mode && props.user.role === 'Urban Planner' && <div style={{ position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000 }}>
-                <Button variant="light" onClick={() => {setAreaToDraw(null);navigate("/addArea") }} style={{ border: '2px solid gray', display: 'flex', justifyContent: 'center', alignItems: 'center', width: "100px" }}>
+            {!selectedDoc && props.user.role === 'Urban Planner' && <div style={{ position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000 }}>
+                <Button variant="light" onClick={() => {navigate("/addArea") }} style={{ border: '2px solid gray', display: 'flex', justifyContent: 'center', alignItems: 'center', width: "100px" }}>
                     <div style={{ textAlign: 'left' }}>
                         <span style={{ display: 'block', fontSize: '12px' }}>Draw</span>
                         <span style={{ display: 'block', fontSize: '12px' }}>area</span>
@@ -125,7 +151,7 @@ function MapViewer(props) {
     );
 }
 
-function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user, excludeTitle, setArea }) {
+function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user, excludeTitle}) {
     const [n, setN] = useState(0);
     useEffect(() => {
         const getNConnection = async () => {
@@ -143,7 +169,6 @@ function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user, exclu
                         className="btn btn-close"
                         onClick={() => {
                             setSelectedDoc(null);
-                            setArea(null)
                         }}
                         aria-label="Close"
                     />
@@ -187,49 +212,6 @@ function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user, exclu
             </Card.Body>
         </Card>
     );
-}
-function PopUpAea({ area, documents, setSelectedDoc, setArea }) {
-    const [docs, setDocs] = useState([]);
-    useEffect(() => {
-        const getAreaDocs = async () => {
-            if (area) {
-                const doc = await API.getAreasDoc(area.name);
-                setDocs(doc)
-            }
-        }
-        getAreaDocs();
-    }, [area])
-
-    const handleChange = (e) => {
-        const doc = e.target.value;
-        const filtered = documents.filter(item => item.title == doc);
-        setSelectedDoc(filtered[0])
-    }
-
-    return (
-        <Popup className="area-popup" closeButton={false} eventHandlers={{ remove: () => { setArea(null) } }}>
-            <div style={{ width: '140px' }}>
-                <Form.Group className="mb-3">
-                    <Form.Label className="custom-label-color" style={{ fontWeight: 'bold' }}>Docs:</Form.Label>
-                    <Form.Select
-                        name="docs"
-                        onChange={handleChange}
-                        defaultValue="default"
-                    >
-                        <option value="default" disabled>Select a doc</option>
-                        {docs.map((item) => (
-                            <option key={item} value={item}>{item}</option>
-                        ))}
-                    </Form.Select>
-                </Form.Group>
-            </div>
-        </Popup>
-    )
-}
-
-function showCardForArea(area, setSelectedDoc) {
-    const doc = API.getAreasDoc(area.name);
-    setSelectedDoc(doc);
 }
 
 export default MapViewer;

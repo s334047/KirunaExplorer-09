@@ -30,7 +30,7 @@ export default class daoStory4{
                                         .replace(/(\[\s*)/g, '[')
                                         .replace(/(\s*\])/g, ']')
                                   )
-                                : null,  // Imposta `null` se `row.Vertex` è `null`
+                                : null,
                             row.Description
                         )
                     );

@@ -1,4 +1,7 @@
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat.js';
+dayjs.extend(customParseFormat);
+
 
 class DocumentDescription{
     id: number
@@ -18,7 +21,9 @@ class DocumentDescription{
         this.title = title,
         this.stakeholder = stakeholder,
         this.scale = scale,
-        this.date = dayjs(date).format('DD-MM-YY').toString(),
+        console.log(date)
+        this.date = dayjs(date,'DD/MM/YYYY',true).format('DD-MM-YY').toString(),
+        console.log(this.date)
         this.type = type,
         this.language = language,
         this.page = page,
