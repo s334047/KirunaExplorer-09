@@ -4,16 +4,16 @@ import { Area, Coordinates } from "../Components/Georeference.ts";
 export default class Dao {
 
     /**story 1 */
-    newDescription(title: string, sh: string, sc: string, date: string, type: string, lang: string, page: number, coord: Number[], descr: string){
+    newDescription(title: string, sh: string, sc: string, date: string, type: string, lang: string, page: number, coord: number[],area:number, descr: string){
         return new Promise<void>((resolve, reject) => {
             let coordTemp:string=null;
             if(coord!=null){
                   coordTemp = '[ '+coord[0]+', '+coord[1]+' ]'
             }
             const query = `INSERT INTO Document 
-                            (Title, Stakeholder, Scale, Date, Type, Language, Page, Coordinate, Description)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-            db.run(query, [title, sh, sc, date, type, lang, page, coordTemp, descr], function(err){
+                            (Title, Stakeholder, Scale, Date, Type, Language, Page, Coordinate,Area, Description)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            db.run(query, [title, sh, sc, date, type, lang, page, coordTemp,area, descr], function(err){
                 if(err)
                     reject(err);
                 else
@@ -85,6 +85,9 @@ export default class Dao {
             db.get(query, [name], (err: any, row: any) => {
                 if(err)
                     reject(err);
+                if(!row){
+                    resolve(null)
+                }
                 else
                     resolve(row.Id);
             })

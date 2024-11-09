@@ -23,14 +23,14 @@ async function login(username, password) {
   
   
 /** API story 1 */
-async function addDocument(title, stakeholder, scale, date, type, language, page, coordinate, description) {
+async function addDocument(title, stakeholder, scale, date, type, language, page, coordinate,area, description) {
     return await fetch(`${SERVER_URL}/documents`, {
         method: 'POST',
         headers: {
             'Content-type': 'application/json'
         },
         //credentials: 'include',
-        body: JSON.stringify({ title, stakeholder, scale, date, type, language, page, coordinate, description })
+        body: JSON.stringify({ title, stakeholder, scale, date, type, language, page, coordinate,area, description })
     }).then(response => response.json())
 };
 

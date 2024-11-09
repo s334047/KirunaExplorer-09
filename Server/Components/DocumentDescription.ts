@@ -10,10 +10,10 @@ class DocumentDescription{
     language: string
     page: number
     coordinate: number[]
-    area: string
+    area: number[][]
     description: string
 
-    constructor(id: number, title: string, stakeholder: string, scale: string, date: string, type: string, language: string, page: number, coordinate: number[], description: string){
+    constructor(id: number, title: string, stakeholder: string, scale: string, date: string, type: string, language: string, page: number, coordinate: number[], area:number[][], description: string){
         this.id = id;
         this.title = title,
         this.stakeholder = stakeholder,
@@ -23,6 +23,7 @@ class DocumentDescription{
         this.language = language,
         this.page = page,
         this.coordinate = coordinate,
+        this.area = area,
         this.description = description
     }
 }

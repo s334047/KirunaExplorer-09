@@ -49,16 +49,11 @@ function AddDocument(props){
         navigate("/")
     }
     const handleSave =()=>{
-        console.log(formData)
-        console.log(formLink)
-        console.log(selectedArea)
-        console.log(selectedPoint)
         try {
             if (selectedArea == null) {
-              API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, selectedPoint, formData.description);
+              API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, selectedPoint, selectedArea, formData.description);
             } else {
-               API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, selectedPoint, formData.description);
-              API.addAreaToDoc(formData.title, selectedArea.name);
+               API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, selectedPoint, selectedArea.name, formData.description);
             }
             if (formLink.document != '' || formLink.type != '') {
               API.SetDocumentsConnection(formData.title, formLink.document, formLink.type);

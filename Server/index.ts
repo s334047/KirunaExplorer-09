@@ -70,7 +70,11 @@ app.use((req:any, res: any, next: any) => {
 /** Story 1 routes */
 app.post('/api/documents', async (req: any, res: any) => {
     try {
-        await dao.newDescription(req.body.title, req.body.stakeholder, req.body.scale, req.body.date, req.body.type, req.body.language, req.body.page, req.body.coordinate, req.body.description);
+        let number = null;
+        if(req.body.area!=null){
+            number=await dao.getAreaIdFromName(req.body.area)
+        }
+        await dao.newDescription(req.body.title, req.body.stakeholder, req.body.scale, req.body.date, req.body.type, req.body.language, req.body.page, req.body.coordinate,number, req.body.description);
         res.status(200).json({message: 'Document add successfully'});
     } catch (error) {
         res.status(503).json({ error: Error });

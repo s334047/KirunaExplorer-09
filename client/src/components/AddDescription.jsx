@@ -12,8 +12,8 @@ function DescriptionComponent(props) {
     scale: '',
     issuanceDate: '',
     type: '',
-    language: '',
-    pages: '',
+    language: null,
+    pages: null,
     description: ''
   });
 
