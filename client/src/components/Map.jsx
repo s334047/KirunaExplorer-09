@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, LayersControl, Popup, FeatureGroup, Polygon } from 'react-leaflet';
-import { EditControl } from 'react-leaflet-draw';
+import React, { useState } from 'react';
+import { MapContainer, TileLayer, Marker, LayersControl, Polygon } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
-import { Card, Button, Row, Col, Form } from 'react-bootstrap';
-import API from '../../API.mjs';
+import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import DocumentCard from './DocCard'
 
 
 function MapViewer(props) {
@@ -144,74 +143,10 @@ function MapViewer(props) {
                     <i className="bi bi-bounding-box-circles fs-3" style={{ marginLeft: '15px' }}></i>
                 </Button>
             </div>}
-
-
-
         </div>
     );
 }
 
-function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user, excludeTitle}) {
-    const [n, setN] = useState(0);
-    useEffect(() => {
-        const getNConnection = async () => {
-            const n = await API.GetDocumentConnections(selectedDoc.title);
-            setN(n);
-        }
-        getNConnection();
-    }, [selectedDoc])
-    return (
-        <Card className="document-card">
-            <Card.Body>
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                    <div style={{ flex: 1 }} />
-                    <button
-                        className="btn btn-close"
-                        onClick={() => {
-                            setSelectedDoc(null);
-                        }}
-                        aria-label="Close"
-                    />
-                </div>
-                <Row >
-                    <Col md={6} >
-                        <ul style={{ listStyleType: 'none', paddingLeft: '30px' }}>
-                            <li><strong>Title:</strong> {selectedDoc.title}</li>
-                            <li><strong>Stakeholder:</strong> {selectedDoc.stakeholder}</li>
-                            <li><strong>Scale:</strong> {selectedDoc.scale}</li>
-                            <li><strong>Date:</strong> {selectedDoc.date}</li>
-                            <li><strong>Type:</strong> {selectedDoc.type}</li>
-                            <li>
-                                <strong>Connections:</strong> {n}
-                                {user.role === 'Urban Planner' && <a
-                                    href="#"
-                                    style={{
-                                        textDecoration: 'underline',
-                                        color: 'green',
-                                        marginLeft: '5px',
-                                        cursor: 'pointer'
-                                    }}
-                                    onClick={() => {
-                                        setShowAddLink(true);
-                                        excludeTitle(selectedDoc.title)
-                                    }}
-                                >
-                                    <i className="bi bi-plus-circle-fill"></i>
-                                </a>}
-                            </li>
-                            <li><strong>Language:</strong> {selectedDoc.language}</li>
-                            {selectedDoc.coordinate != null && <li><strong>Coordinates:</strong> {selectedDoc.coordinate[0]} N, {selectedDoc.coordinate[1]} E </li>}
-                        </ul>
-                    </Col>
-                    <Col md={6}>
-                        <ul style={{ listStyleType: 'none', paddingRight: '30px' }}>
-                            <li><strong>Description:</strong><br />{selectedDoc.description}</li>
-                        </ul>
-                    </Col>
-                </Row>
-            </Card.Body>
-        </Card>
-    );
-}
+
 
 export default MapViewer;

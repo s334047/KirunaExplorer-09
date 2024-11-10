@@ -13,6 +13,7 @@ import LoginComponent from './components/Auth';
 import AddArea from './components/AddArea';
 import API from '../API.mjs'
 import AddDocument from './components/AddDocument';
+import DocumentTable from './components/ListDocuments';
 
 function App() {
   const [showAddLink, setShowAddLink] = useState(false) //state for showing the modal for linking documents
@@ -74,9 +75,6 @@ function App() {
         <>
           <NavHeader loggedIn={loggedIn} logout={handleLogout} setShow={() => setShowLoginModal(true)}/>
           <Container fluid className='mt-3 justify-content-center align-items-center'>
-          {/*message && <Row>
-            <Alert variant={message.type} onClose={() => setMessage('')} dismissible>{message.msg}</Alert>
-          </Row>*/}
             <Outlet />
           </Container>
         </>
@@ -89,11 +87,14 @@ function App() {
         }
         >
         </Route>
-        {/*<Route path='/login' element={
-          loggedIn ? <Navigate replace to='/' /> : <LoginComponent login={handleLogin} />
-        } />*/}
         <Route path='/addArea' element={<AddArea areas={areas} documents={documents}/>}/>
         <Route path='/addDoc' element={<AddDocument areas={areas} documents={documents}/>}/>
+
+        <Route path='/documents' element={<>
+          <DocumentTable user={user} setTitle={setExcludeDoc} showAddLink={showAddLink} documents={documents} setShowAddLink={setShowAddLink}/>
+          <ListDocumentLink item={documents} title={excludeDoc} show={showAddLink} setShow={setShowAddLink} />
+          </>
+          }></Route>
       </Route>
     </Routes>
   );

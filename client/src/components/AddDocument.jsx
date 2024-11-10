@@ -9,6 +9,7 @@ import API from '../../API.mjs';
 import { useNavigate } from 'react-router-dom';
 import DescriptionComponent from './AddDescription';
 
+
 function AddDocument(props){
     const position = [67.8558, 20.2253];
     const bounds = [
@@ -19,7 +20,7 @@ function AddDocument(props){
     const [show,setShow]=useState(true);
     const [selectedArea, setSelectedArea] = useState(null)
     const [selectedPoint, setSelectedPoint] = useState(null)
-    const [formLink, setFormLink] = useState(null);
+    const [formLink, setFormLink] = useState([]);
     const [formData, setFormData] = useState(null);
     const [resetDrawing, setResetDrawing] = useState(false);
     const aree = props.areas;

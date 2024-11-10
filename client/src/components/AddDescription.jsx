@@ -1,9 +1,10 @@
-import { Modal, Button, Form, Container } from 'react-bootstrap';
+import { Modal, Button, Form, Container, Row, Col } from 'react-bootstrap';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 function DescriptionComponent(props) {
   const navigate= useNavigate();
   const [errors, setErrors] = useState({});
+  const [isDate, setIsDate] = useState(true);
   const [mode, setMode] = useState("")
   const [item, setItem] = useState({ document: "", type: "" });
   const [formData, setFormData] = useState({
@@ -48,7 +49,8 @@ function DescriptionComponent(props) {
       if (!formData.scale) newErrors.scale = "The scale is mandatory.";
       if (!scaleRegex.test(formData.scale) && !allowedScales.includes(formData.scale)) newErrors.scale = "The format is not correct.";
       if (!formData.type) newErrors.type = "The type is mandatory.";
-      if (!formData.issuanceDate) newErrors.date = "The date is mandatory.";
+      if (isDate && !formData.issuanceDate) newErrors.date = "The date is mandatory.";
+      if (!isDate && !formData.issuanceDate) newErrors.year = "The year is mandatory.";
       if (formData.pages !== undefined && formData.pages !== null) {
         if (isNaN(Number(formData.pages))) {
           newErrors.pages = "The field must be a number.";
@@ -122,6 +124,14 @@ function DescriptionComponent(props) {
     );
   };
 
+  const handleToggleDate = () => {
+    setIsDate(!isDate);
+    setFormData({
+      ...formData,
+      issuanceDate: "",
+    });
+  };
+
   return (
     <Container>
       <Modal show={props.show} onHide={closeModal} centered>
@@ -175,17 +185,43 @@ function DescriptionComponent(props) {
                   </Form.Control.Feedback>
                 </Form.Group>
 
+
                 <Form.Group className="mb-3">
-                  <Form.Label className="custom-label-color">Issuance date:</Form.Label>
-                  <Form.Control
-                    type="date"
-                    name="issuanceDate"
-                    onChange={handleChange}
-                    isInvalid={!!errors.date}
-                  />
+                  <Row>
+                  <Form.Label className="custom-label-color">Issuance {isDate?'date':'year'}:</Form.Label>
+                    <Col md={8}>
+                    {isDate ? (
+                      <Form.Control
+                        type="date"
+                        name="issuanceDate"
+                        onChange={handleChange}
+                        isInvalid={!!errors.date}
+                      />
+                    ) : (
+                      <Form.Control
+                        type="text"
+                        name="issuanceDate"
+                        placeholder="aaaa"
+                        onChange={handleChange}
+                        isInvalid={!!errors.year}
+                      />
+                  )}
                   <Form.Control.Feedback type="invalid">
-                    {errors.date}
+                    {errors.date || errors.year}
                   </Form.Control.Feedback>
+                  </Col>
+
+                  <Col md={4} className="d-flex align-items-center">
+                  <Form.Check
+                    type="switch"
+                    id="date-format-switch"
+                    label={'Full date'}
+                    onChange={handleToggleDate}
+                    checked={isDate}
+                    className="custom-toggle"
+                  />
+                  </Col>
+                  </Row>
                 </Form.Group>
 
                 <Form.Group className="mb-3">

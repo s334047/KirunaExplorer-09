@@ -1,8 +1,6 @@
 import { Nav, Navbar, Container, Button } from 'react-bootstrap'
-import { Link, useLocation } from 'react-router-dom';
 
 function NavHeader(props) {
-    const location = useLocation();
     return (
         <Navbar expand="lg" className="custom-navbar" style={{ borderBottom: '1px solid #dee2e6' }}>
             <Container fluid>
@@ -14,7 +12,7 @@ function NavHeader(props) {
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="me-auto">
                             <Nav.Link href="/">Map</Nav.Link>
-                            <Nav.Link href="/page">Documents</Nav.Link>
+                            <Nav.Link href="/documents">Documents</Nav.Link>
                             <Nav.Link>Diagram</Nav.Link>
                         </Nav>
                     </Navbar.Collapse>
