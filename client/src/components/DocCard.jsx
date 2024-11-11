@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col } from 'react-bootstrap';
 import API from '../../API.mjs';
+import { useNavigate } from 'react-router-dom';
 
 function DocumentCard({selectedDoc, setSelectedDoc, setShowAddLink, user, excludeTitle}) {
     const [n, setN] = useState(0);
+    const navigate= useNavigate();
     useEffect(() => {
         const getNConnection = async () => {
             const n = await API.GetDocumentConnections(selectedDoc.title);
@@ -60,6 +62,14 @@ function DocumentCard({selectedDoc, setSelectedDoc, setShowAddLink, user, exclud
                         </ul>
                     </Col>
                 </Row>
+                {user.role === 'Urban Planner' && <button
+            className="btn btn-primary position-absolute bottom-0 end-0 m-3"
+            onClick={()=>{   
+                excludeTitle(selectedDoc)
+                navigate(`/modifyGeoreference`);}}
+        >
+            Action
+        </button>}
             </Card.Body>
         </Card> 
     );
