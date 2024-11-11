@@ -1,8 +1,8 @@
 FROM node:23
 WORKDIR /app
-COPY package*.json ./
-RUN npm install --omit=optional
+COPY package*.json .
+RUN npm install
 COPY . .
-ENV PORT=5173
-EXPOSE 5173
-CMD ["npm", "run", "dev"]
+RUN npm run build
+EXPOSE 3000
+CMD [ "npm", "run", "dev" ]

@@ -1,19 +1,18 @@
 #version: "3.8"
 services:
   client:
+    image: kirunaexplorer-client
     build:
       context: ./client
-      dockerfile: Dockerfile
+      dockerfile: ./Dockerfile
     ports:
-      - "5173:5173"
-    volumes:
-      - ./client:/app
+      - "3000:3000"
     networks:
       - kirunaexplorer-network
   server:
     build:
       context: ./server
-      dockerfile: Dockerfile
+      dockerfile: ./Dockerfile
     ports:
       - "3001:3001"
     volumes:

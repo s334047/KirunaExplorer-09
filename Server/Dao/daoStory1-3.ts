@@ -11,7 +11,7 @@ export default class Dao {
                   coordTemp = '[ '+coord[0]+', '+coord[1]+' ]'
             }
             const query = `INSERT INTO Document 
-                            (Title, Stakeholder, Scale, Date, Type, Language, Page, Coordinate,Area, Description)
+                            (Title, Stakeholder, Scale, Date, Type, Language, Page, Coordinate, Area, Description)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
             db.run(query, [title, sh, sc, date, type, lang, page, coordTemp,area, descr], function(err){
                 if(err)

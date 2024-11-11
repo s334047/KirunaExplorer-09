@@ -46,7 +46,7 @@ describe("DaoStory1 Test", () => {
                 callback(null); // Simulate a successful insertion
                 return db;
             });
-            const result = await daoS1.newDescription("Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, coordinate, "Test Description");
+            const result = await daoS1.newDescription("Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, coordinate, 1, "Test Description");
             expect(result).toBe(undefined);
             expect(mockRun).toHaveBeenCalled();
             expect(mockRun).toHaveBeenCalledWith(
@@ -62,7 +62,7 @@ describe("DaoStory1 Test", () => {
                 return db;
             });
 
-            await expect(daoS1.newDescription("Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, [123, 456], "Test Description"))
+            await expect(daoS1.newDescription("Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, [123, 456],1, "Test Description"))
                 .rejects.toThrow("Database error");
 
             expect(mockRun).toHaveBeenCalled();
