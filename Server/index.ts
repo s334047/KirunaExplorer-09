@@ -13,7 +13,7 @@ import DaoStory4 from './Dao/daoStory4.ts';
 const dao = new Dao();
 const daoKX2 = new DaoKX2();
 const daoUser = new DaoUser();
-const daoStory4 = new  DaoStory4();
+const daoStory4 = new DaoStory4();
 
 const app = express();
 const port = 3001;
@@ -44,38 +44,38 @@ passport.serializeUser((user, cb) => cb(null, user));
 passport.deserializeUser((user, cb) => cb(null, user));
 
 // authentication middleware
-export const isLoggedIn = (req: any , res: any, next: any) => {
+export const isLoggedIn = (req: any, res: any, next: any) => {
     if (req.isAuthenticated()) {
-      return next();
+        return next();
     }
     return res.status(401).json({ error: 'Not authorized' });
-  }
+}
 
-  // session setup
+// session setup
 const secret = "SECRETTTTTTT"
 app.use(session({
-  secret: secret,
-  resave: false,
-  saveUninitialized: false,
+    secret: secret,
+    resave: false,
+    saveUninitialized: false,
 }));
 app.use(passport.authenticate('session'));
 
-app.use((req:any, res: any, next: any) => {
-  if (!req.session.memePoints) {
-    req.session.memePoints = {};
-  }
-  next();
+app.use((req: any, res: any, next: any) => {
+    if (!req.session.memePoints) {
+        req.session.memePoints = {};
+    }
+    next();
 });
 
 /** Story 1 routes */
 app.post('/api/documents', async (req: any, res: any) => {
     try {
         let number = null;
-        if(req.body.area!=null){
-            number=await dao.getAreaIdFromName(req.body.area)
+        if (req.body.area != null) {
+            number = await dao.getAreaIdFromName(req.body.area)
         }
-        await dao.newDescription(req.body.title, req.body.stakeholder, req.body.scale, req.body.date, req.body.type, req.body.language, req.body.page, req.body.coordinate,number, req.body.description);
-        res.status(200).json({message: 'Document add successfully'});
+        await dao.newDescription(req.body.title, req.body.stakeholder, req.body.scale, req.body.date, req.body.type, req.body.language, req.body.page, req.body.coordinate, number, req.body.description);
+        res.status(200).json({ message: 'Document add successfully' });
     } catch (error) {
         res.status(503).json({ error: Error });
     }
@@ -85,9 +85,9 @@ app.post('/api/documents', async (req: any, res: any) => {
 app.post('/api/connections', isLoggedIn, async (req: any, res: any) => {
     try {
         console.log(req.body)
-        const SourceDoc=req.body.SourceDocument;
-        const TargetDoc=req.body.TargetDocument;
-        const Type=req.body.ConnectionType;
+        const SourceDoc = req.body.SourceDocument;
+        const TargetDoc = req.body.TargetDocument;
+        const Type = req.body.ConnectionType;
         await daoKX2.SetDocumentsConnection(SourceDoc, TargetDoc, Type);
     } catch (error) {
         res.status(503).json({ error: Error });
@@ -105,52 +105,52 @@ app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
 
 /** Story 3 routes */
 app.put('/api/documents/area', isLoggedIn, async (req: any, res: any) => { //add an existing area to a document
-    try{
+    try {
         const areaId = await dao.getAreaIdFromName(req.body.area);
         const documentId = await dao.getDocumentIdFromTitle(req.body.title);
         await dao.addAreaToDoc(areaId, documentId);
-    }catch(error){
-        res.status(503).json({error: Error});
+    } catch (error) {
+        res.status(503).json({ error: Error });
     }
 });
 
 app.get('/api/areas', async (req: any, res: any) => {   //get all the areas in the db
-    try{
+    try {
         const areas = await dao.getAllAreas();
         res.json(areas);
-    }catch(error){
-        res.status(503).json({error: Error});
+    } catch (error) {
+        res.status(503).json({ error: Error });
     }
 })
 
 app.post('/api/areas', isLoggedIn, async (req: any, res: any) => { //add a new area in the db
-    try{
+    try {
         await dao.addArea(req.body.name, req.body.vertex);
-        res.status(201).json({message: 'Area add successfully'});
-    }catch(error){
-        res.status(503).json({error: Error});
+        res.status(201).json({ message: 'Area add successfully' });
+    } catch (error) {
+        res.status(503).json({ error: Error });
     }
 });
 
 /** Story 4 routes */
-app.get('/api/documents',async (req: any, res: any)=>{
-    try{
+app.get('/api/documents', async (req: any, res: any) => {
+    try {
         const docs = await daoStory4.getAllDoc();
         res.json(docs);
-    }catch(error){
-        res.status(503).json({error: Error});
+    } catch (error) {
+        res.status(503).json({ error: Error });
     }
 })
 
 
-app.get('/api/area/docs/:name',async (req: any, res: any)=>{
-    try{
-        const name=req.params.name;
-        const id=await dao.getAreaIdFromName(name);
-        const docs=await daoStory4.getAllDocOfArea(id);
+app.get('/api/area/docs/:name', async (req: any, res: any) => {
+    try {
+        const name = req.params.name;
+        const id = await dao.getAreaIdFromName(name);
+        const docs = await daoStory4.getAllDocOfArea(id);
         res.json(docs);
-    }catch(error){
-        res.status(503).json({error: Error});
+    } catch (error) {
+        res.status(503).json({ error: Error });
     }
 })
 //API AUTENTICATION
@@ -197,3 +197,10 @@ app.listen(port, () => {
 
 export { app };
 
+app.get('/', (req, res) => {
+    res.send('Hello World!');
+});
+const PORT = process.env.PORT;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});

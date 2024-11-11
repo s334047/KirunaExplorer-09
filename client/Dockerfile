@@ -1,8 +1,8 @@
-FROM node:20
+FROM node:23
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm install --omit=optional
 COPY . .
-ENV PORT=3000
-EXPOSE 3000
-CMD ["npm", "start"]
+ENV PORT=5173
+EXPOSE 5173
+CMD ["npm", "run", "dev"]
