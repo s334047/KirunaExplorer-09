@@ -11,6 +11,7 @@ import DescriptionComponent from './AddDescription';
 
 
 function AddDocument(props){
+    
     const position = [67.8558, 20.2253];
     const bounds = [
         [67, 20],
@@ -149,6 +150,7 @@ function AddDocument(props){
                     url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                     attribution='&copy; <a href="https://www.esri.com/">Esri</a>, Sources: Esri, Garmin, GEBCO, NOAA NGDC, and other contributors'
                 />
+             {mode === "Area" && selectedArea && <Polygon positions={selectedArea.vertex} color="red"></Polygon>}
             <DescriptionComponent show={show} setShow={setShow} item={docs} setMode={setMode} setFormData={setFormData} setFormLink={setFormLink} />
         </MapContainer>
     </div>)

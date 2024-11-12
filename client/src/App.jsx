@@ -14,6 +14,7 @@ import AddArea from './components/AddArea';
 import API from '../API.mjs'
 import AddDocument from './components/AddDocument';
 import DocumentTable from './components/ListDocuments';
+import ModifyGeoreference from './components/ModifyGeorefernce';
 
 function App() {
   const [showAddLink, setShowAddLink] = useState(false) //state for showing the modal for linking documents
@@ -89,6 +90,7 @@ function App() {
         </Route>
         <Route path='/addArea' element={<AddArea areas={areas} documents={documents}/>}/>
         <Route path='/addDoc' element={<AddDocument areas={areas} documents={documents}/>}/>
+        <Route path='/modifyGeoreference' element={<ModifyGeoreference areas={areas} doc={excludeDoc}/>}/>
 
         <Route path='/documents' element={<>
           <DocumentTable user={user} setTitle={setExcludeDoc} showAddLink={showAddLink} documents={documents} setShowAddLink={setShowAddLink}/>
