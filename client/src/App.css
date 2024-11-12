@@ -80,3 +80,10 @@
 .rounded-item {
   border-radius: 20px; /* Puoi aumentare o diminuire il valore per ottenere l'effetto desiderato */
 }
+
+
+
+.custom-table-header{
+  background-color: #154109;  /* Colore di sfondo verde scuro */
+  color: white    ;       /* Colore del testo bianco */
+}
