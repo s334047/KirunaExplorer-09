@@ -74,3 +74,9 @@
   background-color: #ffffff;
   border-color: #000000;
 }
+
+
+
+.rounded-item {
+  border-radius: 20px; /* Puoi aumentare o diminuire il valore per ottenere l'effetto desiderato */
+}
