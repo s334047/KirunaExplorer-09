@@ -3,23 +3,22 @@ import express from 'express';
 import morgan from 'morgan';
 import passport from 'passport';
 import session from 'express-session';
+import {check} from 'express-validator';
 import * as LocalStrategy from 'passport-local';
-import DaoKX2 from './Dao/daoKX2.ts';
-import Dao from './Dao/daoStory1-3.ts';
 import DaoUser from './Dao/daoUser.ts';
-import DaoStory4 from './Dao/daoStory4.ts';
+import DaoDocument from './Dao/documentDao.ts';
+import DaoConnection from './Dao/connectionDao.ts';
+import DaoArea from './Dao/areaDao.ts';
 import DaoStory5 from './Dao/daoStory5.ts';
 
-
-const dao = new Dao();
-const daoKX2 = new DaoKX2();
+const daoDocument = new DaoDocument();
+const daoConnection = new DaoConnection();
+const daoArea = new DaoArea();
 const daoUser = new DaoUser();
-const daoStory4 = new  DaoStory4();
 const daoStory5 = new  DaoStory5();
 
 const app = express();
 const port = 3001;
-
 
 app.use(express.json());
 app.use(morgan('dev'));
@@ -45,14 +44,6 @@ passport.use(new LocalStrategy.Strategy(async function verify(username, password
 passport.serializeUser((user, cb) => cb(null, user));
 passport.deserializeUser((user, cb) => cb(null, user));
 
-// authentication middleware
-export const isLoggedIn = (req: any , res: any, next: any) => {
-    if (req.isAuthenticated()) {
-      return next();
-    }
-    return res.status(401).json({ error: 'Not authorized' });
-  }
-
   // session setup
 const secret = "SECRETTTTTTT"
 app.use(session({
@@ -69,104 +60,38 @@ app.use((req:any, res: any, next: any) => {
   next();
 });
 
-/** Story 1 routes */
-app.post('/api/documents', async (req: any, res: any) => {
-    try {
-        let number = null;
-        if(req.body.area!=null){
-            number=await dao.getAreaIdFromName(req.body.area)
-        }
-        await dao.newDescription(req.body.title, req.body.stakeholder, req.body.scale, req.body.date, req.body.type, req.body.language, req.body.page, req.body.coordinate,number, req.body.description);
-        res.status(200).json({message: 'Document add successfully'});
-    } catch (error) {
-        res.status(503).json({ error: Error });
+// authentication middleware
+export const isLoggedIn = (req: any , res: any, next: any) => {
+    if (req.isAuthenticated()) {
+      return next();
     }
-})
+    return res.status(401).json({ error: 'Not authorized' });
+}
 
-// Story KX2 routes
-app.post('/api/connections', isLoggedIn, async (req: any, res: any) => {
-    try {
-        console.log(req.body)
-        const SourceDoc=req.body.SourceDocument;
-        const TargetDoc=req.body.TargetDocument;
-        const Type=req.body.ConnectionType;
-        await daoKX2.SetDocumentsConnection(SourceDoc, TargetDoc, Type);
-    } catch (error) {
-        res.status(503).json({ error: Error });
-    }
-})
-app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
-    try {
-        const { SourceDoc } = req.params;
-        const connections = await daoKX2.GetDocumentConnections(SourceDoc);
-        res.json(connections);
-    } catch (error) {
-        res.status(503).json({ error: Error });
-    }
-});
+const docValidation = [
+    check('title').notEmpty().isString(),
+    check('stakeholder').notEmpty().isString(),
+        check('scale').notEmpty(),
+        check('date').notEmpty().isDate(),
+        check('type').notEmpty().isString(),
+        check('language').optional({nullable: true}).isString(),
+        check('page').optional({nullable: true}).isInt(),
+        check('coordinate').optional({nullable: true}).isString(),
+        check('description').notEmpty().isString()
+];
 
-/** Story 3 routes */
-app.put('/api/documents/area', isLoggedIn, async (req: any, res: any) => { //add an existing area to a document
-    try{
-        const areaId = await dao.getAreaIdFromName(req.body.area);
-        const documentId = await dao.getDocumentIdFromTitle(req.body.title);
-        await dao.addAreaToDoc(areaId, documentId);
-    }catch(error){
-        res.status(503).json({error: Error});
-    }
-});
+const connectionValidation = [
+    check('SourceDocument').notEmpty().isString(),
+    check('TargetDocument').notEmpty().isString(),
+    check('ConnectionType').notEmpty().isString()
+];
 
-app.get('/api/areas', async (req: any, res: any) => {   //get all the areas in the db
-    try{
-        const areas = await dao.getAllAreas();
-        res.json(areas);
-    }catch(error){
-        res.status(503).json({error: Error});
-    }
-})
+const areaValidation = [
+    check('name').notEmpty().isString(),
+    check('vertex').notEmpty().isString()
+];
 
-app.post('/api/areas', isLoggedIn, async (req: any, res: any) => { //add a new area in the db
-    try{
-        await dao.addArea(req.body.name, req.body.vertex);
-        res.status(201).json({message: 'Area add successfully'});
-    }catch(error){
-        res.status(503).json({error: Error});
-    }
-});
-
-/** Story 4 routes */
-app.get('/api/documents',async (req: any, res: any)=>{
-    try{
-        const docs = await daoStory4.getAllDoc();
-        res.json(docs);
-    }catch(error){
-        res.status(503).json({error: Error});
-    }
-})
-
-
-app.get('/api/area/docs/:name',async (req: any, res: any)=>{
-    try{
-        const name=req.params.name;
-        const id=await dao.getAreaIdFromName(name);
-        const docs=await daoStory4.getAllDocOfArea(id);
-        res.json(docs);
-    }catch(error){
-        res.status(503).json({error: Error});
-    }
-})
-/** Story 5 routes */
-app.put('/api/modifyGeoreference',async (req: any, res: any)=>{
-    try{
-        const id = await dao.getDocumentIdFromTitle(req.body.name);
-        await daoStory5.modifyGeoreference(id,req.body.coord,req.body.oldCoord,req.body.area,req.body.oldArea)
-        res.status(200);
-    }catch(error){
-        res.status(503).json({error: Error});
-    }
-})
-
-//API AUTENTICATION
+/*** Users APIs */
 
 app.post('/api/sessions', (req: any, res: any, next: any) => {
     passport.authenticate('local', (err: any, user: any, info: any) => {
@@ -194,7 +119,6 @@ app.get('/api/sessions/current', (req: any, res: any) => {
     }
 });
 
-
 app.delete('/api/sessions/current', (req: any, res: any) => {
     req.logout((err: any) => {
         if (err) {
@@ -203,6 +127,120 @@ app.delete('/api/sessions/current', (req: any, res: any) => {
         return res.end();
     });
 });
+
+
+/**Documents' APIs */
+
+//add a new document
+app.post('/api/documents', async (req: any, res: any) => {
+    try {
+        let number = null;
+        if(req.body.area!=null){
+            number=await daoArea.getAreaIdFromName(req.body.area)
+        }
+        await daoDocument.newDescription(req.body.title, req.body.stakeholder, req.body.scale, req.body.date, req.body.type, req.body.language, req.body.page, req.body.coordinate,number, req.body.description);
+        res.status(200).json({message: 'Document add successfully'});
+    } catch (error) {
+        res.status(503).json({ error: Error });
+    }
+})
+
+//get the list of all documents
+app.get('/api/documents',async (req: any, res: any)=>{
+    try{
+        const docs = await daoDocument.getAllDoc();
+        res.json(docs);
+    }catch(error){
+        res.status(503).json({error: Error});
+    }
+})
+
+//get all documents associate to an area
+app.get('/api/documents/areas/:name',async (req: any, res: any)=>{
+    try{
+        const name=req.params.name;
+        const id=await daoArea.getAreaIdFromName(name);
+        const docs=await daoDocument.getAllDocOfArea(id);
+        res.json(docs);
+    }catch(error){
+        res.status(503).json({error: Error});
+    }
+})
+
+/** Connections' APIs */
+
+//add a new connection between two documents
+app.post('/api/connections', isLoggedIn, async (req: any, res: any) => {
+    try {
+        const SourceDoc=req.body.SourceDocument;
+        const TargetDoc=req.body.TargetDocument;
+        const Type=req.body.ConnectionType;
+        await daoConnection.SetDocumentsConnection(SourceDoc, TargetDoc, Type);
+        res.status(200).json({message: 'Connection add successfully'});
+    } catch (error) {
+        res.status(503).json({ error: Error });
+    }
+})
+
+//get the number of connection associate to a document
+app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
+    try {
+        const { SourceDoc } = req.params;
+        const connections = await daoConnection.GetDocumentConnections(SourceDoc);
+        res.json(connections);
+    } catch (error) {
+        res.status(503).json({ error: Error });
+    }
+});
+
+
+/** Areas' APIs */
+
+//associate an area to a document
+app.put('/api/documents/area', isLoggedIn, async (req: any, res: any) => { //add an existing area to a document
+    try{
+        const areaId = await daoArea.getAreaIdFromName(req.body.area);
+        const documentId = await daoDocument.getDocumentIdFromTitle(req.body.title);
+        await daoArea.addAreaToDoc(areaId, documentId);
+        res.status(200).json({message: 'Association between area and document successfull'});
+    }catch(error){
+        res.status(503).json({error: Error});
+    }
+});
+
+//get all the areas in the DB
+app.get('/api/areas', async (req: any, res: any) => {   
+    try{
+        const areas = await daoArea.getAllAreas();
+        res.json(areas);
+    }catch(error){
+        res.status(503).json({error: Error});
+    }
+})
+
+//add a new area in the DB
+app.post('/api/areas', isLoggedIn, async (req: any, res: any) => { //add a new area in the db
+    try{
+        await daoArea.addArea(req.body.name, req.body.vertex);
+        res.status(201).json({message: 'Area add successfully'});
+    }catch(error){
+        res.status(503).json({error: Error});
+    }
+});
+
+
+/** Story 5 routes */
+//modify the coordinates of an area
+app.put('/api/modifyGeoreference',async (req: any, res: any)=>{
+    try{
+        const id = await daoDocument.getDocumentIdFromTitle(req.body.name);
+        await daoStory5.modifyGeoreference(id,req.body.coord,req.body.oldCoord,req.body.area,req.body.oldArea)
+        res.status(200);
+    }catch(error){
+        res.status(503).json({error: Error});
+    }
+})
+
 // Activate the server
 app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);
