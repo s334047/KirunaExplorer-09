@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, FeatureGroup, Marker,Polygon} from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import L from 'leaflet';
@@ -11,6 +11,8 @@ import { useNavigate } from 'react-router-dom';
 function ModifyGeoreference(props){
     const [mode,setMode]=useState(null);
     const [show,setShow]=useState(true);
+    const [lat,setLat]=useState(null);
+    const [lng,setLng]=useState(null);
     const [selectedArea, setSelectedArea] = useState(null)
     const [selectedPoint, setSelectedPoint] = useState(null)
     const [resetDrawing, setResetDrawing] = useState(false);
@@ -59,8 +61,9 @@ function ModifyGeoreference(props){
     const handleEdit = (e) => {
         const layers = e.layers;
         layers.eachLayer((layer) => {
-            const newCoords = layer.getLatLngs(); // Ottieni le nuove coordinate dell'area modificata
-            setSelectedArea(newCoords); // Aggiorna lo stato con le nuove coordinate
+            const latlngs = layer.getLatLngs(); // Ottieni le nuove coordinate dell'area modificata
+            const newPolygon = latlngs[0].map((latlng) => [latlng.lat, latlng.lng]);
+            setSelectedArea(newPolygon); // Aggiorna lo stato con le nuove coordinate
         });
     };
     const handleDrawCreated = (e) => {
@@ -71,9 +74,14 @@ function ModifyGeoreference(props){
         };
 
     }
+    const handleLatLng = (value, setCoordinate)=>{
+        const isValidNumber = /^-?\d*\.?\d*$/;
+        if (isValidNumber.test(value)) {
+            setCoordinate(value); // Update state only if valid
+        }
+    }
     const handleMarkerDragEnd = (event) => {
         const newLatLng = event.target.getLatLng(); // Ottieni la nuova posizione del marker
-        console.log(newLatLng)
         setSelectedPoint([newLatLng.lat, newLatLng.lng]); // Aggiorna lo stato con le nuove coordinate
     };
     const handleDeleteDraw = () => {
@@ -85,8 +93,32 @@ function ModifyGeoreference(props){
         navigate("/")
     }
     const handleSave =()=>{
-
+        try {
+            if(mode === 'PointOld'){
+                API.modifyGeoreference(props.doc.title,selectedPoint,props.doc.coordinate,null,null)
+            }
+            if(mode === 'PointNew'){
+                API.modifyGeoreference(props.doc.title,selectedPoint,null,null,null)
+            } 
+            if(mode === 'AreaNew'){
+                API.modifyGeoreference(props.doc.title,null,null,selectedArea.vertex,null)
+            } 
+            if(mode === 'AreaOld'){
+                API.modifyGeoreference(props.doc.title,null,null,selectedArea,props.doc.area)
+            } 
+        } catch (error) {
+            console.log(error)
+        }
+        navigate("/")
     }
+    useEffect(()=>{
+        if(lat && lng){
+            setSelectedPoint([lat,lng]);
+        }
+        else if(mode === 'PointOld'){
+            setSelectedPoint(props.doc.coordinate)
+        }
+    },[lat,lng])
     return(   
     <div style={{ display: 'flex', flex: 1, position: 'relative', height: '90vh' }}>
         {mode === "AreaNew" && <div style={{
@@ -147,6 +179,26 @@ function ModifyGeoreference(props){
                 borderRadius: '5px',
                 boxShadow: '0 0 10px rgba(0,0,0,0.1)' // Optional: shadow effect
             }}>
+                    <Form>
+            <Form.Group controlId="latitude">
+                <Form.Label>Latitude</Form.Label>
+                <Form.Control
+                    type="number"
+
+                    onChange={(e)=>{handleLatLng(e.target.value,setLat)}}
+                    placeholder="Enter latitude"
+                />
+            </Form.Group>
+            <Form.Group controlId="longitude" style={{ marginTop: '10px' }}>
+                <Form.Label>Longitude</Form.Label>
+                <Form.Control
+                    type="number"
+
+                    onChange={(e)=>{handleLatLng(e.target.value,setLng)}}
+                    placeholder="Enter longitude"
+                />
+            </Form.Group>
+        </Form>
                 <div style={{ display: 'flex', marginTop: '10px', gap: "5px" }}>
                     <Button variant="primary" onClick={handleSave} disabled={!selectedPoint} style={{ backgroundColor: "#154109", borderColor: "#154109", flexGrow: 1 }}>Confirm</Button>{' '}
                     <Button variant="secondary" onClick={handleClose} style={{ flexGrow: 1 }}>Close</Button>

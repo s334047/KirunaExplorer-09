@@ -8,12 +8,14 @@ import DaoKX2 from './Dao/daoKX2.ts';
 import Dao from './Dao/daoStory1-3.ts';
 import DaoUser from './Dao/daoUser.ts';
 import DaoStory4 from './Dao/daoStory4.ts';
+import DaoStory5 from './Dao/daoStory5.ts';
 
 
 const dao = new Dao();
 const daoKX2 = new DaoKX2();
 const daoUser = new DaoUser();
 const daoStory4 = new  DaoStory4();
+const daoStory5 = new  DaoStory5();
 
 const app = express();
 const port = 3001;
@@ -153,6 +155,17 @@ app.get('/api/area/docs/:name',async (req: any, res: any)=>{
         res.status(503).json({error: Error});
     }
 })
+/** Story 5 routes */
+app.put('/api/modifyGeoreference',async (req: any, res: any)=>{
+    try{
+        const id = await dao.getDocumentIdFromTitle(req.body.name);
+        await daoStory5.modifyGeoreference(id,req.body.coord,req.body.oldCoord,req.body.area,req.body.oldArea)
+        res.status(200);
+    }catch(error){
+        res.status(503).json({error: Error});
+    }
+})
+
 //API AUTENTICATION
 
 app.post('/api/sessions', (req: any, res: any, next: any) => {

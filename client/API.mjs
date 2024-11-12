@@ -88,7 +88,7 @@ async function addArea(name, vertex){           //add a new area in the db
         body: JSON.stringify({name, vertex})
     }).then(response => response.json())
 };
-/**API STory 4 */
+/**API Story 4 */
 async function getAllDocs() {                  //get all the docs in the db
   return await fetch(`${SERVER_URL}/documents`, {
       method: 'GET',
@@ -105,6 +105,17 @@ async function getAreasDoc(name) {                  //get docs of an area
       headers: {
           'Content-type': 'application/json'
       },
+      //credentials: 'include'
+  }).then(response => response.json())
+}
+/**API Story 5 */
+async function modifyGeoreference(name,coord,oldCoord,area,oldArea) {  //modify the georeference of a document
+  return await fetch(`${SERVER_URL}/modifyGeoreference`, {
+      method: 'PUT',
+      headers: {
+          'Content-type': 'application/json'
+      },
+      body: JSON.stringify({ name, coord, oldCoord, area, oldArea })
       //credentials: 'include'
   }).then(response => response.json())
 }
@@ -150,7 +161,7 @@ const logIn = async (credentials) => {
   }
 
 
-const API = {addDocument, SetDocumentsConnection, GetDocumentConnections, addAreaToDoc, getAllAreas, addArea,getAllDocs,getAreasDoc, logIn, getUserInfo, logOut};
+const API = {addDocument, SetDocumentsConnection, GetDocumentConnections, addAreaToDoc, getAllAreas, addArea,getAllDocs,getAreasDoc,modifyGeoreference, logIn, getUserInfo, logOut};
 
 
 export default API;

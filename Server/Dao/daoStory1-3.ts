@@ -59,16 +59,11 @@ export default class Dao {
     //-------------------------------------------
 
     addArea(name: string, vertex: number[][]){      
-        let vertexTemp = '[ ';
-        for(let i=0; i<vertex.length; i++){
-            vertexTemp = vertexTemp + '[ '+vertex[i]+ ' ]';
-        }
-        vertexTemp = vertexTemp+' ]';
         return new Promise<void>((resolve, reject) => {
             const query = `INSERT INTO Area
                             (Name, Vertex)
                             VALUES(?,?)`;
-            db.run(query, [name, vertexTemp], function(err){
+            db.run(query, [name, JSON.stringify(vertex)], function(err){
                 if(err)
                     reject(err);
                 else
