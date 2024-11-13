@@ -1,29 +1,18 @@
 import { Coordinates } from "../../Components/Georeference.ts";
-import Dao from "../../Dao/daoStory1-3.ts";
+import DaoDocument from "../../Dao/documentDao.ts";
 import { db } from "../../DB/db.ts";
 import { describe, test, expect, jest, beforeEach, afterEach, } from "@jest/globals";
 import { Area } from "../../Components/Georeference.ts";
+import DaoArea from "../../Dao/areaDao.ts";
 
-
-// database mock
-// jest.mock("../../DB/db.ts", () => ({
-//     db: {
-//         run: jest.fn(),
-//     },
-// }));
 
 describe("DaoStory1 Test", () => {
-    let daoS1: Dao;
-    // let mockUser: User;
+    let daoS1: DaoDocument;
     const coordinate = [123, 456];
-
+    const idArea = 4;
     beforeEach(() => {
-        daoS1 = new Dao();
-        // const user = new User("TestUser", "TestPassword", "TestEmail", "TestName", "TestSurname", "TestRole");
-        // mockUser = user;
+        daoS1 = new DaoDocument();
         jest.clearAllMocks();
-        // jest.restoreAllMocks();
-        // jest.resetAllMocks();
     });
     afterEach(() => {
         jest.clearAllMocks();
@@ -35,7 +24,7 @@ describe("DaoStory1 Test", () => {
         test("should insert a new description into the Document table", async () => {
             const mockRun = jest.spyOn(db, 'run').mockImplementation((query, params, callback) => {
                 // checking parameters
-                if (params.length !== 9) {
+                if (params.length !== 10) {
                     throw new Error("Wrong number of parameters in DaoStory1 newDescription");
                 } else if (typeof callback !== "function") {
                     throw new Error("Callback is not a function in DaoStory1 newDescription");
@@ -46,12 +35,12 @@ describe("DaoStory1 Test", () => {
                 callback(null); // Simulate a successful insertion
                 return db;
             });
-            const result = await daoS1.newDescription("Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, coordinate, "Test Description");
+            const result = await daoS1.newDescription("Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, coordinate, idArea, "Test Description");
             expect(result).toBe(undefined);
             expect(mockRun).toHaveBeenCalled();
             expect(mockRun).toHaveBeenCalledWith(
                 expect.any(String), // SQL query
-                ["Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, "[ 123, 456 ]", "Test Description"],
+                ["Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, "[ 123, 456 ]", idArea, "Test Description"],
                 expect.any(Function) // Callback function
             );
         });
@@ -62,7 +51,7 @@ describe("DaoStory1 Test", () => {
                 return db;
             });
 
-            await expect(daoS1.newDescription("Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, [123, 456], "Test Description"))
+            await expect(daoS1.newDescription("Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, [123, 456], idArea, "Test Description"))
                 .rejects.toThrow("Database error");
 
             expect(mockRun).toHaveBeenCalled();
@@ -70,16 +59,13 @@ describe("DaoStory1 Test", () => {
     });
 });
 describe("DaoStory3 Test",() =>{
-    let daoS1: Dao;
-    // let mockUser: User;
+    let daoArea: DaoArea;
+    let daoDocument: DaoDocument;
 
     beforeEach(() => {
-        daoS1 = new Dao();
-        // const user = new User("TestUser", "TestPassword", "TestEmail", "TestName", "TestSurname", "TestRole");
-        // mockUser = user;
+        daoArea = new DaoArea();
+        daoDocument = new DaoDocument()
         jest.clearAllMocks();
-        // jest.restoreAllMocks();
-        // jest.resetAllMocks();
     });
     afterEach(() => {
         jest.clearAllMocks();
@@ -92,7 +78,7 @@ describe("DaoStory3 Test",() =>{
                 callback(null);
                 return db;
             });
-            const response=await  daoS1.addAreaToDoc(12,12);
+            const response=await  daoArea.addAreaToDoc(12,12);
             expect(response).toBe(undefined)
             expect(mockRun).toHaveBeenCalled();
         })
@@ -101,7 +87,7 @@ describe("DaoStory3 Test",() =>{
                 callback(new Error("Database Error"));
                 return db;
             });
-            await expect(daoS1.addAreaToDoc(12,12)).rejects.toThrow('Database Error');;
+            await expect(daoArea.addAreaToDoc(12,12)).rejects.toThrow('Database Error');;
             expect(mockRun).toHaveBeenCalled();
         })
     })
@@ -111,7 +97,7 @@ describe("DaoStory3 Test",() =>{
                 callback(null);
                 return db;
             });
-            const response=await  daoS1.addArea("Test",[[12,12],[12,12]]);
+            const response=await  daoArea.addArea("Test",[[12,12],[12,12]]);
             expect(response).toBe(undefined)
             expect(mockRun).toHaveBeenCalled();
         })
@@ -120,7 +106,7 @@ describe("DaoStory3 Test",() =>{
                 callback(new Error("Database Error"));
                 return db;
             });
-            await expect(daoS1.addArea("Test",[[12,12],[12,12]])).rejects.toThrow('Database Error');;
+            await expect(daoArea.addArea("Test",[[12,12],[12,12]])).rejects.toThrow('Database Error');;
             expect(mockRun).toHaveBeenCalled();
         })
     })
@@ -130,7 +116,7 @@ describe("DaoStory3 Test",() =>{
                 callback(null,[{Id:12,Name:"Area 1",Vertex:"[[12,12],[13,13]]"},{Id:13,Name:"Area 2",Vertex:"[[14,14],[15,15]]"}]);
                 return db;
             });
-            const response=await  daoS1.getAllAreas();
+            const response=await  daoArea.getAllAreas();
             expect(response).toStrictEqual([new Area(12,"Area 1",[[12,12],[13,13]]),new Area(13,"Area 2",[[14,14],[15,15]])])
             expect(mockRun).toHaveBeenCalled();
         })
@@ -139,7 +125,7 @@ describe("DaoStory3 Test",() =>{
                 callback(new Error("Database Error"));
                 return db;
             });
-            await expect(daoS1.getAllAreas()).rejects.toThrow('Database Error');;
+            await expect(daoArea.getAllAreas()).rejects.toThrow('Database Error');;
             expect(mockRun).toHaveBeenCalled();
         }) 
     })
@@ -149,7 +135,7 @@ describe("DaoStory3 Test",() =>{
                 callback(null,{Id:12});
                 return db;
             });
-            const response=await  daoS1.getAreaIdFromName("Area 1");
+            const response=await  daoArea.getAreaIdFromName("Area 1");
             expect(response).toStrictEqual(12)
             expect(mockRun).toHaveBeenCalled();
         })
@@ -158,7 +144,7 @@ describe("DaoStory3 Test",() =>{
                 callback(new Error("Database Error"));
                 return db;
             });
-            await expect(daoS1.getAreaIdFromName("Area 1")).rejects.toThrow('Database Error');;
+            await expect(daoArea.getAreaIdFromName("Area 1")).rejects.toThrow('Database Error');;
             expect(mockRun).toHaveBeenCalled();
         }) 
     })
@@ -168,7 +154,7 @@ describe("DaoStory3 Test",() =>{
                 callback(null,{Id:12});
                 return db;
             });
-            const response=await  daoS1.getDocumentIdFromTitle("Title 1");
+            const response=await  daoDocument.getDocumentIdFromTitle("Title 1");
             expect(response).toStrictEqual(12)
             expect(mockRun).toHaveBeenCalled();
         })
@@ -177,7 +163,7 @@ describe("DaoStory3 Test",() =>{
                 callback(new Error("Database Error"));
                 return db;
             });
-            await expect(daoS1.getAreaIdFromName("Title 1")).rejects.toThrow('Database Error');;
+            await expect(daoArea.getAreaIdFromName("Title 1")).rejects.toThrow('Database Error');;
             expect(mockRun).toHaveBeenCalled();
         }) 
     })

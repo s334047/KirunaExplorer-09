@@ -1,4 +1,4 @@
-import daoStory4 from "../../Dao/daoStory4.ts";
+import DaoDocument from "../../Dao/documentDao.ts";
 import { DocumentDescription } from "../../Components/DocumentDescription.ts";
 import {jest, describe, afterEach, test, expect} from "@jest/globals";
 import { Database } from "sqlite3";
@@ -7,7 +7,7 @@ import { db } from "../../DB/db.ts";
 jest.mock("sqlite3");
 
 describe("daoStory4", () => {
-    const dao = new daoStory4();
+    const dao = new DaoDocument();
 
     afterEach(() => {
         jest.clearAllMocks();

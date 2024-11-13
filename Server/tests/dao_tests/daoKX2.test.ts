@@ -1,10 +1,10 @@
 import { Connection } from "../../Components/Connection.ts";
-import DaoKX2 from "../../Dao/daoKX2.ts";
+import DaoConnection from "../../Dao/connectionDao.ts";
 import { db } from "../../DB/db.ts";
 import { Database } from "sqlite3";
 import { describe, test, expect, jest, afterEach, } from "@jest/globals";
 
-const daoKX2 = new DaoKX2;
+const daoConnection = new DaoConnection;
 
 jest.mock('sqlite3');
 
@@ -22,11 +22,11 @@ describe("Class DaoKX2, function SetDocumentsConnection", () => {
         const docIds = [1, 2];
         const typeMock = 'tipoConnessione';
 
-        const spySourceId = jest.spyOn(daoKX2, "GetDocumentsId")
+        const spySourceId = jest.spyOn(daoConnection, "GetDocumentsId")
         .mockResolvedValueOnce(docIds[0])
         .mockResolvedValueOnce(docIds[1]);
         
-        const spyDuplicateDoc = jest.spyOn(daoKX2, "FindDuplicatedDocument")
+        const spyDuplicateDoc = jest.spyOn(daoConnection, "FindDuplicatedDocument")
         .mockResolvedValueOnce(true);
 
         const dbRunMock = jest.spyOn(db, "run").mockImplementation((query, params, callback) => {
@@ -34,7 +34,7 @@ describe("Class DaoKX2, function SetDocumentsConnection", () => {
             return {} as Database;
         });
 
-        const result = await daoKX2.SetDocumentsConnection(sourceMock, targetMock, typeMock);
+        const result = await daoConnection.SetDocumentsConnection(sourceMock, targetMock, typeMock);
         expect(result).toBe(true);
         expect(dbRunMock).toBeCalledWith(`INSERT INTO Connection (SourceDocId, TargetDocId, Type) VALUES (?, ?, ?)`,
             [docIds[0], docIds[1], typeMock], expect.any(Function));
@@ -49,11 +49,11 @@ describe("Class DaoKX2, function SetDocumentsConnection", () => {
         const typeMock = 'tipoConnessione'; 
         const mockError = 'Database error';
 
-        jest.spyOn(daoKX2, "GetDocumentsId")
+        jest.spyOn(daoConnection, "GetDocumentsId")
         .mockResolvedValueOnce(docIds[0])
         .mockResolvedValueOnce(docIds[1]);
         
-        jest.spyOn(daoKX2, "FindDuplicatedDocument")
+        jest.spyOn(daoConnection, "FindDuplicatedDocument")
         .mockResolvedValueOnce(true);
 
         jest.spyOn(db, "run").mockImplementation((query, params, callback) => {
@@ -61,7 +61,7 @@ describe("Class DaoKX2, function SetDocumentsConnection", () => {
             return {} as Database;
         });
 
-        await expect(daoKX2.SetDocumentsConnection(sourceMock, targetMock, typeMock)).rejects.toEqual("DocumentsConnection: "+mockError);
+        await expect(daoConnection.SetDocumentsConnection(sourceMock, targetMock, typeMock)).rejects.toEqual("DocumentsConnection: "+mockError);
     })
 
     test("it should return false if there's a duplicate in the db ", async() => {
@@ -71,14 +71,14 @@ describe("Class DaoKX2, function SetDocumentsConnection", () => {
         const docIds = [1, 2];
         const typeMock = 'tipoConnessione'; 
 
-        jest.spyOn(daoKX2, "GetDocumentsId")
+        jest.spyOn(daoConnection, "GetDocumentsId")
         .mockResolvedValueOnce(docIds[0])
         .mockResolvedValueOnce(docIds[1]);
         
-        jest.spyOn(daoKX2, "FindDuplicatedDocument")
+        jest.spyOn(daoConnection, "FindDuplicatedDocument")
         .mockResolvedValueOnce(false);
 
-        await expect(daoKX2.SetDocumentsConnection(sourceMock, targetMock, typeMock)).rejects.toEqual("Duplicate connection on FindDuplicatedDocument\n");
+        await expect(daoConnection.SetDocumentsConnection(sourceMock, targetMock, typeMock)).rejects.toEqual("Duplicate connection on FindDuplicatedDocument\n");
     })
 
     test("it should return false if one or more documents doesn't exist ", async() => {
@@ -87,11 +87,11 @@ describe("Class DaoKX2, function SetDocumentsConnection", () => {
         const docIds = [1, null];
         const typeMock = 'tipoConnessione'; 
 
-        jest.spyOn(daoKX2, "GetDocumentsId")
+        jest.spyOn(daoConnection, "GetDocumentsId")
         .mockResolvedValueOnce(docIds[0])
         .mockResolvedValueOnce(docIds[1]);
 
-        await expect(daoKX2.SetDocumentsConnection(sourceMock, targetMock, typeMock)).rejects.toEqual("SourceDocId or TargetDocId not found");
+        await expect(daoConnection.SetDocumentsConnection(sourceMock, targetMock, typeMock)).rejects.toEqual("SourceDocId or TargetDocId not found");
     })
 })
 
@@ -105,7 +105,7 @@ describe("Class DaoKX2, function GetDocumentConnections", () => {
         const connection3 = new Connection(1,5, "type2");
         const mockConnections = [connection1, connection2, connection3];
 
-        const spySourceDocId = jest.spyOn(daoKX2, "GetDocumentsId")
+        const spySourceDocId = jest.spyOn(daoConnection, "GetDocumentsId")
         .mockResolvedValueOnce(sourceDocIdMock);
     
         const dbGetMock = jest.spyOn(db, "get").mockImplementation((query, params, callback) => {
@@ -113,7 +113,7 @@ describe("Class DaoKX2, function GetDocumentConnections", () => {
             return {} as Database;
         });
     
-        const result = await daoKX2.GetDocumentConnections(sourceDocMock);
+        const result = await daoConnection.GetDocumentConnections(sourceDocMock);
         expect(result).toBe(mockConnections.length);
         expect(dbGetMock).toBeCalledWith(`SELECT  COUNT(*) as n FROM Connection WHERE SourceDocId = ? OR TargetDocId = ?`,
             [sourceDocIdMock, sourceDocIdMock], expect.any(Function));
@@ -125,7 +125,7 @@ describe("Class DaoKX2, function GetDocumentConnections", () => {
         const sourceDocIdMock = 1;
         const mockError = 'Database error';
 
-        const spySourceDocId = jest.spyOn(daoKX2, "GetDocumentsId")
+        const spySourceDocId = jest.spyOn(daoConnection, "GetDocumentsId")
         .mockResolvedValueOnce(sourceDocIdMock);
     
         const dbGetMock = jest.spyOn(db, "get").mockImplementation((query, params, callback) => {
@@ -133,7 +133,7 @@ describe("Class DaoKX2, function GetDocumentConnections", () => {
             return {} as Database;
         });
     
-        await expect(daoKX2.GetDocumentConnections(sourceDocMock)).rejects.toEqual(mockError);
+        await expect(daoConnection.GetDocumentConnections(sourceDocMock)).rejects.toEqual(mockError);
         expect(spySourceDocId).toHaveBeenCalledTimes(1);
         expect(dbGetMock).toBeCalledWith(`SELECT  COUNT(*) as n FROM Connection WHERE SourceDocId = ? OR TargetDocId = ?`,
             [sourceDocIdMock, sourceDocIdMock], expect.any(Function));
@@ -143,9 +143,9 @@ describe("Class DaoKX2, function GetDocumentConnections", () => {
         const sourceDocMock = 'doc1';
         const sourceDocIdMock = null;
 
-        const spySourceDocId = jest.spyOn(daoKX2, "GetDocumentsId").mockResolvedValueOnce(sourceDocIdMock);
+        const spySourceDocId = jest.spyOn(daoConnection, "GetDocumentsId").mockResolvedValueOnce(sourceDocIdMock);
     
-        await expect(daoKX2.GetDocumentConnections(sourceDocMock)).rejects.toEqual("SourceDocId not found");
+        await expect(daoConnection.GetDocumentConnections(sourceDocMock)).rejects.toEqual("SourceDocId not found");
         expect(spySourceDocId).toHaveBeenCalledTimes(1);
     });
 })
@@ -161,7 +161,7 @@ describe("Class DaoKX2, function GetDocumentsId", () => {
             return {} as Database;
         });
 
-        const res = await daoKX2.GetDocumentsId(mockTitle);
+        const res = await daoConnection.GetDocumentsId(mockTitle);
         expect(res).toEqual(mockId);
         expect(dbGetMock).toBeCalledWith(`SELECT Id FROM Document WHERE Title = ?`,
             [mockTitle], expect.any(Function));
@@ -176,7 +176,7 @@ describe("Class DaoKX2, function GetDocumentsId", () => {
             return {} as Database;
         });
     
-        await expect(daoKX2.GetDocumentsId(mockTitle)).rejects.toEqual(mockError);
+        await expect(daoConnection.GetDocumentsId(mockTitle)).rejects.toEqual(mockError);
     });
 })
 
@@ -192,7 +192,7 @@ describe("Class DaoKX2, function FindDuplicateDocument", () => {
             return {} as Database;
         });
 
-        const res = await daoKX2.FindDuplicatedDocument(mockSourceId, mockTargetId);
+        const res = await daoConnection.FindDuplicatedDocument(mockSourceId, mockTargetId);
         expect(res).toEqual(false);
         expect(dbAllMock).toBeCalledWith(`SELECT Id FROM Connection WHERE SourceDocId = ? AND TargetDocId = ?`,
             [mockTargetId, mockSourceId], expect.any(Function));
@@ -206,7 +206,7 @@ describe("Class DaoKX2, function FindDuplicateDocument", () => {
             return {} as Database;
         });
 
-        const res = await daoKX2.FindDuplicatedDocument(mockSourceId, mockTargetId);
+        const res = await daoConnection.FindDuplicatedDocument(mockSourceId, mockTargetId);
         expect(res).toEqual(true);
         expect(dbAllMock).toBeCalledWith(`SELECT Id FROM Connection WHERE SourceDocId = ? AND TargetDocId = ?`,
             [mockTargetId, mockSourceId], expect.any(Function));
@@ -220,7 +220,7 @@ describe("Class DaoKX2, function FindDuplicateDocument", () => {
             return {} as Database;
         });
     
-        await expect(daoKX2.FindDuplicatedDocument(mockSourceId, mockTargetId)).rejects.toEqual(mockError);
+        await expect(daoConnection.FindDuplicatedDocument(mockSourceId, mockTargetId)).rejects.toEqual(mockError);
     });
     
 })
