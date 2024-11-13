@@ -9,13 +9,13 @@ import DaoUser from './Dao/daoUser.ts';
 import DaoDocument from './Dao/documentDao.ts';
 import DaoConnection from './Dao/connectionDao.ts';
 import DaoArea from './Dao/areaDao.ts';
-import DaoStory5 from './Dao/daoStory5.ts';
+import Authenticator from './auth.ts'; //NEW
+import AuthRoutes from './authRoutes.ts'; //NEW
 
 const daoDocument = new DaoDocument();
 const daoConnection = new DaoConnection();
 const daoArea = new DaoArea();
 const daoUser = new DaoUser();
-const daoStory5 = new  DaoStory5();
 
 const app = express();
 const port = 3001;
@@ -29,6 +29,10 @@ const corsOption = {
 };
 app.use(cors(corsOption));
 
+const auth = new Authenticator(app); //NEW
+//const authRoutes = new AuthRoutes(auth); //NEW
+//app.use('localhost:5173/api/sessions', authRoutes.getRouter()) //NEW
+/*
 passport.use(new LocalStrategy.Strategy(async function verify(username, password, cb) {
     try {
         const user = await daoUser.getUser(username, password);
@@ -59,14 +63,8 @@ app.use((req:any, res: any, next: any) => {
   }
   next();
 });
-
+*/
 // authentication middleware
-export const isLoggedIn = (req: any , res: any, next: any) => {
-    if (req.isAuthenticated()) {
-      return next();
-    }
-    return res.status(401).json({ error: 'Not authorized' });
-}
 
 const docValidation = [
     check('title').notEmpty().isString(),
@@ -94,6 +92,8 @@ const areaValidation = [
 /*** Users APIs */
 
 app.post('/api/sessions', (req: any, res: any, next: any) => {
+    auth.login(req, res, next);
+    /*
     passport.authenticate('local', (err: any, user: any, info: any) => {
         if (err) {
             return next(err);
@@ -109,24 +109,36 @@ app.post('/api/sessions', (req: any, res: any, next: any) => {
             return res.status(201).json(req.user);
         });
     })(req, res, next);
+    */
 });
 
-app.get('/api/sessions/current', (req: any, res: any) => {
+app.get('/api/sessions/current', (req: any, res: any, next: any) => {
+    auth.isLoggedIn(req, res, next)
+    /*
     if (req.isAuthenticated()) {
         return res.json(req.user);
     } else {
         return res.status(401).json({ error: 'Not authenticated' });
     }
+        */
 });
 
-app.delete('/api/sessions/current', (req: any, res: any) => {
+app.delete('/api/sessions/current', (req: any, res: any, next: any) => {
+    auth.isLoggedIn(req, res, next)
+    auth.logout(req, res, next)
+    /*
     req.logout((err: any) => {
         if (err) {
             return res.status(500).send({ error: 'Logout failed' });
         }
         return res.end();
     });
+    */
 });
+app.delete('/api/sessions/current', (req: any, res: any, next: any) => 
+    auth.isLoggedIn(req, res, next),
+    (req, res, next) => auth.logout(req, res, next)
+);
 
 
 /**Documents' APIs */
@@ -146,7 +158,7 @@ app.post('/api/documents', async (req: any, res: any) => {
 })
 
 //get the list of all documents
-app.get('/api/documents',async (req: any, res: any)=>{
+app.get('/api/documents', auth.isLoggedIn, async (req: any, res: any)=>{
     try{
         const docs = await daoDocument.getAllDoc();
         res.json(docs);
@@ -170,7 +182,7 @@ app.get('/api/documents/areas/:name',async (req: any, res: any)=>{
 /** Connections' APIs */
 
 //add a new connection between two documents
-app.post('/api/connections', isLoggedIn, async (req: any, res: any) => {
+app.post('/api/connections', auth.isLoggedIn, async (req: any, res: any) => {
     try {
         const SourceDoc=req.body.SourceDocument;
         const TargetDoc=req.body.TargetDocument;
@@ -197,7 +209,7 @@ app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
 /** Areas' APIs */
 
 //associate an area to a document
-app.put('/api/documents/area', isLoggedIn, async (req: any, res: any) => { //add an existing area to a document
+app.put('/api/documents/area', auth.isLoggedIn, async (req: any, res: any) => { //add an existing area to a document
     try{
         const areaId = await daoArea.getAreaIdFromName(req.body.area);
         const documentId = await daoDocument.getDocumentIdFromTitle(req.body.title);
@@ -219,7 +231,7 @@ app.get('/api/areas', async (req: any, res: any) => {
 })
 
 //add a new area in the DB
-app.post('/api/areas', isLoggedIn, async (req: any, res: any) => { //add a new area in the db
+app.post('/api/areas', auth.isLoggedIn, async (req: any, res: any) => { //add a new area in the db
     try{
         await daoArea.addArea(req.body.name, req.body.vertex);
         res.status(201).json({message: 'Area add successfully'});
@@ -234,7 +246,7 @@ app.post('/api/areas', isLoggedIn, async (req: any, res: any) => { //add a new a
 app.put('/api/modifyGeoreference',async (req: any, res: any)=>{
     try{
         const id = await daoDocument.getDocumentIdFromTitle(req.body.name);
-        await daoStory5.modifyGeoreference(id,req.body.coord,req.body.oldCoord,req.body.area,req.body.oldArea)
+        await daoArea.modifyGeoreference(id,req.body.coord,req.body.oldCoord,req.body.area,req.body.oldArea)
         res.status(200);
     }catch(error){
         res.status(503).json({error: Error});

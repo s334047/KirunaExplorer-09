@@ -97,6 +97,7 @@ async function modifyGeoreference(name,coord,oldCoord,area,oldArea) {  //modify 
       //credentials: 'include'
   }).then(response => response.json())
 }
+
 // NEW
 const logIn = async (credentials) => {
     const response = await fetch(`${SERVER_URL}/sessions`, {
