@@ -158,7 +158,7 @@ app.post('/api/documents', async (req: any, res: any) => {
 })
 
 //get the list of all documents
-app.get('/api/documents', auth.isLoggedIn, async (req: any, res: any)=>{
+app.get('/api/documents', async (req: any, res: any)=>{
     try{
         const docs = await daoDocument.getAllDoc();
         res.json(docs);
