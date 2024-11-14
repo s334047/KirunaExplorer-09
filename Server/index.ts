@@ -33,8 +33,8 @@ const docValidation = [
     check('type').notEmpty().isString(),
     check('language').optional({nullable: true}).isString(),
     check('page').optional({nullable: true}).isInt(),
-    check('coordinate').optional({nullable: true}).isString(),
-    check('area').optional({nullable: true}).isString(),
+    check('coordinate').optional({nullable: true}),
+    check('area').optional({nullable: true}),
     check('description').notEmpty().isString(),
     check().custom(({coordinate, area}) => {
         if((coordinate && area) || (!coordinate && !area))
@@ -50,7 +50,7 @@ const connectionValidation = [
 
 const areaValidation = [
     check('name').notEmpty().isString(),
-    check('vertex').notEmpty().isString()
+    check('vertex').notEmpty()
 ];
 
 /*** Users APIs */
