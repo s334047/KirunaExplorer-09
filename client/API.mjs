@@ -32,14 +32,14 @@ async function getAreasDoc(name) {                  //get docs of an area
 
 /** API Connections */
 async function SetDocumentsConnection(SourceDocument, TargetDocument, ConnectionType) { // all parameters are strings
-    return await fetch(`${SERVER_URL}/connections`, {
-        method: 'POST',
-        headers: {
-            'Content-type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({ SourceDocument, TargetDocument, ConnectionType })
-    }).then(response => response.json())
+  return await fetch(`${SERVER_URL}/connections`, {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json'
+    },
+    credentials: 'include',
+    body: JSON.stringify({ SourceDocument, TargetDocument, ConnectionType })
+  }).then(response => response.json())
 };
 
 async function GetDocumentConnections(SourceDocument) { // SourceDocument is a string
@@ -72,15 +72,15 @@ async function getAllAreas() {                  //get all the areas in the db
     }).then(response => response.json())
 }
 
-async function addArea(name, vertex){           //add a new area in the db
-    return await fetch(`${SERVER_URL}/areas`, {
-        method: 'POST',
-        headers: {
-            'Content-type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({name, vertex})
-    }).then(response => response.json())
+async function addArea(name, vertex) {           //add a new area in the db
+  return await fetch(`${SERVER_URL}/areas`, {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json'
+    },
+    credentials: 'include',
+    body: JSON.stringify({ name, vertex })
+  }).then(response => response.json())
 };
 
 async function modifyGeoreference(name,coord,oldCoord,area,oldArea) {  //modify the georeference of a document
@@ -96,44 +96,44 @@ async function modifyGeoreference(name,coord,oldCoord,area,oldArea) {  //modify 
 
 /** API Authentication */
 const logIn = async (credentials) => {
-    const response = await fetch(`${SERVER_URL}/sessions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify(credentials),
-    });
-    if (response.ok) {
-      const user = await response.json();
-      return user;
-    }
-    else {
-      const errDetails = await response.text();
-      throw errDetails;
-    }
-  };
-  
-  const getUserInfo = async () => {
-    const res = await fetch(`${SERVER_URL}/sessions/current`, {
-      credentials: 'include',
-    });
-    const user = await res.json();
-    if (res.ok) {
-      return user;
-    } else {
-      throw user;  // an object with the error coming from the server
-    }
-  };
-  
-  const logOut = async () => {
-    const res = await fetch(`${SERVER_URL}/sessions/current`, {
-      method: 'DELETE',
-      credentials: 'include'
-    });
-    if (res.ok)
-      return null;
+  const response = await fetch(`${SERVER_URL}/sessions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(credentials),
+  });
+  if (response.ok) {
+    const user = await response.json();
+    return user;
   }
+  else {
+    const errDetails = await response.text();
+    throw errDetails;
+  }
+};
+
+const getUserInfo = async () => {
+  const res = await fetch(`${SERVER_URL}/sessions/current`, {
+    credentials: 'include',
+  });
+  const user = await res.json();
+  if (res.ok) {
+    return user;
+  } else {
+    throw user;  // an object with the error coming from the server
+  }
+};
+
+const logOut = async () => {
+  const res = await fetch(`${SERVER_URL}/sessions/current`, {
+    method: 'DELETE',
+    credentials: 'include'
+  });
+  if (res.ok)
+    return null;
+}
 
 
 const API = {addDocument, SetDocumentsConnection, GetDocumentConnections, addAreaToDoc, getAllAreas, addArea,getAllDocs,getAreasDoc,modifyGeoreference, logIn, getUserInfo, logOut};

@@ -14,6 +14,7 @@ To restore the entire database quickly, follow these steps:
 Below is a description of each table in the database, including the parameters and descriptions of each field.
 
 ### Document
+
 The `Document` table represents a document that serves as a node of the diagram, detailing various types of official documents.
 
 - `Id`: INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  
@@ -40,6 +41,7 @@ The `Document` table represents a document that serves as a node of the diagram,
   Specifies a brief description of the document.
 
 ### Attachment
+
 The `Attachment` table represents any additional files (such as photos, videos, or diagrams) provided to enhance the understanding of the document.
 
 - `Id`: INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  
@@ -50,6 +52,7 @@ The `Attachment` table represents any additional files (such as photos, videos, 
   Specifies the reference to the document that the attachment is associated with. If the document is deleted, the related attachment is also deleted.
 
 ### Original Resource
+
 The `Resource` table represents original resources related to documents. It may consist of multiple files (e.g., maps, text documents).
 
 - `Id`: INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  
@@ -60,6 +63,7 @@ The `Resource` table represents original resources related to documents. It may 
   Specifies the reference to the document that the original resource is associated with. If the document is deleted, the related original resource is also deleted.
 
 ### Connection
+
 The `Connection` table represents the connections between two documents, which is an essential feature for understanding the relationships within the diagram.
 
 - `Id`: INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  
@@ -74,6 +78,7 @@ The `Connection` table represents the connections between two documents, which i
   Ensures that each connection between two documents is unique.
 
 ### Area
+
 The `Area` table represents a geographic area that is associated with one or more documents.
 
 - `Id`: INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  
@@ -84,6 +89,7 @@ The `Area` table represents a geographic area that is associated with one or mor
   Specifies the list of vertices that define the area, stored in JSON format (e.g., `{ [20.5, 35.4], [54.4, 67.5], [37.2, 18.5], [12.4, 20.9] }`).
 
 ### AreaDocLink
+
 The `AreaDocLink` table represents the connection between a document and an area, allowing for geographic relationships to be established.
 
 - `AreaId`: INTEGER NOT NULL REFERENCES Area(Id)  
@@ -94,6 +100,7 @@ The `AreaDocLink` table represents the connection between a document and an area
   Ensures that the link between a document and an area is unique.
 
 ### User
+
 The `User` table represents different types of users who can interact with the system. There are four user roles:
 
 1. **Resident**: A resident of the municipality of Kiruna.
@@ -113,8 +120,8 @@ The `User` table represents different types of users who can interact with the s
   Specifies the user's role from the predefined list (Resident, Urban Developer, Urban Planner, Visitor).
 
 ### Summary
-This documentation covers all the tables used in the Kiruna Explorer database, including their columns and relationships. Each table plays an important role in storing data related to documents, geographic areas, users, and connections between documents, allowing for comprehensive interaction with the relocation project of Kiruna.
 
+This documentation covers all the tables used in the Kiruna Explorer database, including their columns and relationships. Each table plays an important role in storing data related to documents, geographic areas, users, and connections between documents, allowing for comprehensive interaction with the relocation project of Kiruna.
 
 # API Documentation
 
@@ -123,6 +130,7 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
 ## Authentication Endpoints
 
 ### POST /api/sessions
+
 - **Description**: Logs in a user and starts a session.
 - **Request Body**:
   - `username` (string): The username of the user.
@@ -132,12 +140,14 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
   - On failure, returns an error message.
 
 ### GET /api/sessions/current
+
 - **Description**: Retrieves information about the currently logged-in user.
 - **Response**:
   - On success, returns the current user's information.
   - On failure, returns an authentication error.
 
 ### DELETE /api/sessions/current
+
 - **Description**: Logs out the current user and ends the session.
 - **Response**:
   - Returns `200 OK` on successful logout.
@@ -145,6 +155,7 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
 ## Document Endpoints
 
 ### POST /api/documents
+
 - **Description**: Adds a new document to the database.
 - **Request Body**:
   - `title` (string): Title of the document.
@@ -161,6 +172,7 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
   - Returns `503 Service Unavailable` if an error occurs.
 
 ### PUT /api/documents/area
+
 - **Description**: Associates an existing area with a document.
 - **Request Body**:
   - `title` (string): Title of the document.
@@ -170,6 +182,7 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
   - Returns `503 Service Unavailable` if an error occurs.
 
 ### GET /api/documents
+
 - **Description**: Retrieves all documents in the database.
 - **Response**:
   - Returns an array of documents.
@@ -177,6 +190,7 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
 ## Area Endpoints
 
 ### POST /api/areas
+
 - **Description**: Adds a new area to the database.
 - **Authentication**: Requires the user to be logged in.
 - **Request Body**:
@@ -187,11 +201,13 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
   - Returns `503 Service Unavailable` if an error occurs.
 
 ### GET /api/areas
+
 - **Description**: Retrieves all areas from the database.
 - **Response**:
   - Returns an array of areas.
 
 ### GET /api/area/docs/:name
+
 - **Description**: Retrieves all documents associated with a specific area.
 - **Path Parameter**:
   - `name` (string): Name of the area.
@@ -201,6 +217,7 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
 ## Connection Endpoints
 
 ### POST /api/connections
+
 - **Description**: Creates a new connection between two documents.
 - **Request Body**:
   - `SourceDocument` (string): Title of the source document.
@@ -211,6 +228,7 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
   - Returns `503 Service Unavailable` if an error occurs.
 
 ### GET /api/connections/:SourceDoc
+
 - **Description**: Retrieves all connections starting from a given source document.
 - **Path Parameter**:
   - `SourceDoc` (string): Title of the source document.
@@ -220,11 +238,8 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
 ## User Information Endpoints
 
 ### GET /api/sessions/current
+
 - **Description**: Retrieves information about the logged-in user.
 - **Response**:
   - Returns user information if the user is authenticated.
   - Returns `401 Unauthorized` if the user is not authenticated.
-
-
-
-
