@@ -1,8 +1,10 @@
 import { Modal, Button, Form, Container, Row, Col,ListGroup } from 'react-bootstrap';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
+import API from '../../API.mjs';
+
 dayjs.extend(customParseFormat);
 function DescriptionComponent(props) {
   const navigate= useNavigate();
@@ -37,7 +39,14 @@ function DescriptionComponent(props) {
   };
 
   const [currentStep, setCurrentStep] = useState(1); // Step tracking state
-  const filteredItems = props.item;
+  const [filteredItems,setItems]=useState([]);
+  useEffect(()=>{
+    const getDocs = async()=>{
+      const docs = await API.getAllDocs();
+      setItems(docs)
+    }
+    getDocs()
+  },[]) 
   const closeModal = () => {
     navigate("/")
   };

@@ -23,10 +23,19 @@ function AddDocument(props){
     const [selectedPoint, setSelectedPoint] = useState([lat,lng])
     const [formLink, setFormLink] = useState([]);
     const [formData, setFormData] = useState(null);
-    const aree = props.areas;
-    const docs = props.documents;
+    const [aree,setAree]=useState([]) 
+    const [docs,setDocs]=useState([]); 
     const navigate= useNavigate();
 
+    useEffect(()=>{
+        const getDocsAreas = async()=>{
+          const documents = await API.getAllDocs();
+          setDocs(documents)
+          const areas = await API.getAllAreas()
+          setAree(areas)
+        }
+        getDocsAreas();
+      },[]); 
 
     const handleChangeArea = (e) => {
         const selectedNome = e.target.value;

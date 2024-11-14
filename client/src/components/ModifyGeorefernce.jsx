@@ -23,7 +23,14 @@ function ModifyGeoreference(props){
         [68, 21]
     ];
     const navigate= useNavigate();
-    const aree = props.areas;
+    const [aree,setAree] = useState([]); 
+    useEffect(()=>{
+        const getAreas = async()=>{
+          const areas = await API.getAllAreas()
+          setAree(areas)
+        }
+        getAreas()
+      },[]) 
     const handleChangeArea = (e) => {
         const selectedNome = e.target.value;
         const foundArea = aree.find(area => area.name === selectedNome);

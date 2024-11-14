@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, LayersControl, Polygon } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet-draw';
@@ -6,6 +6,7 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import DocumentCard from './DocCard'
+import API from '../../API.mjs';
 
 
 function MapViewer(props) {
@@ -15,9 +16,14 @@ function MapViewer(props) {
         [67, 20],
         [68, 21]
     ];
-    const aree = props.areas;
-    const docs = props.documents;
-
+    const [docs,setDocs] = useState([]); 
+    useEffect(()=>{
+        const getDocs = async()=>{
+          const documents = await API.getAllDocs();
+          setDocs(documents);
+        }
+        getDocs();
+      },[]) 
     const customIcon = new L.Icon({
         iconUrl: 'file.png',
         iconSize: [35, 35],

@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Modal, Button, Form, ListGroup } from 'react-bootstrap';
 import API from '../../API.mjs';
 
 const ListDocumentLink = (props) => {
 
   // Filtra gli elementi per escludere quelli con il titolo specificato
-  const filteredItems = props.item;
   const [errors, setErrors] = useState({});
   const [item, setItem] = useState({ document: "", type: "" });
   const [links, setLinks] = useState([]);
+  const [filteredItems,setItems]=useState([]);
+  useEffect(()=>{
+    const getDocs = async()=>{
+      const docs = await API.getAllDocs();
+      setItems(docs)
+    }
+    getDocs()
+  },[]) 
   const handleSubmit = () => {
     const newErrors = {};
 

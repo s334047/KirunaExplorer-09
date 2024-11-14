@@ -81,20 +81,20 @@ function App() {
         </>
       }>
         <Route index element={<>
-          <MapViewer user={user}  setTitle={setExcludeDoc}  showAddLink={showAddLink} setShowAddLink={setShowAddLink} areas={areas} documents={documents}/>
-          <ListDocumentLink item={documents} title={excludeDoc} show={showAddLink} setShow={setShowAddLink} />
+          <MapViewer user={user}  setTitle={setExcludeDoc}  showAddLink={showAddLink} setShowAddLink={setShowAddLink}/>
+          <ListDocumentLink title={excludeDoc} show={showAddLink} setShow={setShowAddLink} />
           <LoginComponent login={handleLogin} show={showLoginModal} setShow={setShowLoginModal}/>
         </>
         }
         >
         </Route>
-        <Route path='/addArea' element={<AddArea areas={areas} documents={documents}/>}/>
-        <Route path='/addDoc' element={<AddDocument areas={areas} documents={documents}/>}/>
-        <Route path='/modifyGeoreference' element={<ModifyGeoreference areas={areas} doc={excludeDoc}/>}/>
+        <Route path='/addArea' element={<AddArea/>}/>
+        <Route path='/addDoc' element={<AddDocument/>}/>
+        <Route path='/modifyGeoreference' element={<ModifyGeoreference doc={excludeDoc}/>}/>
 
         <Route path='/documents' element={<>
-          <DocumentTable user={user} setTitle={setExcludeDoc} showAddLink={showAddLink} documents={documents} setShowAddLink={setShowAddLink}/>
-          <ListDocumentLink item={documents} title={excludeDoc} show={showAddLink} setShow={setShowAddLink} />
+          <DocumentTable user={user} setTitle={setExcludeDoc} showAddLink={showAddLink}setShowAddLink={setShowAddLink}/>
+          <ListDocumentLink  title={excludeDoc} show={showAddLink} setShow={setShowAddLink} />
           </>
           }></Route>
       </Route>

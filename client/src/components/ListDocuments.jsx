@@ -3,11 +3,18 @@ import { Table, Button} from 'react-bootstrap';
 import API from '../../API.mjs';
 import ListDocumentLink from './Link';
 
-function DocumentTable({ setTitle, documents, user, setShowAddLink }) {
+function DocumentTable({ setTitle, user, setShowAddLink }) {
 
     const [selectedDoc, setSelectedDoc] = useState(null);
     const [showAddLink, setShowAddLinkModal] = useState(false);
-
+    const [documents,setDocuments] = useState([]);
+    useEffect(()=>{
+        const getDocs = async()=>{
+          const docs = await API.getAllDocs();
+          setDocuments(docs)
+        }
+        getDocs()
+      },[]) 
     const handleRowClick = (docId) => {
         const doc = documents.find((d) => d.id === docId);
         setSelectedDoc((prevDoc) => (prevDoc?.id === doc.id ? null : doc));
