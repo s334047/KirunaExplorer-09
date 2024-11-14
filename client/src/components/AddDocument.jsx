@@ -38,10 +38,10 @@ function AddDocument(props){
     }
     const handleSave =()=>{
         try {
-            if (selectedArea == null) {
-              API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, selectedPoint, selectedArea, formData.description);
-            } else {
-               API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, selectedPoint, selectedArea.name, formData.description);
+            if (mode === 'Point') {
+              API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, selectedPoint, null, formData.description);
+            } else if(mode === 'Area') {
+               API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, null, selectedArea.name, formData.description);
             }
             
             formLink.forEach((link) => {
@@ -68,12 +68,7 @@ function AddDocument(props){
         navigate("/")
     }
     useEffect(()=>{
-        if(lat && lng){
-            setSelectedPoint([lat,lng]);
-        }
-        else if(mode === 'Point'){
-            setSelectedPoint(null)
-        }
+        setSelectedPoint([lat,lng])
     },[lat,lng])
     const handleMarkerDragEnd = (event) => {
         const newLatLng = event.target.getLatLng(); // Ottieni la nuova posizione del marker
@@ -165,7 +160,7 @@ function AddDocument(props){
                     attribution='&copy; <a href="https://www.esri.com/">Esri</a>, Sources: Esri, Garmin, GEBCO, NOAA NGDC, and other contributors'
                 />
              {mode === "Area" && selectedArea && <Polygon positions={selectedArea.vertex} color="red"></Polygon>}
-             {mode === "Point"  && <Marker position={selectedPoint} draggable={true} eventHandlers={{dragend: handleMarkerDragEnd}}></Marker>}
+             {mode === "Point" && selectedPoint && <Marker position={selectedPoint} draggable={true} eventHandlers={{dragend: handleMarkerDragEnd}}></Marker>}
             <DescriptionComponent show={show} setShow={setShow} item={docs} setMode={setMode} setFormData={setFormData} setFormLink={setFormLink} />
         </MapContainer>
     </div>)

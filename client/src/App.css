@@ -75,15 +75,19 @@
   border-color: #000000;
 }
 
-
-
-.rounded-item {
-  border-radius: 20px; /* Puoi aumentare o diminuire il valore per ottenere l'effetto desiderato */
+.custom-table thead th {
+  background-color:#154109;
+  color:#ffffff;
 }
 
+.table-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
-
-.custom-table-header{
-  background-color: #154109;  /* Colore di sfondo verde scuro */
-  color: white    ;       /* Colore del testo bianco */
+.selected-row td {
+    
+    background-color: #dcede6 !important;
+    
 }
