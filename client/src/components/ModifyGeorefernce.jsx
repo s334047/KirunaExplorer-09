@@ -11,10 +11,10 @@ import { useNavigate } from 'react-router-dom';
 function ModifyGeoreference(props){
     const [mode,setMode]=useState(null);
     const [show,setShow]=useState(true);
-    const [lat,setLat]=useState(null);
-    const [lng,setLng]=useState(null);
+    const [lat,setLat]=useState(67.8525);
+    const [lng,setLng]=useState(20.2255);
     const [selectedArea, setSelectedArea] = useState(null)
-    const [selectedPoint, setSelectedPoint] = useState(null)
+    const [selectedPoint, setSelectedPoint] = useState()
     const [resetDrawing, setResetDrawing] = useState(false);
     const [errors, setErrors] = useState({});
     const position = [67.8558, 20.2253];
@@ -51,6 +51,8 @@ function ModifyGeoreference(props){
         }
         if(mode === 'Point' && props.doc.coordinate){
             setSelectedPoint(props.doc.coordinate)
+            setLat(props.doc.coordinate[0])
+            setLng(props.doc.coordinate[1])
             setMode('PointOld')
         }
         if(mode === 'Point' && !props.doc.coordinate){
@@ -66,29 +68,12 @@ function ModifyGeoreference(props){
             setSelectedArea(newPolygon); // Aggiorna lo stato con le nuove coordinate
         });
     };
-    const handleDrawCreated = (e) => {
-        const layer = e.layer;
-        if (layer instanceof L.Marker) {
-            const latlng = layer.getLatLng()
-            setSelectedPoint([latlng.lat, latlng.lng])
-        };
-
-    }
-    const handleLatLng = (value, setCoordinate)=>{
-        const isValidNumber = /^-?\d*\.?\d*$/;
-        if (isValidNumber.test(value)) {
-            setCoordinate(value); // Update state only if valid
-        }
-    }
     const handleMarkerDragEnd = (event) => {
         const newLatLng = event.target.getLatLng(); // Ottieni la nuova posizione del marker
+        setLat(newLatLng.lat.toFixed(4))
+        setLng(newLatLng.lng.toFixed(4))
         setSelectedPoint([newLatLng.lat, newLatLng.lng]); // Aggiorna lo stato con le nuove coordinate
     };
-    const handleDeleteDraw = () => {
-        setSelectedPoint(null)
-        setResetDrawing(true);
-        setTimeout(() => setResetDrawing(false), 0);
-    }
     const handleClose =()=>{
         navigate("/")
     }
@@ -112,12 +97,7 @@ function ModifyGeoreference(props){
         navigate("/")
     }
     useEffect(()=>{
-        if(lat && lng){
-            setSelectedPoint([lat,lng]);
-        }
-        else if(mode === 'PointOld'){
-            setSelectedPoint(props.doc.coordinate)
-        }
+        setSelectedPoint([lat,lng]);
     },[lat,lng])
     return(   
     <div style={{ display: 'flex', flex: 1, position: 'relative', height: '90vh' }}>
@@ -167,7 +147,7 @@ function ModifyGeoreference(props){
                     <Button variant="secondary" onClick={handleClose} style={{ flexGrow: 1 }}>Close</Button>
                 </div>
             </div>}
-            {mode === "PointOld" && <div style={{
+            {(mode === "PointOld" || mode== "PointNew")&& <div style={{
                 position: 'absolute',
                 top: '20px',
                 left: '50%',
@@ -180,22 +160,25 @@ function ModifyGeoreference(props){
                 boxShadow: '0 0 10px rgba(0,0,0,0.1)' // Optional: shadow effect
             }}>
                     <Form>
-            <Form.Group controlId="latitude">
-                <Form.Label>Latitude</Form.Label>
-                <Form.Control
-                    type="number"
-
-                    onChange={(e)=>{handleLatLng(e.target.value,setLat)}}
-                    placeholder="Enter latitude"
+                    <Form.Group controlId="latitude">
+                <Form.Label>Latitude: {lat}</Form.Label>
+                <Form.Range
+                    min={67.8211}
+                    max={67.8844}
+                    value={lat}
+                    step={0.0001}
+                    onChange={(e) => setLat(e.target.value)}
                 />
             </Form.Group>
-            <Form.Group controlId="longitude" style={{ marginTop: '10px' }}>
-                <Form.Label>Longitude</Form.Label>
-                <Form.Control
-                    type="number"
 
-                    onChange={(e)=>{handleLatLng(e.target.value,setLng)}}
-                    placeholder="Enter longitude"
+            <Form.Group controlId="longitude" style={{ marginTop: '10px' }}>
+                <Form.Label>Longitude: {lng} </Form.Label>
+                <Form.Range
+                   min={20.1098}
+                   max={20.3417}
+                   step={0.0001}
+                   value={lng}
+                    onChange={(e) => setLng(e.target.value)}
                 />
             </Form.Group>
         </Form>
@@ -204,23 +187,7 @@ function ModifyGeoreference(props){
                     <Button variant="secondary" onClick={handleClose} style={{ flexGrow: 1 }}>Close</Button>
                 </div>
             </div>}
-            {mode === "PointNew" && <div style={{
-                position: 'absolute',
-                top: '20px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 1000,
-                width: '300px',
-                backgroundColor: 'white', // Add a background for better visibility
-                padding: '10px',
-                borderRadius: '5px',
-                boxShadow: '0 0 10px rgba(0,0,0,0.1)' // Optional: shadow effect
-            }}>
-                <div style={{ display: 'flex', marginTop: '10px', gap: "5px" }}>
-                    <Button variant="primary" onClick={handleSave} disabled={!selectedPoint} style={{ backgroundColor: "#154109", borderColor: "#154109", flexGrow: 1 }}>Confirm</Button>{' '}
-                    <Button variant="secondary" onClick={handleClose} style={{ flexGrow: 1 }}>Close</Button>
-                </div>
-            </div>}
+
         <MapContainer
                 center={position}
                 minZoom={12}
@@ -260,23 +227,21 @@ function ModifyGeoreference(props){
           </Button>
         </Modal.Footer>
         </Modal>
-            {(mode === 'PointNew' || mode === 'AreaOld') && <FeatureGroup key={resetDrawing ? 'reset' : 'normal'}>
+            {( mode === 'AreaOld') && <FeatureGroup key={resetDrawing ? 'reset' : 'normal'}>
                     <EditControl
                         position="topright"
-                        onCreated={handleDrawCreated}
-                        onDeleted={handleDeleteDraw}
                         onEdited={handleEdit}
                         draw={{
                             rectangle: false,
                             polyline: false,
                             circle: false,
                             circlemarker: false,
-                            marker: !selectedPoint && mode === 'PointNew' ,
+                            marker: false ,
                             polygon:false
                         }}
                         edit={{
                             edit: mode === 'AreaOld' ? {} : false, 
-                            remove: mode === 'PointNew'
+                            remove: false
                         }}
                     />
                     {mode === "AreaOld" && props.doc.area && <Polygon positions={props.doc.area} color="red"></Polygon>}
@@ -286,7 +251,7 @@ function ModifyGeoreference(props){
                     attribution='&copy; <a href="https://www.esri.com/">Esri</a>, Sources: Esri, Garmin, GEBCO, NOAA NGDC, and other contributors'
                 />
                 {mode === "AreaNew" && selectedArea && <Polygon positions={selectedArea.vertex} color="red"></Polygon>}
-                {mode === "PointOld" && selectedPoint  && <Marker position={selectedPoint} draggable={true} eventHandlers={{dragend: handleMarkerDragEnd}}></Marker>}
+                {(mode === "PointOld" || mode === 'PointNew')  && <Marker position={selectedPoint} draggable={true} eventHandlers={{dragend: handleMarkerDragEnd}}></Marker>}
         </MapContainer>
    </div>
     )

@@ -17,31 +17,19 @@ function AddDocument(props){
         [67, 20],
         [68, 21]
     ];
+    const [lat,setLat]=useState(67.8525);
+    const [lng,setLng]=useState(20.2255);
     const [mode,setMode]=useState(null);
     const [show,setShow]=useState(true);
     const [selectedArea, setSelectedArea] = useState(null)
-    const [selectedPoint, setSelectedPoint] = useState(null)
+    const [selectedPoint, setSelectedPoint] = useState([lat,lng])
     const [formLink, setFormLink] = useState([]);
     const [formData, setFormData] = useState(null);
-    const [resetDrawing, setResetDrawing] = useState(false);
     const aree = props.areas;
     const docs = props.documents;
     const navigate= useNavigate();
 
-    const handleDrawCreated = (e) => {
-        const layer = e.layer;
-        if (layer instanceof L.Marker) {
-            const latlng = layer.getLatLng()
-            setSelectedPoint([latlng.lat, latlng.lng])
-        };
 
-    }
-    const handleDeleteDraw = () => {
-        setSelectedPoint(null)
-        setResetDrawing(true);
-        setTimeout(() => setResetDrawing(false), 0);
-
-    }
     const handleChangeArea = (e) => {
         const selectedNome = e.target.value;
         const foundArea = aree.find(area => area.name === selectedNome);
@@ -72,6 +60,20 @@ function AddDocument(props){
           }
         navigate("/")
     }
+    useEffect(()=>{
+        if(lat && lng){
+            setSelectedPoint([lat,lng]);
+        }
+        else if(mode === 'Point'){
+            setSelectedPoint(null)
+        }
+    },[lat,lng])
+    const handleMarkerDragEnd = (event) => {
+        const newLatLng = event.target.getLatLng(); // Ottieni la nuova posizione del marker
+        setLat(newLatLng.lat.toFixed(4))
+        setLng(newLatLng.lng.toFixed(4))
+        setSelectedPoint([newLatLng.lat, newLatLng.lng]); // Aggiorna lo stato con le nuove coordinate
+    };
     return(        
     <div style={{ display: 'flex', flex: 1, position: 'relative', height: '90vh' }}>
         {mode === "Area" && <div style={{
@@ -115,6 +117,28 @@ function AddDocument(props){
                 borderRadius: '5px',
                 boxShadow: '0 0 10px rgba(0,0,0,0.1)' // Optional: shadow effect
             }}>
+                                    <Form>
+                    <Form.Group controlId="latitude">
+                <Form.Label>Latitude: {lat}</Form.Label>
+                <Form.Range
+                    min={67.8211}
+                    max={67.8844}
+                    step={0.0001}
+                    onChange={(e) => setLat(e.target.value)}
+                />
+            </Form.Group>
+
+            <Form.Group controlId="longitude" style={{ marginTop: '10px' }}>
+                <Form.Label>Longitude: {lng} </Form.Label>
+                <Form.Range
+                   min={20.1098}
+                   max={20.3417}
+                   step={0.0001}
+                
+                    onChange={(e) => setLng(e.target.value)}
+                />
+            </Form.Group>
+        </Form>
                 <div style={{ display: 'flex', marginTop: '10px', gap: "5px" }}>
                     <Button variant="primary" onClick={handleSave} disabled={!selectedPoint} style={{ backgroundColor: "#154109", borderColor: "#154109", flexGrow: 1 }}>Confirm</Button>{' '}
                     <Button variant="secondary" onClick={handleClose} style={{ flexGrow: 1 }}>Close</Button>
@@ -128,29 +152,12 @@ function AddDocument(props){
                 style={{ flex: 1, height: "100%", width: "100%", borderRadius: '10px' }}
                 scrollWheelZoom={false}
             >
-            {mode === 'Point' && <FeatureGroup key={resetDrawing ? 'reset' : 'normal'}>
-                    <EditControl
-                        position="topright"
-                        onCreated={handleDrawCreated}
-                        onDeleted={handleDeleteDraw}
-                        draw={{
-                            rectangle: false,
-                            polyline: false,
-                            circle: false,
-                            circlemarker: false,
-                            marker: !selectedPoint,
-                            polygon:false
-                        }}
-                        edit={{
-                            edit: false
-                        }}
-                    />
-                </FeatureGroup >}
                 <TileLayer
                     url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                     attribution='&copy; <a href="https://www.esri.com/">Esri</a>, Sources: Esri, Garmin, GEBCO, NOAA NGDC, and other contributors'
                 />
              {mode === "Area" && selectedArea && <Polygon positions={selectedArea.vertex} color="red"></Polygon>}
+             {mode === "Point"  && <Marker position={selectedPoint} draggable={true} eventHandlers={{dragend: handleMarkerDragEnd}}></Marker>}
             <DescriptionComponent show={show} setShow={setShow} item={docs} setMode={setMode} setFormData={setFormData} setFormLink={setFormLink} />
         </MapContainer>
     </div>)
