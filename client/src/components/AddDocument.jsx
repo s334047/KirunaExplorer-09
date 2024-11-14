@@ -43,7 +43,7 @@ function AddDocument(props){
             } else {
                API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, selectedPoint, selectedArea.name, formData.description);
             }
-            if (formLink.length()>0) {
+            
             formLink.forEach((link) => {
                 API.SetDocumentsConnection(formData.title, link.document, link.type)
                   .catch((error) => {
@@ -54,7 +54,7 @@ function AddDocument(props){
                     }));
                   });
               });
-            }
+            
         
             // Reset degli stati
             setFormData(null);
