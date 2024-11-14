@@ -1,4 +1,4 @@
-import { Modal, Button, Form, Container, Row, Col } from 'react-bootstrap';
+import { Modal, Button, Form, Container, Row, Col,ListGroup } from 'react-bootstrap';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 function DescriptionComponent(props) {
@@ -6,6 +6,7 @@ function DescriptionComponent(props) {
   const [errors, setErrors] = useState({});
   const [isDate, setIsDate] = useState(true);
   const [mode, setMode] = useState("")
+  const [links, setLinks] = useState([]);
   const [item, setItem] = useState({ document: "", type: "" });
   const [formData, setFormData] = useState({
     title: '',
@@ -86,7 +87,7 @@ function DescriptionComponent(props) {
     else {
       props.setMode(mode)
       props.setFormData(formData);
-      props.setFormLink(item)
+      props.setFormLink(links)
       props.setShow(false); // Close the modal
     }
   }
@@ -110,7 +111,29 @@ function DescriptionComponent(props) {
     const { _, value } = e.target;
     setMode(value);
   }
+  const handleAddLink = () => {
+    const newErrors = validateFields();
+    setErrors(newErrors);
 
+    if (Object.keys(newErrors).length > 0) {
+      return; // If there are errors, do not proceed
+    }
+
+    // Add the new link to the list of links
+    setLinks([...links, { document: item.document, type: item.type }]);
+    setErrors({});
+  };
+
+  const validateFields = () => {
+    const newErrors = {};
+    if (!item.document) newErrors.document = "The document is mandatory.";
+    if (!item.type) newErrors.type = "The type is mandatory.";
+    return newErrors;
+  };
+
+  const handleDeleteLink = (index) => {
+    setLinks(links.filter((_, i) => i !== index));
+  };
   const renderProgressLines = () => {
     return (
       <div className="progress-line-container">
@@ -286,33 +309,62 @@ function DescriptionComponent(props) {
                 </Form.Control.Feedback>
               </Form.Group>
             )}
-            {currentStep === 3 && (<><div style={{ textAlign: 'center' }}>
+            {currentStep === 3 && (<><Form.Group>
+          <div className="row">
+            <div className="col-4">
+              <Form.Label className="custom-label-color">Document:</Form.Label>
+              <Form.Select name="document" onChange={handleChangeLink} isInvalid={!!errors.document}>
+                <option value="">Select a doc</option>
+                {filteredItems.filter((item) => item.title !== props.title).map((item) => (
+                  <option key={item.title} value={item.title}>{item.title}</option>
+                ))}
+              </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                {errors.document}
+              </Form.Control.Feedback>
             </div>
-              <Form.Group className="mb-3">
-                <Form.Label style={{ color: "#154109" }}><strong>Document to link:</strong></Form.Label>
-                <Form.Select name="document" onChange={handleChangeLink} isInvalid={!!errors.linkTitle}>
-                  <option value="">Select a document</option>
-                  {filteredItems.map((item) => (
-                    <option key={item.title} value={item.title}>{item.title}</option>
-                  ))}
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  {errors.linkTitle}
-                </Form.Control.Feedback>
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label style={{ color: "#154109" }}><strong>Type of link:</strong></Form.Label>
-                <Form.Select name="type" onChange={handleChangeLink} isInvalid={!!errors.linkType}>
-                  <option value="">Select a type</option>
-                  <option value="Collateral Consequence">Collateral Consequence</option>
-                  <option value="Direct Consequence">Direct Consequence</option>
-                  <option value="Projection">Projection</option>
-                  <option value="Update">Update</option>
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  {errors.linkType}
-                </Form.Control.Feedback>
-              </Form.Group></>)}
+
+            <div className="col-4">
+              <Form.Label className="custom-label-color">Type:</Form.Label>
+              <Form.Select name="type" onChange={handleChangeLink} isInvalid={!!errors.type}>
+                <option value="">Select a type</option>
+                <option value="Collateral Consequence">Collateral Consequence</option>
+                <option value="Direct Consequence">Direct Consequence</option>
+                <option value="Projection">Projection</option>
+                <option value="Update">Update</option>
+              </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                {errors.type}
+              </Form.Control.Feedback>
+            </div>
+
+            <div className="col-4 d-flex align-items-end">
+              <Button
+                variant="light"
+                style={{ color: "#154109", borderColor: "#154109" }}
+                onClick={handleAddLink}
+                className="d-flex align-items-center"
+              >
+                <i className="bi bi-plus-circle-fill me-2"></i> Create Link
+              </Button>
+            </div>
+          </div>
+        </Form.Group>
+
+        <br /><ListGroup>
+          {links.map((link, index) => (
+            <ListGroup.Item key={index}
+              className="d-flex justify-content-between align-items-center"
+              style={{ fontSize: '0.7rem' }}>
+              <div>{link.document} - {link.type}</div>
+              <span
+                onClick={() => handleDeleteLink(index)}
+              >
+                <i className="bi bi-x"></i>
+              </span>
+            </ListGroup.Item>
+          ))}
+        </ListGroup></>)}
             {currentStep === 4 && (<><div style={{ textAlign: 'center' }}>
             </div>
               <Form.Group className="mb-3">
