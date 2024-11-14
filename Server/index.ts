@@ -107,7 +107,7 @@ app.delete('/api/sessions/current', (req: any, res: any, next: any) =>
 
 //add a new document
 app.post('/api/documents', auth.isLoggedIn, docValidation, async (req: any, res: any) => {
-    const errors = validationResult(req);
+    const errors = validationResult(req.body);
     if(!errors.isEmpty()){
         return res.status(422).json({message: 'invalid field'});
     }
@@ -149,7 +149,7 @@ app.get('/api/documents/areas/:name',async (req: any, res: any)=>{
 
 //add a new connection between two documents
 app.post('/api/connections', auth.isLoggedIn, connectionValidation, async (req: any, res: any) => {
-    const errors = validationResult(req);
+    const errors = validationResult(req.body);
     if(!errors.isEmpty()){
         return res.status(422).json({message: 'invalid field'});
     }
@@ -202,7 +202,7 @@ app.get('/api/areas', async (req: any, res: any) => {
 
 //add a new area in the DB
 app.post('/api/areas', auth.isLoggedIn, areaValidation, async (req: any, res: any) => { //add a new area in the db
-    const errors = validationResult(req);
+    const errors = validationResult(req.body);
     if(!errors.isEmpty()){
         return res.status(422).json({message: 'invalid field'});
     }
