@@ -64,7 +64,6 @@ const ListDocumentLink = (props) => {
 
     // Add the new link to the list of links
     setLinks([...links, { document: item.document, type: item.type }]);
-    setItem({ document: "", type: "" }); // Clear form fields
     setErrors({});
   };
 

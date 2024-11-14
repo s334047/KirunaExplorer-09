@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, LayersControl, Popup, FeatureGroup, Polygon } from 'react-leaflet';
-import { EditControl } from 'react-leaflet-draw';
-import L from 'leaflet';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { Card, Button, Row, Col, Form } from 'react-bootstrap';
@@ -45,9 +43,18 @@ function AddDocument(props){
             } else {
                API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, selectedPoint, selectedArea.name, formData.description);
             }
-            if (formLink.document != '' || formLink.type != '') {
-              API.SetDocumentsConnection(formData.title, formLink.document, formLink.type);
-            }
+            
+            formLink.forEach((link) => {
+                API.SetDocumentsConnection(formData.title, link.document, link.type)
+                  .catch((error) => {
+                    console.error("Error submitting link:", error);
+                    setErrors((prevErrors) => ({
+                      ...prevErrors,
+                      submit: "An error occurred while submitting the links.",
+                    }));
+                  });
+              });
+            
         
             // Reset degli stati
             setFormData(null);
@@ -124,6 +131,7 @@ function AddDocument(props){
                     min={67.8211}
                     max={67.8844}
                     step={0.0001}
+                    value={lat}
                     onChange={(e) => setLat(e.target.value)}
                 />
             </Form.Group>
@@ -134,7 +142,7 @@ function AddDocument(props){
                    min={20.1098}
                    max={20.3417}
                    step={0.0001}
-                
+                value={lng}
                     onChange={(e) => setLng(e.target.value)}
                 />
             </Form.Group>

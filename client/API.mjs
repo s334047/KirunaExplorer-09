@@ -1,18 +1,36 @@
 const SERVER_URL = "http://localhost:3001/api";
   
-/** API story 1 */
+/** API Documents */
 async function addDocument(title, stakeholder, scale, date, type, language, page, coordinate,area, description) {
     return await fetch(`${SERVER_URL}/documents`, {
         method: 'POST',
         headers: {
             'Content-type': 'application/json'
         },
-        //credentials: 'include',
+        credentials: 'include',
         body: JSON.stringify({ title, stakeholder, scale, date, type, language, page, coordinate,area, description })
     }).then(response => response.json())
 };
 
-/** API story 2 */
+async function getAllDocs() {                  //get all the docs in the db
+  return await fetch(`${SERVER_URL}/documents`, {
+      method: 'GET',
+      headers: {
+          'Content-type': 'application/json'
+      },
+  }).then(response => response.json())
+}
+
+async function getAreasDoc(name) {                  //get docs of an area
+  return await fetch(`${SERVER_URL}/documents/areas/${encodeURIComponent(name)}`, {
+      method: 'GET',
+      headers: {
+          'Content-type': 'application/json'
+      },
+  }).then(response => response.json())
+}
+
+/** API Connections */
 async function SetDocumentsConnection(SourceDocument, TargetDocument, ConnectionType) { // all parameters are strings
     return await fetch(`${SERVER_URL}/connections`, {
         method: 'POST',
@@ -30,11 +48,10 @@ async function GetDocumentConnections(SourceDocument) { // SourceDocument is a s
         headers: {
             'Content-type': 'application/json'
         },
-        //credentials: 'include'
     }).then(response => response.json())
 }
 
-/** API story 3 */
+/** API Areas */
 async function addAreaToDoc(title, area){   //add an area to a document
     return await fetch(`${SERVER_URL}/documents/area`, {
         method: 'PUT',
@@ -52,7 +69,6 @@ async function getAllAreas() {                  //get all the areas in the db
         headers: {
             'Content-type': 'application/json'
         },
-        //credentials: 'include'
     }).then(response => response.json())
 }
 
@@ -66,39 +82,19 @@ async function addArea(name, vertex){           //add a new area in the db
         body: JSON.stringify({name, vertex})
     }).then(response => response.json())
 };
-/**API Story 4 */
-async function getAllDocs() {                  //get all the docs in the db
-  return await fetch(`${SERVER_URL}/documents`, {
-      method: 'GET',
-      headers: {
-          'Content-type': 'application/json'
-      },
-      //credentials: 'include'
-  }).then(response => response.json())
-}
 
-async function getAreasDoc(name) {                  //get docs of an area
-  return await fetch(`${SERVER_URL}/documents/areas/${encodeURIComponent(name)}`, {
-      method: 'GET',
-      headers: {
-          'Content-type': 'application/json'
-      },
-      //credentials: 'include'
-  }).then(response => response.json())
-}
-/**API Story 5 */
 async function modifyGeoreference(name,coord,oldCoord,area,oldArea) {  //modify the georeference of a document
   return await fetch(`${SERVER_URL}/modifyGeoreference`, {
       method: 'PUT',
       headers: {
           'Content-type': 'application/json'
       },
+      credentials: 'include',
       body: JSON.stringify({ name, coord, oldCoord, area, oldArea })
-      //credentials: 'include'
   }).then(response => response.json())
 }
 
-// NEW
+/** API Authentication */
 const logIn = async (credentials) => {
     const response = await fetch(`${SERVER_URL}/sessions`, {
       method: 'POST',
@@ -141,6 +137,5 @@ const logIn = async (credentials) => {
 
 
 const API = {addDocument, SetDocumentsConnection, GetDocumentConnections, addAreaToDoc, getAllAreas, addArea,getAllDocs,getAreasDoc,modifyGeoreference, logIn, getUserInfo, logOut};
-
 
 export default API;
