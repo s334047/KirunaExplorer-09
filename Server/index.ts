@@ -1,21 +1,15 @@
 import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
-import passport from 'passport';
-import session from 'express-session';
-import {check} from 'express-validator';
-import * as LocalStrategy from 'passport-local';
-import DaoUser from './Dao/daoUser.ts';
+import {check, validationResult} from 'express-validator';
 import DaoDocument from './Dao/documentDao.ts';
 import DaoConnection from './Dao/connectionDao.ts';
 import DaoArea from './Dao/areaDao.ts';
-import Authenticator from './auth.ts'; //NEW
-import AuthRoutes from './authRoutes.ts'; //NEW
+import Authenticator from './auth.ts';
 
 const daoDocument = new DaoDocument();
 const daoConnection = new DaoConnection();
 const daoArea = new DaoArea();
-const daoUser = new DaoUser();
 
 const app = express();
 const port = 3001;
@@ -29,53 +23,23 @@ const corsOption = {
 };
 app.use(cors(corsOption));
 
-const auth = new Authenticator(app); //NEW
-//const authRoutes = new AuthRoutes(auth); //NEW
-//app.use('localhost:5173/api/sessions', authRoutes.getRouter()) //NEW
-/*
-passport.use(new LocalStrategy.Strategy(async function verify(username, password, cb) {
-    try {
-        const user = await daoUser.getUser(username, password);
-        if (!user) {
-            return cb(null, false, new Error('Incorrect username or password.'));
-        }
-        return cb(null, user);
-    } catch (err) {
-        return cb(err);
-    }
-}));
-
-passport.serializeUser((user, cb) => cb(null, user));
-passport.deserializeUser((user, cb) => cb(null, user));
-
-  // session setup
-const secret = "SECRETTTTTTT"
-app.use(session({
-  secret: secret,
-  resave: false,
-  saveUninitialized: false,
-}));
-app.use(passport.authenticate('session'));
-
-app.use((req:any, res: any, next: any) => {
-  if (!req.session.memePoints) {
-    req.session.memePoints = {};
-  }
-  next();
-});
-*/
-// authentication middleware
+const auth = new Authenticator(app);
 
 const docValidation = [
     check('title').notEmpty().isString(),
     check('stakeholder').notEmpty().isString(),
-        check('scale').notEmpty(),
-        check('date').notEmpty().isDate(),
-        check('type').notEmpty().isString(),
-        check('language').optional({nullable: true}).isString(),
-        check('page').optional({nullable: true}).isInt(),
-        check('coordinate').optional({nullable: true}).isString(),
-        check('description').notEmpty().isString()
+    check('scale').notEmpty().isString(),
+    check('date').notEmpty(),
+    check('type').notEmpty().isString(),
+    check('language').optional({nullable: true}).isString(),
+    check('page').optional({nullable: true}).isInt(),
+    check('coordinate').optional({nullable: true}).isString(),
+    check('area').optional({nullable: true}).isString(),
+    check('description').notEmpty().isString(),
+    check().custom(({coordinate, area}) => {
+        if((coordinate && area) || (!coordinate && !area))
+            throw new Error('Select an area OR a point on the map')
+    })
 ];
 
 const connectionValidation = [
@@ -113,7 +77,6 @@ app.post('/api/sessions', (req: any, res: any, next: any) => {
 });
 
 app.get('/api/sessions/current', (req: any, res: any, next: any) => {
-
     if (req.isAuthenticated()) {
         return res.json(req.user);
     } else {
@@ -143,7 +106,11 @@ app.delete('/api/sessions/current', (req: any, res: any, next: any) =>
 /**Documents' APIs */
 
 //add a new document
-app.post('/api/documents', async (req: any, res: any) => {
+app.post('/api/documents', auth.isLoggedIn, docValidation, async (req: any, res: any) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        return res.status(422).json({message: 'invalid field'});
+    }
     try {
         let number = null;
         if(req.body.area!=null){
@@ -181,7 +148,11 @@ app.get('/api/documents/areas/:name',async (req: any, res: any)=>{
 /** Connections' APIs */
 
 //add a new connection between two documents
-app.post('/api/connections', auth.isLoggedIn, async (req: any, res: any) => {
+app.post('/api/connections', auth.isLoggedIn, connectionValidation, async (req: any, res: any) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        return res.status(422).json({message: 'invalid field'});
+    }
     try {
         const SourceDoc=req.body.SourceDocument;
         const TargetDoc=req.body.TargetDocument;
@@ -230,7 +201,11 @@ app.get('/api/areas', async (req: any, res: any) => {
 })
 
 //add a new area in the DB
-app.post('/api/areas', auth.isLoggedIn, async (req: any, res: any) => { //add a new area in the db
+app.post('/api/areas', auth.isLoggedIn, areaValidation, async (req: any, res: any) => { //add a new area in the db
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        return res.status(422).json({message: 'invalid field'});
+    }
     try{
         await daoArea.addArea(req.body.name, req.body.vertex);
         res.status(201).json({message: 'Area add successfully'});
@@ -239,10 +214,8 @@ app.post('/api/areas', auth.isLoggedIn, async (req: any, res: any) => { //add a 
     }
 });
 
-
-/** Story 5 routes */
-//modify the coordinates of an area
-app.put('/api/modifyGeoreference',async (req: any, res: any)=>{
+//modify the coordinates of an area  (Story 5 routes)
+app.put('/api/modifyGeoreference', auth.isLoggedIn, async (req: any, res: any)=>{
     try{
         const id = await daoDocument.getDocumentIdFromTitle(req.body.name);
         await daoArea.modifyGeoreference(id,req.body.coord,req.body.oldCoord,req.body.area,req.body.oldArea)
