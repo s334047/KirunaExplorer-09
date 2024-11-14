@@ -36,7 +36,7 @@ function DocumentCard({selectedDoc, setSelectedDoc, setShowAddLink, user, exclud
                             <li><strong>Type:</strong> {selectedDoc.type}</li>
                             <li>
                                 <strong>Connections:</strong> {n}
-                                {user.role === 'Urban Planner' && <a
+                                {/*{user.role === 'Urban Planner' && <a
                                     href="#"
                                     style={{
                                         textDecoration: 'underline',
@@ -50,7 +50,7 @@ function DocumentCard({selectedDoc, setSelectedDoc, setShowAddLink, user, exclud
                                     }}
                                 >
                                     <i className="bi bi-plus-circle-fill"></i>
-                                </a>}
+                                </a>}*/}
                             </li>
                             {selectedDoc.language&&<li><strong>Language:</strong> {selectedDoc.language}</li>}
                             {selectedDoc.page&&<li><strong>Pages:</strong> {selectedDoc.page}</li>}
