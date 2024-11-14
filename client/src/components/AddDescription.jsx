@@ -1,6 +1,9 @@
 import { Modal, Button, Form, Container, Row, Col,ListGroup } from 'react-bootstrap';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat.js';
+dayjs.extend(customParseFormat);
 function DescriptionComponent(props) {
   const navigate= useNavigate();
   const [errors, setErrors] = useState({});
@@ -41,17 +44,18 @@ function DescriptionComponent(props) {
 
   const handleSave = () => {
     const allowedScales = ["blueprint/effects", "concept","text"]; // sostituisci con le stringhe consentite
-    const scaleRegex = /^1:\d+$/;
+    const scaleRegex = /^1:\d+([.,]\d+)?$/;
     const newErrors = {};
     // Validazione dei campi obbligatori
     if (currentStep === 1) {
       if (!formData.title) newErrors.title = "The title is mandatory.";
       if (!formData.stakeholders) newErrors.stakeholders = "The stakeholders are mandatory.";
       if (!formData.scale) newErrors.scale = "The scale is mandatory.";
-      if (!scaleRegex.test(formData.scale) && !allowedScales.includes(formData.scale)) newErrors.scale = "The format is not correct.";
+      if (!scaleRegex.test(formData.scale) && !allowedScales.includes(formData.scale) && formData.scale) newErrors.scale = "The format is not correct.";
       if (!formData.type) newErrors.type = "The type is mandatory.";
       if (isDate && !formData.issuanceDate) newErrors.date = "The date is mandatory.";
       if (!isDate && !formData.issuanceDate) newErrors.year = "The year is mandatory.";
+      if(!isDate && formData.issuanceDate && dayjs(formData.issuanceDate , 'YYYY', true).isValid()==false) newErrors.year = "The format is not correct."
       if (formData.pages !== undefined && formData.pages !== null) {
         if (isNaN(Number(formData.pages))) {
           newErrors.pages = "The field must be a number.";

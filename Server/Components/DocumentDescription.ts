@@ -23,8 +23,8 @@ class DocumentDescription {
         this.scale = scale;
 
         let parsedDate;
-        if (dayjs(date, 'DD/MM/YYYY', true).isValid()) {
-            parsedDate = dayjs(date, 'DD/MM/YYYY');
+        if (dayjs(date, 'YYYY-MM-DD', true).isValid()) {
+            parsedDate = dayjs(date, 'YYYY-MM-DD');
             this.date = parsedDate.format('DD-MM-YYYY');
         } else if (dayjs(date, 'YYYY', true).isValid()) {
             parsedDate = dayjs(date, 'YYYY');
@@ -33,8 +33,6 @@ class DocumentDescription {
             this.date = 'Invalid Date';
             console.warn(`Invalid date format for input: ${date}`);
         }
-
-        console.log(this.date)
         this.type = type,
             this.language = language,
             this.page = page,
