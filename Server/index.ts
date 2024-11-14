@@ -92,7 +92,7 @@ const areaValidation = [
 /*** Users APIs */
 
 app.post('/api/sessions', (req: any, res: any, next: any) => {
-    auth.login(req, res, next);
+     auth.login(req, res, next);
     /*
     passport.authenticate('local', (err: any, user: any, info: any) => {
         if (err) {
@@ -113,14 +113,13 @@ app.post('/api/sessions', (req: any, res: any, next: any) => {
 });
 
 app.get('/api/sessions/current', (req: any, res: any, next: any) => {
-    auth.isLoggedIn(req, res, next)
-    /*
+
     if (req.isAuthenticated()) {
         return res.json(req.user);
     } else {
         return res.status(401).json({ error: 'Not authenticated' });
     }
-        */
+
 });
 
 app.delete('/api/sessions/current', (req: any, res: any, next: any) => {

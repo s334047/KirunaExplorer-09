@@ -67,4 +67,6 @@ export default class Authenticator {
         }
         return res.status(401).json({ error: 'Not authorized' });
     }
+
+    
 }
