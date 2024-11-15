@@ -1,5 +1,5 @@
-import React, { useState, useEffect} from 'react';
-import { Table, Button} from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Table, Button, Form, Row, Col } from 'react-bootstrap';
 import API from '../../API.mjs';
 import ListDocumentLink from './Link';
 
@@ -7,22 +7,75 @@ function DocumentTable({ setTitle, user, setShowAddLink }) {
 
     const [selectedDoc, setSelectedDoc] = useState(null);
     const [showAddLink, setShowAddLinkModal] = useState(false);
-    const [documents,setDocuments] = useState([]);
-    useEffect(()=>{
-        const getDocs = async()=>{
-          const docs = await API.getAllDocs();
-          setDocuments(docs)
+    const [documents, setDocuments] = useState([]);
+    const [searchDoc, setSearchDoc] = useState("")
+    const [searchStakeholder, setSearchStakeholder] = useState("")
+    const [searchYear, setSearchYear] = useState("")
+    const [searchDescription, setSearchDescription] = useState("")
+    const [searchMode, setSearchMode] = useState("Simple")
+    useEffect(() => {
+        const getDocs = async () => {
+            const docs = await API.getAllDocs();
+            setDocuments(docs)
         }
         getDocs()
-      },[]) 
+    }, [])
     const handleRowClick = (docId) => {
         const doc = documents.find((d) => d.id === docId);
         setSelectedDoc((prevDoc) => (prevDoc?.id === doc.id ? null : doc));
     };
-
     return (
         <div className="table-container">
-            <Table className="custom-table"  style={{ height: '100%' }} bordered hover>
+            {searchMode === "Simple" &&
+                <Row>
+                    <Col md={11}>
+                        <Form.Group className="mb-3">
+                            <Form.Control
+                                type="text"
+                                placeholder="Search document..."
+                                value={searchDoc}
+                                onChange={(e) => setSearchDoc(e.target.value)}
+                            />
+                        </Form.Group>
+                    </Col>
+                    <Col md={1}><Button onClick={()=>{setSearchMode("Advanced");setSearchDoc("")}}>Ciao</Button></Col>
+                </Row>}
+                {searchMode === "Advanced" &&
+                <Row>
+                    <Col md={4}>
+                        <Form.Group className="mb-3">
+                            <Form.Control
+                                type="text"
+                                placeholder="Search stakeholder..."
+                                value={searchStakeholder}
+                                onChange={(e) => setSearchStakeholder(e.target.value)}
+                            />
+                        </Form.Group>
+                    </Col>
+                    <Col md={2}>
+                        <Form.Group className="mb-3">
+                            <Form.Control
+                                type="text"
+                                placeholder="Search year..."
+                                value={searchYear}
+                                onChange={(e) => setSearchYear(e.target.value)}
+                            />
+                        </Form.Group>
+                    </Col>
+                    <Col md={5}>
+                        <Form.Group className="mb-3">
+                            <Form.Control
+                                type="text"
+                                placeholder="Search description..."
+                                value={searchDescription}
+                                onChange={(e) => setSearchDescription(e.target.value)}
+                            />
+                        </Form.Group>
+                    </Col>
+                    <Col md={1}><Button onClick={()=>{setSearchMode("Simple");setSearchDescription("");setSearchStakeholder(""),setSearchYear("")}}>Ciao</Button></Col>
+                </Row>}
+               
+            <Table className="custom-table" style={{ height: '100%' }} bordered hover>
                 <thead>
                     <tr>
                         <th >Title</th>
@@ -32,9 +85,13 @@ function DocumentTable({ setTitle, user, setShowAddLink }) {
                     </tr>
                 </thead>
                 <tbody>
-                    {documents.map((doc) => (
+                    {documents.filter((doc) => !searchDoc || doc.title.toLowerCase().includes(searchDoc.toLowerCase()))
+                    .filter((doc) => !searchDescription|| doc.description.toLowerCase().includes(searchDescription.toLowerCase()))
+                    .filter((doc) => !searchYear|| doc.date.toLowerCase().includes(searchYear.toLowerCase()))
+                    .filter((doc) => !searchStakeholder|| doc.stakeholder.toLowerCase().includes(searchStakeholder.toLowerCase()))
+                    .map((doc) => (
                         <React.Fragment key={doc.id} >
-                            <tr 
+                            <tr
                                 onClick={() => handleRowClick(doc.id)}
                                 style={{ cursor: 'pointer' }}
                                 className={selectedDoc?.id === doc.id ? 'selected-row' : ''}
@@ -45,7 +102,7 @@ function DocumentTable({ setTitle, user, setShowAddLink }) {
                                 <td>{doc.type}</td>
                             </tr>
                             {selectedDoc?.id === doc.id && (
-                                <AdditionalInfo selectedDoc={selectedDoc} setShowAddLinkModal={setShowAddLinkModal}/>
+                                <AdditionalInfo selectedDoc={selectedDoc} setShowAddLinkModal={setShowAddLinkModal} />
                             )}
                         </React.Fragment>
                     ))}
@@ -57,11 +114,11 @@ function DocumentTable({ setTitle, user, setShowAddLink }) {
                 title={selectedDoc?.title}
                 item={documents}
             />
-            </div>
+        </div>
     );
 };
 
-function AdditionalInfo({ selectedDoc, setShowAddLinkModal}) {
+function AdditionalInfo({ selectedDoc, setShowAddLinkModal }) {
     const [file, setFile] = useState(null);
     const [n, setN] = useState(0);
     useEffect(() => {
@@ -82,40 +139,40 @@ function AdditionalInfo({ selectedDoc, setShowAddLinkModal}) {
         document.getElementById('file-input').click(); // Simula il clic sull'input file
     };
     return (
-            <tr style={{paddingBottom: '40px'}} className='selected-row'>
-                <td colSpan="5">
-                    <ul style={{ listStyleType: 'none', paddingLeft: '40px', paddingRight: '40px', paddingTop: '40px', paddingBottom: '30px'}}>
-                        
-                        <li><strong>Scale:</strong> {selectedDoc.scale}</li>
-                        <li><strong>Type:</strong> {selectedDoc.type}</li>
-                        <li><strong>Connections:</strong> {n}</li>
-                        {selectedDoc.language && <li><strong>Language:</strong> {selectedDoc.language}</li>}
-                        {selectedDoc.page && <li><strong>Pages:</strong> {selectedDoc.page}</li>}
-                
+        <tr style={{ paddingBottom: '40px' }} className='selected-row'>
+            <td colSpan="5">
+                <ul style={{ listStyleType: 'none', paddingLeft: '40px', paddingRight: '40px', paddingTop: '40px', paddingBottom: '30px' }}>
+
+                    <li><strong>Scale:</strong> {selectedDoc.scale}</li>
+                    <li><strong>Type:</strong> {selectedDoc.type}</li>
+                    <li><strong>Connections:</strong> {n}</li>
+                    {selectedDoc.language && <li><strong>Language:</strong> {selectedDoc.language}</li>}
+                    {selectedDoc.page && <li><strong>Pages:</strong> {selectedDoc.page}</li>}
+
                     <li><strong>Description:</strong>{selectedDoc.description}</li>
 
                 </ul>
 
                 <div style={{ textAlign: 'right' }}>
                     <Button variant="light" style={{ color: "#154109", borderColor: "#154109", marginRight: "10px" }} onClick={() => { setShowAddLinkModal(true); }}><i className="bi bi-plus-circle-fill me-2"></i>Add link</Button>
-                    <Button variant="light" style={{ color: "#154109", borderColor: "#154109", marginRight: "10px"  }}><i className="bi bi-geo-alt-fill me-2"></i>Edit georeference</Button>
+                    <Button variant="light" style={{ color: "#154109", borderColor: "#154109", marginRight: "10px" }}><i className="bi bi-geo-alt-fill me-2"></i>Edit georeference</Button>
                     <Button variant="light" style={{ color: "#154109", borderColor: "#154109" }} onClick={handleAddOriginalResourcesClick}><i className="bi bi-paperclip me-2"></i>Add original resources</Button>
                 </div>
 
-                <input 
-                    id="file-input" 
-                    type="file" 
-                    style={{ display: 'none' }} 
-                    onChange={handleFileChange} 
+                <input
+                    id="file-input"
+                    type="file"
+                    style={{ display: 'none' }}
+                    onChange={handleFileChange}
                 />
-                
+
                 {file && (
                     <div>
                         <h5>Selected File:</h5>
                         <p>{file.name}</p>
                     </div>
                 )}
-                </td>
+            </td>
         </tr>
     );
 }
