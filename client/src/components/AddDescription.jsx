@@ -1,4 +1,4 @@
-import { Modal, Button, Form, Container, Row, Col,ListGroup } from 'react-bootstrap';
+import { Modal, Button, Form, Container, Row, Col, ListGroup } from 'react-bootstrap';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -7,7 +7,7 @@ import API from '../../API.mjs';
 
 dayjs.extend(customParseFormat);
 function DescriptionComponent(props) {
-  const navigate= useNavigate();
+  const navigate = useNavigate();
   const [errors, setErrors] = useState({});
   const [isDate, setIsDate] = useState(true);
   const [mode, setMode] = useState("")
@@ -39,20 +39,20 @@ function DescriptionComponent(props) {
   };
 
   const [currentStep, setCurrentStep] = useState(1); // Step tracking state
-  const [filteredItems,setItems]=useState([]);
-  useEffect(()=>{
-    const getDocs = async()=>{
+  const [filteredItems, setItems] = useState([]);
+  useEffect(() => {
+    const getDocs = async () => {
       const docs = await API.getAllDocs();
       setItems(docs)
     }
     getDocs()
-  },[]) 
+  }, [])
   const closeModal = () => {
     navigate("/")
   };
 
   const handleSave = () => {
-    const allowedScales = ["blueprint/effects", "concept","text"]; // sostituisci con le stringhe consentite
+    const allowedScales = ["blueprint/effects", "concept", "text"]; // sostituisci con le stringhe consentite
     const scaleRegex = /^1:\d+([.,]\d+)?$/;
     const newErrors = {};
     // Validazione dei campi obbligatori
@@ -64,7 +64,7 @@ function DescriptionComponent(props) {
       if (!formData.type) newErrors.type = "The type is mandatory.";
       if (isDate && !formData.issuanceDate) newErrors.date = "The date is mandatory.";
       if (!isDate && !formData.issuanceDate) newErrors.year = "The year is mandatory.";
-      if(!isDate && formData.issuanceDate && dayjs(formData.issuanceDate , 'YYYY', true).isValid()==false) newErrors.year = "The format is not correct."
+      if (!isDate && formData.issuanceDate && dayjs(formData.issuanceDate, 'YYYY', true).isValid() == false) newErrors.year = "The format is not correct."
       if (formData.pages !== undefined && formData.pages !== null) {
         if (isNaN(Number(formData.pages))) {
           newErrors.pages = "The field must be a number.";
@@ -74,7 +74,7 @@ function DescriptionComponent(props) {
     else if (currentStep === 2) {
       if (!formData.description) newErrors.description = "The description is mandatory.";
     }
-    else if(currentStep === 3){
+    else if (currentStep === 3) {
       if ((!item.document && item.type)) newErrors.linkTitle = "All two field are mandatoriy.";
       if ((item.document && !item.type)) newErrors.linkType = "All two field are mandatoriy.";
 
@@ -172,7 +172,7 @@ function DescriptionComponent(props) {
     <Container>
       <Modal show={props.show} onHide={closeModal} centered>
         <Modal.Header className="custom-modal" style={{ borderBottom: 'none' }} closeButton>
-        <Modal.Title style={{ color: "#154109" }}>{getTitleByStep()}</Modal.Title>
+          <Modal.Title style={{ color: "#154109" }}>{getTitleByStep()}</Modal.Title>
         </Modal.Header>
 
         {renderProgressLines()}
@@ -224,39 +224,39 @@ function DescriptionComponent(props) {
 
                 <Form.Group className="mb-3">
                   <Row>
-                  <Form.Label className="custom-label-color">Issuance {isDate?'date':'year'}:</Form.Label>
+                    <Form.Label className="custom-label-color">Issuance {isDate ? 'date' : 'year'}:</Form.Label>
                     <Col md={8}>
-                    {isDate ? (
-                      <Form.Control
-                        type="date"
-                        name="issuanceDate"
-                        onChange={handleChange}
-                        isInvalid={!!errors.date}
-                      />
-                    ) : (
-                      <Form.Control
-                        type="text"
-                        name="issuanceDate"
-                        placeholder="aaaa"
-                        onChange={handleChange}
-                        isInvalid={!!errors.year}
-                      />
-                  )}
-                  <Form.Control.Feedback type="invalid">
-                    {errors.date || errors.year}
-                  </Form.Control.Feedback>
-                  </Col>
+                      {isDate ? (
+                        <Form.Control
+                          type="date"
+                          name="issuanceDate"
+                          onChange={handleChange}
+                          isInvalid={!!errors.date}
+                        />
+                      ) : (
+                        <Form.Control
+                          type="text"
+                          name="issuanceDate"
+                          placeholder="aaaa"
+                          onChange={handleChange}
+                          isInvalid={!!errors.year}
+                        />
+                      )}
+                      <Form.Control.Feedback type="invalid">
+                        {errors.date || errors.year}
+                      </Form.Control.Feedback>
+                    </Col>
 
-                  <Col md={4} className="d-flex align-items-center">
-                  <Form.Check
-                    type="switch"
-                    id="date-format-switch"
-                    label={'Full date'}
-                    onChange={handleToggleDate}
-                    checked={isDate}
-                    className="custom-toggle"
-                  />
-                  </Col>
+                    <Col md={4} className="d-flex align-items-center">
+                      <Form.Check
+                        type="switch"
+                        id="date-format-switch"
+                        label={'Full date'}
+                        onChange={handleToggleDate}
+                        checked={isDate}
+                        className="custom-toggle"
+                      />
+                    </Col>
                   </Row>
                 </Form.Group>
 
@@ -323,61 +323,61 @@ function DescriptionComponent(props) {
               </Form.Group>
             )}
             {currentStep === 3 && (<><Form.Group>
-          <div className="row">
-            <div className="col-4">
-              <Form.Label className="custom-label-color">Document:</Form.Label>
-              <Form.Select name="document" onChange={handleChangeLink} isInvalid={!!errors.document}>
-                <option value="">Select a doc</option>
-                {filteredItems.filter((item) => item.title !== props.title).map((item) => (
-                  <option key={item.title} value={item.title}>{item.title}</option>
+              <div className="row">
+                <div className="col-4">
+                  <Form.Label className="custom-label-color">Document:</Form.Label>
+                  <Form.Select name="document" onChange={handleChangeLink} isInvalid={!!errors.document}>
+                    <option value="">Select a doc</option>
+                    {filteredItems.filter((item) => item.title !== props.title).map((item) => (
+                      <option key={item.title} value={item.title}>{item.title}</option>
+                    ))}
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.document}
+                  </Form.Control.Feedback>
+                </div>
+
+                <div className="col-4">
+                  <Form.Label className="custom-label-color">Type:</Form.Label>
+                  <Form.Select name="type" onChange={handleChangeLink} isInvalid={!!errors.type}>
+                    <option value="">Select a type</option>
+                    <option value="Collateral Consequence">Collateral Consequence</option>
+                    <option value="Direct Consequence">Direct Consequence</option>
+                    <option value="Projection">Projection</option>
+                    <option value="Update">Update</option>
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.type}
+                  </Form.Control.Feedback>
+                </div>
+
+                <div className="col-4 d-flex align-items-end">
+                  <Button
+                    variant="light"
+                    style={{ color: "#154109", borderColor: "#154109" }}
+                    onClick={handleAddLink}
+                    className="d-flex align-items-center"
+                  >
+                    <i className="bi bi-plus-circle-fill me-2"></i> Create Link
+                  </Button>
+                </div>
+              </div>
+            </Form.Group>
+
+              <br /><ListGroup>
+                {links.map((link, index) => (
+                  <ListGroup.Item key={index}
+                    className="d-flex justify-content-between align-items-center"
+                    style={{ fontSize: '0.7rem' }}>
+                    <div>{link.document} - {link.type}</div>
+                    <span
+                      onClick={() => handleDeleteLink(index)}
+                    >
+                      <i className="bi bi-x"></i>
+                    </span>
+                  </ListGroup.Item>
                 ))}
-              </Form.Select>
-              <Form.Control.Feedback type="invalid">
-                {errors.document}
-              </Form.Control.Feedback>
-            </div>
-
-            <div className="col-4">
-              <Form.Label className="custom-label-color">Type:</Form.Label>
-              <Form.Select name="type" onChange={handleChangeLink} isInvalid={!!errors.type}>
-                <option value="">Select a type</option>
-                <option value="Collateral Consequence">Collateral Consequence</option>
-                <option value="Direct Consequence">Direct Consequence</option>
-                <option value="Projection">Projection</option>
-                <option value="Update">Update</option>
-              </Form.Select>
-              <Form.Control.Feedback type="invalid">
-                {errors.type}
-              </Form.Control.Feedback>
-            </div>
-
-            <div className="col-4 d-flex align-items-end">
-              <Button
-                variant="light"
-                style={{ color: "#154109", borderColor: "#154109" }}
-                onClick={handleAddLink}
-                className="d-flex align-items-center"
-              >
-                <i className="bi bi-plus-circle-fill me-2"></i> Create Link
-              </Button>
-            </div>
-          </div>
-        </Form.Group>
-
-        <br /><ListGroup>
-          {links.map((link, index) => (
-            <ListGroup.Item key={index}
-              className="d-flex justify-content-between align-items-center"
-              style={{ fontSize: '0.7rem' }}>
-              <div>{link.document} - {link.type}</div>
-              <span
-                onClick={() => handleDeleteLink(index)}
-              >
-                <i className="bi bi-x"></i>
-              </span>
-            </ListGroup.Item>
-          ))}
-        </ListGroup></>)}
+              </ListGroup></>)}
             {currentStep === 4 && (<><div style={{ textAlign: 'center' }}>
             </div>
               <Form.Group className="mb-3">
@@ -394,8 +394,8 @@ function DescriptionComponent(props) {
             </>)}
           </Form>
         </Modal.Body>
-       
-        <Modal.Footer style={{paddingTop: '0.1rem', borderTop: 'none' }}>
+
+        <Modal.Footer style={{ paddingTop: '0.1rem', borderTop: 'none' }}>
           <Button variant="secondary" onClick={closeModal}>
             Close
           </Button>
@@ -406,7 +406,7 @@ function DescriptionComponent(props) {
             Next
           </Button>
         </Modal.Footer>
-        
+
       </Modal>
     </Container>
   );
