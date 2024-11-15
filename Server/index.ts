@@ -44,7 +44,11 @@ const storage = multer.diskStorage({
         cb(null, `${base}-${Date.now()}${ext}`);
     }
 });
-const upload = multer({storage});
+const upload = multer({
+    storage,
+    limits: {
+        fileSize: 100 * 1024 * 1024,
+    }});
 
 const docValidation = [
     check('title').notEmpty().isString(),
@@ -250,9 +254,13 @@ app.put('/api/modifyGeoreference', auth.isLoggedIn, async (req: any, res: any)=>
 app.post('/api/originalResources', auth.isLoggedIn, upload.single('file'), async (req: any, res: any) => {
     if(!req.file)
         return res.status(400).json({message: 'No file updated'});
-    const relPath = path.relative(path.join(__dirname, './../../'), req.file.path);
-    await daoResource.addOriginalResource(relPath, req.body.docId);
-    res.json({message: 'File update successfully', filePath: relPath})
+    try{
+        const relPath = path.relative(path.join(__dirname, './../../'), req.file.path);
+        await daoResource.addOriginalResource(relPath, req.body.docId);
+        res.json({message: 'File update successfully', filePath: relPath})
+    }catch(error){
+        res.status(503).json({error: Error});
+    }
 })
 
 // Activate the server
