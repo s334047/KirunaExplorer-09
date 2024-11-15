@@ -94,6 +94,15 @@ async function modifyGeoreference(name,coord,oldCoord,area,oldArea) {  //modify 
   }).then(response => response.json())
 }
 
+/** API Original Resources  */
+async function addOriginalResoource(formData, docId) {
+  return await fetch(`${SERVER_URL}/originalResources`, {
+    method: 'POST',
+    credentials: 'include',
+    body: {formData, docId},
+  }).then(response => response.json())
+};
+
 /** API Authentication */
 const logIn = async (credentials) => {
   const response = await fetch(`${SERVER_URL}/sessions`, {
@@ -136,6 +145,6 @@ const logOut = async () => {
 }
 
 
-const API = {addDocument, SetDocumentsConnection, GetDocumentConnections, addAreaToDoc, getAllAreas, addArea,getAllDocs,getAreasDoc,modifyGeoreference, logIn, getUserInfo, logOut};
+const API = {addDocument, SetDocumentsConnection, GetDocumentConnections, addAreaToDoc, getAllAreas, addArea,getAllDocs,getAreasDoc,modifyGeoreference, addOriginalResoource, logIn, getUserInfo, logOut};
 
 export default API;
