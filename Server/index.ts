@@ -1,15 +1,21 @@
 import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import {check, validationResult} from 'express-validator';
 import DaoDocument from './Dao/documentDao.ts';
 import DaoConnection from './Dao/connectionDao.ts';
 import DaoArea from './Dao/areaDao.ts';
+import DaoResource from './Dao/resourceDao.ts';
 import Authenticator from './auth.ts';
+
 
 const daoDocument = new DaoDocument();
 const daoConnection = new DaoConnection();
 const daoArea = new DaoArea();
+const daoResource = new DaoResource();
 
 const app = express();
 const port = 3001;
@@ -24,6 +30,21 @@ const corsOption = {
 app.use(cors(corsOption));
 
 const auth = new Authenticator(app);
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, './../originalResources'));
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname); //estensione
+        const base = path.basename(file.originalname, ext); //nome file (senza estensione)
+        cb(null, `${base}-${Date.now()}${ext}`);
+    }
+});
+const upload = multer({storage});
 
 const docValidation = [
     check('title').notEmpty().isString(),
@@ -223,6 +244,15 @@ app.put('/api/modifyGeoreference', auth.isLoggedIn, async (req: any, res: any)=>
     }catch(error){
         res.status(503).json({error: Error});
     }
+})
+
+/** Original Resources' APIs - Story 7 */
+app.post('/api/originalResources', auth.isLoggedIn, upload.single('file'), async (req: any, res: any) => {
+    if(!req.file)
+        return res.status(400).json({message: 'No file updated'});
+    const relPath = path.relative(path.join(__dirname, './../../'), req.file.path);
+    await daoResource.addOriginalResource(relPath, req.body.docId);
+    res.json({message: 'File update successfully', filePath: relPath})
 })
 
 // Activate the server
