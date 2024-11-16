@@ -53,9 +53,9 @@ const FileUploader = ({ show, onClose, triggerFileInput, documentId }) => {
                                 style={{ fontSize: '0.7rem' }}
                             >
                                 <div>{file.name}</div>
-                                <span onClick={() => handleRemoveFile(index)}>
+                                <Button variant='transparent' onClick={() => handleRemoveFile(index)}>
                                     <i className="bi bi-x"></i>
-                                </span>
+                                </Button>
                             </ListGroup.Item>
                         ))}
                     </ListGroup>
