@@ -205,7 +205,7 @@ function ModifyGeoreference(props){
             >
                     <Modal show={show} onHide={handleClose} centered>
           <Modal.Header className="custom-modal" style={{ borderBottom: 'none' }} closeButton>
-          <Modal.Title style={{ color: "#154109" }}>Georeference</Modal.Title>
+          <Modal.Title style={{ color: "#154109" }}>Edit georeference</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form>

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col } from 'react-bootstrap';
+import { Card, Row, Col, Button } from 'react-bootstrap';
 import API from '../../API.mjs';
 import { useNavigate } from 'react-router-dom';
 
-function DocumentCard({selectedDoc, setSelectedDoc, setShowAddLink, user, excludeTitle}) {
+function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user, excludeTitle }) {
     const [n, setN] = useState(0);
-    const navigate= useNavigate();
+    const navigate = useNavigate();
     useEffect(() => {
         const getNConnection = async () => {
             const n = await API.GetDocumentConnections(selectedDoc.title);
@@ -52,8 +52,8 @@ function DocumentCard({selectedDoc, setSelectedDoc, setShowAddLink, user, exclud
                                     <i className="bi bi-plus-circle-fill"></i>
                                 </a>}*/}
                             </li>
-                            {selectedDoc.language&&<li><strong>Language:</strong> {selectedDoc.language}</li>}
-                            {selectedDoc.page&&<li><strong>Pages:</strong> {selectedDoc.page}</li>}
+                            {selectedDoc.language && <li><strong>Language:</strong> {selectedDoc.language}</li>}
+                            {selectedDoc.page && <li><strong>Pages:</strong> {selectedDoc.page}</li>}
                         </ul>
                     </Col>
                     <Col md={6}>
@@ -62,16 +62,19 @@ function DocumentCard({selectedDoc, setSelectedDoc, setShowAddLink, user, exclud
                         </ul>
                     </Col>
                 </Row>
-                {user.role === 'Urban Planner' && <button
-            className="btn btn-primary position-absolute bottom-0 end-0 m-3"
-            onClick={()=>{   
-                excludeTitle(selectedDoc)
-                navigate(`/modifyGeoreference`);}}
-        >
-            Action
-        </button>}
+                {user.role === 'Urban Planner' &&
+                    <div class="d-flex justify-content-end">
+                        <Button variant="light" style={{ color: "#154109", borderColor: "#154109" }}
+                            onClick={() => {
+                                excludeTitle(selectedDoc)
+                                navigate(`/modifyGeoreference`);
+                            }}
+                        >
+                            <i className="bi bi-geo-alt-fill me-2"></i>Edit georeference</Button>
+                    </div>
+                }
             </Card.Body>
-        </Card> 
+        </Card>
     );
 }
 

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Form, Row, Col, Container } from 'react-bootstrap';
+import { Table, Button, Form, Row, Col, Container, Modal } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import API from '../../API.mjs';
 import ListDocumentLink from './Link';
+import FileUploader from './AddResources';
 
 function DocumentTable() {
 
@@ -161,7 +162,12 @@ function DocumentTable() {
 };
 
 function AdditionalInfo({ selectedDoc, setShowAddLinkModal }) {
-    const [file, setFile] = useState(null);
+    const [showFileUploader, setShowFileUploader] = useState(false);
+    const [triggerFileInput, setTriggerFileInput] = useState(false);
+    const handleAddResourcesClick = () => {
+        setTriggerFileInput(true);
+        setShowFileUploader(true);
+    };
     const [n, setN] = useState(0);
     useEffect(() => {
         const getNConnection = async () => {
@@ -171,51 +177,55 @@ function AdditionalInfo({ selectedDoc, setShowAddLinkModal }) {
         getNConnection();
     }, [selectedDoc])
 
-    const handleFileChange = (event) => {
-        const selectedFile = event.target.files[0];
-        if (selectedFile) {
-            setFile(selectedFile);
-        }
+    const handleAddFilesClick = () => {
+        document.getElementById('file-input').click();
     };
-    const handleAddOriginalResourcesClick = () => {
-        document.getElementById('file-input').click(); // Simula il clic sull'input file
-    };
+
     return (
-        <tr style={{ paddingBottom: '40px' }} className='selected-row'>
-            <td colSpan="5">
-                <ul style={{ listStyleType: 'none', paddingLeft: '40px', paddingRight: '40px', paddingTop: '40px', paddingBottom: '30px' }}>
+        <>
+            <tr style={{ paddingBottom: '40px' }} className='selected-row'>
+                <td colSpan="5">
+                    <ul style={{ listStyleType: 'none', paddingLeft: '40px', paddingRight: '40px', paddingTop: '40px', paddingBottom: '30px' }}>
 
-                    <li><strong>Scale:</strong> {selectedDoc.scale}</li>
-                    <li><strong>Type:</strong> {selectedDoc.type}</li>
-                    <li><strong>Connections:</strong> {n}</li>
-                    {selectedDoc.language && <li><strong>Language:</strong> {selectedDoc.language}</li>}
-                    {selectedDoc.page && <li><strong>Pages:</strong> {selectedDoc.page}</li>}
+                        <li><strong>Scale:</strong> {selectedDoc.scale}</li>
+                        <li><strong>Type:</strong> {selectedDoc.type}</li>
+                        <li><strong>Connections:</strong> {n}</li>
+                        {selectedDoc.language && <li><strong>Language:</strong> {selectedDoc.language}</li>}
+                        {selectedDoc.page && <li><strong>Pages:</strong> {selectedDoc.page}</li>}
 
-                    <li><strong>Description:</strong>{selectedDoc.description}</li>
+                        <li><strong>Description:</strong>{selectedDoc.description}</li>
 
-                </ul>
+                    </ul>
 
-                <div style={{ textAlign: 'right' }}>
-                    <Button variant="light" style={{ color: "#154109", borderColor: "#154109", marginRight: "10px" }} onClick={() => { setShowAddLinkModal(true); }}><i className="bi bi-plus-circle-fill me-2"></i>Add link</Button>
-                    <Button variant="light" style={{ color: "#154109", borderColor: "#154109", marginRight: "10px" }}><i className="bi bi-geo-alt-fill me-2"></i>Edit georeference</Button>
-                    <Button variant="light" style={{ color: "#154109", borderColor: "#154109" }} onClick={handleAddOriginalResourcesClick}><i className="bi bi-paperclip me-2"></i>Add original resources</Button>
-                </div>
-
-                <input
-                    id="file-input"
-                    type="file"
-                    style={{ display: 'none' }}
-                    onChange={handleFileChange}
-                />
-
-                {file && (
-                    <div>
-                        <h5>Selected File:</h5>
-                        <p>{file.name}</p>
+                    <div style={{ textAlign: 'right' }}>
+                        <Button
+                            variant="light"
+                            style={{ color: "#154109", borderColor: "#154109", marginRight: "10px" }}
+                            onClick={() => { setShowAddLinkModal(true); }}
+                        >
+                            <i className="bi bi-plus-circle-fill me-2"></i>Add link
+                        </Button>
+                        <Button
+                            variant="light"
+                            style={{ color: "#154109", borderColor: "#154109", marginRight: "10px" }}
+                            onClick={handleAddResourcesClick}
+                        >
+                            <i className="bi bi-paperclip me-2"></i>Add original resources
+                        </Button>
                     </div>
-                )}
-            </td>
-        </tr>
+                </td>
+            </tr>
+
+            <FileUploader
+                show={showFileUploader}
+                documentId={selectedDoc.id}
+                onClose={() => {
+                    setShowFileUploader(false);
+                    setTriggerFileInput(false);
+                }}
+                triggerFileInput={triggerFileInput}
+            />
+        </>
     );
 }
 AdditionalInfo.propTypes = {
