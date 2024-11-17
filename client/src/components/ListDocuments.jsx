@@ -86,21 +86,23 @@ function DocumentTable() {
                     <Row>
                         <Col md={3}>
                             <Form.Group className="mb-3">
-                                <Form.Select>
+                                <Form.Select onChange={(e)=>setSearchType(e.target.value)}>
                                     <option value="">Select document&apos;s type</option>
                                     <option value="Technical document">Technical document</option>
                                     <option value="Informative document">Informative document</option>
-                                    <option value="Material Effect">Material effect</option>
+                                    <option value="Material effect">Material effect</option>
                                     <option value="Prescriptive document">Prescriptive document</option>
                                     <option value="Design document">Design document</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col md={3}>
+                        <Col md={3} onChange={(e) => setSearchScale(e.target.value)}>
                             <Form.Group className="mb-3">
                                 <Form.Select>
                                     <option value="">Select document&apos;s scale</option>
-                                    <option value="Blueprint">Blueprint</option>
+                                    <option value="blueprints/effects">Blueprints/effects</option>
+                                    <option value="text">Text</option>
+                                    <option value="concept">Concept</option>
                                     <option value="Numerical">Numerical</option>
                                 </Form.Select>
                             </Form.Group>
@@ -132,6 +134,19 @@ function DocumentTable() {
                         .filter((doc) => !searchYear || doc.date.toLowerCase().includes(searchYear.toLowerCase()))
                         .filter((doc) => !searchStakeholder || doc.stakeholder.toLowerCase().includes(searchStakeholder.toLowerCase()))
                         .filter((doc) => !searchLanguage || doc.language === searchLanguage)
+                        .filter((doc) => !searchType|| doc.type === searchType)
+                        .filter((doc) => {
+                            if (!searchScale) {
+                              // Caso 1: Se searchType è null o undefined, includi tutti i documenti
+                              return true;
+                            } else if (searchScale === 'Numerical') {
+                              // Caso 2: Filtro per un tipo specifico
+                              return doc.scale.includes("1:");
+                            } else {
+                              // Caso 3: Esegui un'altra condizione (ad esempio, controlla una proprietà diversa)
+                              return doc.scale === searchScale;
+                            }
+                          })
                         .map((doc) => (
                             <React.Fragment key={doc.id} >
                                 <tr
