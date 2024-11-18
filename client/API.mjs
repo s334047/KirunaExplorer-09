@@ -95,11 +95,14 @@ async function modifyGeoreference(name,coord,oldCoord,area,oldArea) {  //modify 
 }
 
 /** API Original Resources  */
-async function addOriginalResoource(formData, docId) {
+async function addOriginalResoource(file, docId) {
+  const formData = new FormData(); 
+  formData.append('file', file);  // Aggiungi il file
+  formData.append('docId', docId); 
   return await fetch(`${SERVER_URL}/originalResources`, {
     method: 'POST',
     credentials: 'include',
-    body: {formData, docId},
+    body: formData,
   }).then(response => response.json())
 };
 

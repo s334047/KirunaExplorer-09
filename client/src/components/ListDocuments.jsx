@@ -188,7 +188,7 @@ function DocumentTable() {
                                         <td>{doc.type}</td>
                                     </tr>
                                     {selectedDoc?.id === doc.id && (
-                                        <AdditionalInfo selectedDoc={selectedDoc} setShowAddLinkModal={setShowAddLinkModal} />
+                                        <AdditionalInfo selectedDoc={selectedDoc} setShowAddLinkModal={setShowAddLinkModal}  />
                                     )}
                                 </React.Fragment>
                             ))}
@@ -220,10 +220,6 @@ function AdditionalInfo({ selectedDoc, setShowAddLinkModal }) {
         }
         getNConnection();
     }, [selectedDoc])
-
-    const handleAddFilesClick = () => {
-        document.getElementById('file-input').click();
-    };
 
     return (
         <>

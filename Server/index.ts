@@ -257,7 +257,7 @@ app.post('/api/originalResources', auth.isLoggedIn, upload.single('file'), async
     try{
         const relPath = path.relative(path.join(__dirname, './../../'), req.file.path);
         await daoResource.addOriginalResource(relPath, req.body.docId);
-        res.json({message: 'File update successfully', filePath: relPath})
+        res.status(200).json({message: 'File update successfully', filePath: relPath})
     }catch(error){
         res.status(503).json({error: Error});
     }
