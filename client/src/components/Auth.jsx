@@ -63,6 +63,17 @@ function LoginComponent(props) {
                                     />
                                 </Form.Group>
 
+                                <div
+                                    style={{
+                                        color: props.message.type === 'success' ? 'green' : 'red',
+                                        fontSize: '0.875rem',
+                                        marginBottom: '1rem',
+                                        textAlign: 'center'
+                                    }}
+                                >
+                                    {props.message.msg}
+                                </div>
+
                                 <Button
                                     type="submit"
                                     variant="dark"
@@ -77,7 +88,7 @@ function LoginComponent(props) {
                 </Row>
             </Modal.Body>
         </Modal>
-       
+
     );
 }
 

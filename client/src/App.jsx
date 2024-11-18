@@ -54,11 +54,11 @@ function App() {
       const user = await API.logIn(credentials);
       setLoggedIn(true);
       setShowLoginModal(false);
-      setMessage({ msg: `Benvenuto, ${user.username}!`, type: 'success' });
+      setMessage({msg: `Benvenuto, ${user.username}!`, type:'success'});
       setUser(user);
+      setAuthFailed(false);
     } catch (err) {
-      console.log(err);
-      setMessage({ msg: err, type: 'danger' });
+      setMessage({msg:`Incorrect username or password`, type: 'alert'});
     }
   };
   const handleLogout = async () => {
@@ -83,7 +83,7 @@ function App() {
         <Route index element={<>
           <MapViewer user={user}  setTitle={setExcludeDoc}  showAddLink={showAddLink} setShowAddLink={setShowAddLink}/>
           <ListDocumentLink title={excludeDoc} show={showAddLink} setShow={setShowAddLink} />
-          <LoginComponent login={handleLogin} show={showLoginModal} setShow={setShowLoginModal}/>
+          <LoginComponent message={message} login={handleLogin} show={showLoginModal} setShow={setShowLoginModal}/>
         </>
         }
         >
