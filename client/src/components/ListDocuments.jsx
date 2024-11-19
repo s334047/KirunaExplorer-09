@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Form, Row, Col, Container, Modal, Card } from 'react-bootstrap';
+import { Table, Button, Form, Row, Col, Container, Card } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import API from '../../API.mjs';
 import ListDocumentLink from './Link';
@@ -188,7 +188,7 @@ function DocumentTable() {
                                         <td>{doc.type}</td>
                                     </tr>
                                     {selectedDoc?.id === doc.id && (
-                                        <AdditionalInfo selectedDoc={selectedDoc} setShowAddLinkModal={setShowAddLinkModal}  />
+                                        <AdditionalInfo selectedDoc={selectedDoc} setShowAddLinkModal={setShowAddLinkModal} />
                                     )}
                                 </React.Fragment>
                             ))}
@@ -276,6 +276,7 @@ AdditionalInfo.propTypes = {
         language: PropTypes.string,
         page: PropTypes.number,
         description: PropTypes.string,
+        id: PropTypes.number.isRequired,
     }).isRequired,
     setShowAddLinkModal: PropTypes.func.isRequired,
 };
