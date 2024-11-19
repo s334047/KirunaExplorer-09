@@ -1,13 +1,12 @@
 import cors from 'cors';
 import express from 'express';
+import { check, validationResult } from 'express-validator';
 import morgan from 'morgan';
 import multer from 'multer';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import {check, validationResult} from 'express-validator';
-import DaoDocument from './Dao/documentDao.ts';
-import DaoConnection from './Dao/connectionDao.ts';
 import DaoArea from './Dao/areaDao.ts';
+import DaoConnection from './Dao/connectionDao.ts';
+import DaoDocument from './Dao/documentDao.ts';
 import DaoResource from './Dao/resourceDao.ts';
 import Authenticator from './auth.ts';
 
@@ -31,8 +30,8 @@ app.use(cors(corsOption));
 
 const auth = new Authenticator(app);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
