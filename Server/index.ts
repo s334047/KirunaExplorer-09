@@ -6,7 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import mime from 'mime-types';
-import {check, validationResult} from 'express-validator';
+import { check, validationResult } from 'express-validator';
 import DaoDocument from './Dao/documentDao.ts';
 import DaoConnection from './Dao/connectionDao.ts';
 import DaoArea from './Dao/areaDao.ts';
@@ -321,3 +321,4 @@ app.listen(port, () => {
 });
 
 export { app };
+
