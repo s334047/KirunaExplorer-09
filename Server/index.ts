@@ -1,19 +1,19 @@
 import cors from 'cors';
 import express from 'express';
 import { check, validationResult } from 'express-validator';
+import fs from 'fs';
+import mime from 'mime-types';
 import morgan from 'morgan';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import fs from 'fs';
-import mime from 'mime-types';
 
+import Authenticator from './auth.ts';
+import Resource from './Components/Resource.ts';
 import DaoArea from './Dao/areaDao.ts';
 import DaoConnection from './Dao/connectionDao.ts';
 import DaoDocument from './Dao/documentDao.ts';
 import DaoResource from './Dao/resourceDao.ts';
-import Authenticator from './auth.ts';
-import Resource from './Components/Resource.ts';
 
 
 const daoDocument = new DaoDocument();
@@ -322,3 +322,4 @@ app.listen(port, () => {
 });
 
 export { app };
+
