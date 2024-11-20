@@ -281,8 +281,8 @@ app.get('/api/originalResources/:docId', auth.isLoggedIn, async(req: any, res: a
                 return{
                     id: resource.id,
                     name: path.basename(filePath),
-                    type : mime.lookup(filePath) || 'application/octet-stream',
-                    content: fileContent.toString('base64') //converte in stringa in Base64 per poterlo trasmettere in JSON
+                    //type : mime.lookup(filePath) || 'application/octet-stream',
+                    //content: fileContent.toString('base64') //converte in stringa in Base64 per poterlo trasmettere in JSON
                 }
             }else{
                 return null;
@@ -305,8 +305,9 @@ app.get('/api/originalResources/download/:id', async (req: any, res: any) => {
         if(fs.existsSync(filePath)){
             const fileContent = fs.readFileSync(filePath);
             const fileName = path.basename(filePath);
+            console.log(`Sending file: ${fileName}`); // Log per verificare
             res.setHeader('Content-Type', 'application/octet-stream');
-            res.setHeader('Content-Disposition', `attachment; filename=${fileName}`); //forza il download
+            res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`); //forza il download
             res.send(fileContent);
         }else{
             res.status(404).json({error: 'File not found'});
