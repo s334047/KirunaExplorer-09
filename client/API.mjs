@@ -95,16 +95,37 @@ async function modifyGeoreference(name,coord,oldCoord,area,oldArea) {  //modify 
 }
 
 /** API Original Resources  */
-async function addOriginalResoource(file, docId) {
+async function addOriginalResource(file, docId) {
   const formData = new FormData(); 
   formData.append('file', file);  // Aggiungi il file
   formData.append('docId', docId); 
   return await fetch(`${SERVER_URL}/originalResources`, {
     method: 'POST',
     credentials: 'include',
-    body: formData,
+    body: formData
   }).then(response => response.json())
 };
+
+async function getOriginalResources(docId){
+  return await fetch(`${SERVER_URL}/originalResources/${docId}`, {
+    method: 'GET',
+    headers: {
+      'Content-type': 'application/json'
+    },
+    credentials: 'include',
+  }).then(response => response.json())
+  .then((data) => setFiles(data))
+}
+
+async function downloadResource(id){ //scaricare una SINGOLA resource associata a un documento 
+  return await fetch(`${SERVER_URL}/originalResources/download/${id}`, {
+    method: 'GET',
+    headers: {
+      'Content-type': 'application/octet-stream'
+    },
+    credentials: 'include,'
+  }).then(response => response.json())
+}
 
 /** API Authentication */
 const logIn = async (credentials) => {
@@ -148,6 +169,6 @@ const logOut = async () => {
 }
 
 
-const API = {addDocument, SetDocumentsConnection, GetDocumentConnections, addAreaToDoc, getAllAreas, addArea,getAllDocs,getAreasDoc,modifyGeoreference, addOriginalResoource, logIn, getUserInfo, logOut};
+const API = {addDocument, SetDocumentsConnection, GetDocumentConnections, addAreaToDoc, getAllAreas, addArea,getAllDocs,getAreasDoc,modifyGeoreference, addOriginalResource, getOriginalResources, downloadResource, logIn, getUserInfo, logOut};
 
 export default API;
