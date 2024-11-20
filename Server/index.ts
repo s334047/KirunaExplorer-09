@@ -29,6 +29,7 @@ const corsOption = {
     origin: "http://localhost:5173",
     optionsSuccessStatus: 200,
     credentials: true,
+    exposedHeaders: ['Content-Disposition']
 };
 app.use(cors(corsOption));
 
@@ -256,7 +257,6 @@ app.put('/api/modifyGeoreference', auth.isLoggedIn, async (req: any, res: any)=>
 /** Original Resources' APIs - Story 7 */
 app.post('/api/originalResources', auth.isLoggedIn, upload.single('file'), async (req: any, res: any) => {
     console.log(req.body)
-    //console.log(req.file)
     if(!req.file)
         return res.status(400).json({message: 'No file updated'});
     try{
@@ -272,12 +272,10 @@ app.get('/api/originalResources/:docId', auth.isLoggedIn, async(req: any, res: a
     try{
         const resources: Resource[] = await daoResource.getResourcesByDoc(req.params.docId);
         let files = resources.map((resource) => {
-            console.log(resource)
             const normalizedPath = resource.path.replace(/\\/g, '/');
             const filePath = path.resolve(__dirname, normalizedPath); //praticamente concatena il path assoluto con quello relativo
-            console.log(filePath);
             if(fs.existsSync(filePath)){
-                const fileContent = fs.readFileSync(filePath); //è un buffer
+                //const fileContent = fs.readFileSync(filePath); //è un buffer
                 return{
                     id: resource.id,
                     name: path.basename(filePath),
@@ -296,7 +294,7 @@ app.get('/api/originalResources/:docId', auth.isLoggedIn, async(req: any, res: a
 })
 
 //scaricare una SINGOLA resource associata a un documento 
-app.get('/api/originalResources/download/:id', async (req: any, res: any) => {
+app.get('/api/originalResources/download/:id', auth.isLoggedIn, async (req: any, res: any) => {
     try{
         const resource: Resource = await daoResource.getResourceById(req.params.id);
         const normalizedPath = resource.path.replace(/\\/g, '/');
@@ -305,9 +303,8 @@ app.get('/api/originalResources/download/:id', async (req: any, res: any) => {
         if(fs.existsSync(filePath)){
             const fileContent = fs.readFileSync(filePath);
             const fileName = path.basename(filePath);
-            console.log(`Sending file: ${fileName}`); // Log per verificare
-            res.setHeader('Content-Type', 'application/octet-stream');
-            res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`); //forza il download
+            res.setHeader('Content-Type', 'application/octet-stream'); //informa il client che il contenuto della risposta è un flusso di byte per il download
+            res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`); //forza il download senza aprire il file+nome che deve avere il file quando viene scaricato
             res.send(fileContent);
         }else{
             res.status(404).json({error: 'File not found'});

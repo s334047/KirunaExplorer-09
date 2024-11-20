@@ -114,18 +114,7 @@ async function getOriginalResources(docId) {
     },
     credentials: 'include',
   }).then(response => response.json())
-  //.then((data) => setFiles(data))
 }
-
-/*async function downloadResource(id){ //scaricare una SINGOLA resource associata a un documento 
-  return await fetch(`${SERVER_URL}/originalResources/download/${id}`, {
-    method: 'GET',
-    headers: {
-      'Content-type': 'application/octet-stream'
-    },
-    credentials: 'include'
-  }).then(response => response.json())
-}*/
 
 async function downloadResource(id) {
   try {
@@ -146,7 +135,6 @@ async function downloadResource(id) {
 
     // Estrai il nome del file dall'intestazione Content-Disposition
     const contentDisposition = response.headers.get('Content-Disposition');
-    console.log('Content-Disposition Header:', contentDisposition);
     let filename = 'download'; // Default nome del file
 
     if (contentDisposition) {
