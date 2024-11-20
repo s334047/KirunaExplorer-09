@@ -6,7 +6,6 @@ import mime from 'mime-types';
 import morgan from 'morgan';
 import multer from 'multer';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import Authenticator from './auth.ts';
 import Resource from './Components/Resource.ts';
 import DaoArea from './Dao/areaDao.ts';
@@ -34,8 +33,8 @@ app.use(cors(corsOption));
 
 const auth = new Authenticator(app);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -323,3 +322,4 @@ app.listen(port, () => {
 });
 
 export { app };
+
