@@ -12,7 +12,7 @@ import DaoConnection from './Dao/connectionDao.ts';
 import DaoArea from './Dao/areaDao.ts';
 import DaoResource from './Dao/resourceDao.ts';
 import Authenticator from './auth.ts';
-import { Resource } from './Components/Resource.ts';
+import Resource from './Components/Resource.ts';
 
 
 const daoDocument = new DaoDocument();
