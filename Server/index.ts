@@ -4,11 +4,16 @@ import { check, validationResult } from 'express-validator';
 import morgan from 'morgan';
 import multer from 'multer';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+import mime from 'mime-types';
+
 import DaoArea from './Dao/areaDao.ts';
 import DaoConnection from './Dao/connectionDao.ts';
 import DaoDocument from './Dao/documentDao.ts';
 import DaoResource from './Dao/resourceDao.ts';
 import Authenticator from './auth.ts';
+import Resource from './Components/Resource.ts';
 
 
 const daoDocument = new DaoDocument();
@@ -25,17 +30,18 @@ const corsOption = {
     origin: "http://localhost:5173",
     optionsSuccessStatus: 200,
     credentials: true,
+    exposedHeaders: ['Content-Disposition']
 };
 app.use(cors(corsOption));
 
 const auth = new Authenticator(app);
 
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, './../originalResources'));
+        cb(null, path.join(__dirname, './OriginalResources'));
     },
     filename: (req, file, cb) => {
         const ext = path.extname(file.originalname); //estensione
@@ -251,14 +257,62 @@ app.put('/api/modifyGeoreference', auth.isLoggedIn, async (req: any, res: any)=>
 
 /** Original Resources' APIs - Story 7 */
 app.post('/api/originalResources', auth.isLoggedIn, upload.single('file'), async (req: any, res: any) => {
+    console.log(req.body)
     if(!req.file)
         return res.status(400).json({message: 'No file updated'});
     try{
-        const relPath = path.relative(path.join(__dirname, './../../'), req.file.path);
+        const relPath = path.relative(path.join(__dirname, './'), req.file.path); //OriginalResources\...
         await daoResource.addOriginalResource(relPath, req.body.docId);
         res.status(200).json({message: 'File update successfully', filePath: relPath})
     }catch(error){
         res.status(503).json({error: Error});
+    }
+})
+
+app.get('/api/originalResources/:docId', auth.isLoggedIn, async(req: any, res: any) => {
+    try{
+        const resources: Resource[] = await daoResource.getResourcesByDoc(req.params.docId);
+        let files = resources.map((resource) => {
+            const normalizedPath = resource.path.replace(/\\/g, '/');
+            const filePath = path.resolve(__dirname, normalizedPath); //praticamente concatena il path assoluto con quello relativo
+            if(fs.existsSync(filePath)){
+                //const fileContent = fs.readFileSync(filePath); //è un buffer
+                return{
+                    id: resource.id,
+                    name: path.basename(filePath),
+                    //type : mime.lookup(filePath) || 'application/octet-stream',
+                    //content: fileContent.toString('base64') //converte in stringa in Base64 per poterlo trasmettere in JSON
+                }
+            }else{
+                return null;
+            }
+        }).filter((file) => file != null)
+        res.json(files);
+    }catch(err){
+        console.error('Error reading file: ', err);
+        res.status(503).json({error: Error})
+    }
+})
+
+//scaricare una SINGOLA resource associata a un documento 
+app.get('/api/originalResources/download/:id', auth.isLoggedIn, async (req: any, res: any) => {
+    try{
+        const resource: Resource = await daoResource.getResourceById(req.params.id);
+        const normalizedPath = resource.path.replace(/\\/g, '/');
+        const filePath = path.resolve(__dirname, normalizedPath);
+
+        if(fs.existsSync(filePath)){
+            const fileContent = fs.readFileSync(filePath);
+            const fileName = path.basename(filePath);
+            res.setHeader('Content-Type', 'application/octet-stream'); //informa il client che il contenuto della risposta è un flusso di byte per il download
+            res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`); //forza il download senza aprire il file+nome che deve avere il file quando viene scaricato
+            res.send(fileContent);
+        }else{
+            res.status(404).json({error: 'File not found'});
+        }
+    }catch(err){
+        console.error('Error reading file: ', err);
+        res.status(503).json({error: Error})
     }
 })
 

@@ -29,7 +29,7 @@ const FileUploader = ({ show, onClose, triggerFileInput, documentId }) => {
 
         for (let file of files) {
             try {
-                const response = await API.addOriginalResoource(file, documentId);
+                const response = await API.addOriginalResource(file, documentId);
                 console.log(response);
                 console.log(response.ok)
                 if (!response.status === 200) {

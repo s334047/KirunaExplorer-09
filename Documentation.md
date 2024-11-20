@@ -187,6 +187,44 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
 - **Response**:
   - Returns an array of documents.
 
+  ## API Original Resources  
+
+### POST /api/originalResources
+
+- **Description**: Uploads a new original resource file.
+- **Authentication**: Requires the user to be logged in.
+- **Request Body**:
+  - `file`: File to be uploaded (binary).
+  - `docId` (number): The ID of the document associated with the resource.
+- **Response**:
+  - Returns `200 OK` on success.
+  - Returns `400 Bad Request` if no file is provided.
+  - Returns `503 Service Unavailable` if an error occurs.
+
+### GET /api/originalResources/:docId
+
+- **Description**: Retrieves all original resources associated with a specific document.
+- **Path Parameter**:
+  - `docId` (number): ID of the document whose resources are to be fetched.
+- **Response**:
+  - Returns an array of resources.
+  - Each resource contains:
+    - `id` (number): ID of the resource.
+    - `name` (string): Name of the resource file.
+    - `type` (string): MIME type of the file (e.g., "application/pdf").
+    - `content` (string): Base64-encoded content of the file.
+  - Returns `503 Service Unavailable` if an error occurs.
+
+### GET /api/originalResources/download/:id
+
+- **Description**: Downloads a specific resource associated with a document.
+- **Path Parameter**:
+  - `id` (number): ID of the resource to be downloaded.
+- **Response**:
+  - Returns the binary content of the file with appropriate headers.
+  - Returns `404 Not Found` if the file is missing.
+  - Returns `503 Service Unavailable` if an error occurs.
+
 ## Area Endpoints
 
 ### POST /api/areas

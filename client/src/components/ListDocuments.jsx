@@ -208,6 +208,29 @@ function DocumentTable() {
 function AdditionalInfo({ selectedDoc, setShowAddLinkModal }) {
     const [showFileUploader, setShowFileUploader] = useState(false);
     const [triggerFileInput, setTriggerFileInput] = useState(false);
+    const [resources, setResources] = useState([]);
+
+    const handleDownload = async (id) => {
+        try {
+            await API.downloadResource(id);
+        } catch (err) {
+            console.error("Error downloading resource:", err);
+        }
+    };
+
+    useEffect(() => {
+        const fetchResources = async () => {
+            try {
+                const data = await API.getOriginalResources(selectedDoc.id);
+                setResources(data);
+            } catch (err) {
+                console.error("Error fetching resources:", err);
+            }
+        };
+
+        fetchResources();
+    }, [selectedDoc]);
+
     const handleAddResourcesClick = () => {
         setTriggerFileInput(true);
         setShowFileUploader(true);
@@ -235,7 +258,28 @@ function AdditionalInfo({ selectedDoc, setShowAddLinkModal }) {
 
                         <li><strong>Description:</strong>{selectedDoc.description}</li>
 
+                        <li><strong>Resources:</strong> </li>
+                        {resources.length > 0 ? (
+                            <ul>
+                                {resources.map((resource) => (
+                                    <li key={resource.id}>
+                                        <Button
+                                            variant="link"
+                                            style={{color:"#154109"}}
+                                            onClick={() => handleDownload(resource.id)}
+                                        >
+                                            {resource.name}
+                                        </Button>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No resources found for this document.</p>
+                        )}
+
                     </ul>
+
+
 
                     <div style={{ textAlign: 'right' }}>
                         <Button
