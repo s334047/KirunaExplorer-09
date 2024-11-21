@@ -1,12 +1,21 @@
-import { afterEach, describe, expect, jest, test } from "@jest/globals";
+import { describe, test, expect, jest, beforeEach, afterEach, } from "@jest/globals";
 import request from "supertest";
 import Authenticator from "../../auth.ts";
 import { app } from "../../index.ts";
 
 jest.mock("../../auth");
 
+beforeEach(() => {
+    jest.clearAllMocks();
+    jest.resetModules();
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+});
 afterEach(() => {
     jest.clearAllMocks();
+    jest.restoreAllMocks();
+    jest.resetAllMocks();
+    jest.resetModules();
 });
 
 describe('POST /api/sessions', () => {

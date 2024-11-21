@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, jest, test } from "@jest/globals";
+import { afterEach, describe, expect, jest, test, beforeEach } from "@jest/globals";
 import fs from 'fs';
 import request from "supertest";
 import DaoResource from "../../Dao/resourceDao.ts";
@@ -9,8 +9,17 @@ jest.mock("../../Dao/resourceDao");
 jest.mock("../../auth");
 jest.mock("sqlite3");
 
+beforeEach(() => {
+  jest.clearAllMocks();
+  jest.resetModules();
+  jest.restoreAllMocks();
+  jest.resetAllMocks();
+});
 afterEach(() => {
   jest.clearAllMocks();
+  jest.restoreAllMocks();
+  jest.resetAllMocks();
+  jest.resetModules();
 });
 
 describe("Story 7 - Original Resource APIs", () => {

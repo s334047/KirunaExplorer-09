@@ -47,7 +47,7 @@ sections:
 - Unit Testing:
   - Total hours estimated: 5.5
   - Total hours spent: 7.17
-  - Nr of automated unit test cases: 38
+  - Nr of automated unit test cases: 58
   - Coverage  
   ![coverage](./coverageSprint2.png)
 - E2E testing:
