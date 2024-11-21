@@ -248,7 +248,7 @@ app.put('/api/modifyGeoreference', auth.isLoggedIn, async (req: any, res: any)=>
     try{
         const id = await daoDocument.getDocumentIdFromTitle(req.body.name);
         await daoArea.modifyGeoreference(id,req.body.coord,req.body.oldCoord,req.body.area,req.body.oldArea)
-        res.status(200);
+        res.status(200).json({message: "Georeference updated successfully"});
     }catch(error){
         res.status(503).json({error: Error});
     }
