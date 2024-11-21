@@ -7,7 +7,7 @@ export default class DaoDocument {
         return new Promise<void>((resolve, reject) => {
             let coordTemp:string=null;
             if(coord!=null){
-                  coordTemp = '[ '+coord[0]+', '+coord[1]+' ]'
+                  coordTemp = '['+coord[0]+','+coord[1]+']'
             }
             const query = `INSERT INTO Document 
                             (Title, Stakeholder, Scale, Date, Type, Language, Page, Coordinate,Area, Description)

@@ -52,7 +52,7 @@ export default class DaoArea {
         return new Promise<void>(async (resolve,reject)=>{
             if(coordinate && !oldCoordinate){
                 const sql="UPDATE Document SET Coordinate = ?, Area = NULL WHERE Id = ?"
-                db.run(sql,[JSON.stringify(coordinate),id],function(err){
+                db.run(sql,[JSON.stringify(coordinate).replace(/"/g, ""),id],function(err){
                     if(err){
                         reject(err);
                         return;
@@ -65,7 +65,7 @@ export default class DaoArea {
             }
             if(coordinate && oldCoordinate){
                 const sql="UPDATE Document SET Coordinate = ? WHERE Id = ?"
-                db.run(sql,[JSON.stringify(coordinate),id],function(err){
+                db.run(sql,[JSON.stringify(coordinate).replace(/"/g, ""),id],function(err){
                     if(err){
                         reject(err);
                         return;
