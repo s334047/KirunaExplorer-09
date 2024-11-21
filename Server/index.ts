@@ -12,8 +12,6 @@ import DaoArea from './Dao/areaDao.ts';
 import DaoResource from './Dao/resourceDao.ts';
 import Authenticator from './auth.ts';
 import Resource from './Components/Resource.ts';
-// import { fileURLToPath } from "url";
-// import { dirname } from "path";
 import { dirname, resolve } from 'path';
 
 
@@ -37,9 +35,6 @@ app.use(cors(corsOption));
 
 const auth = new Authenticator(app);
 
-// const __filename = fileURLToPath(import.meta.url);
-// const __filename = resolve(process.cwd(), 'index.ts'); //percorso assoluto del file
-// const __dirname = dirname(__filename);
 if (typeof __filename === 'undefined') {
     globalThis.__filename = resolve(process.cwd(), 'index.ts');
 }
