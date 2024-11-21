@@ -1,4 +1,4 @@
-TEMPLATE FOR RETROSPECTIVE (Team ##)
+TEMPLATE FOR RETROSPECTIVE (Team 09)
 =====================================
 
 The retrospective should include _at least_ the following
@@ -12,11 +12,11 @@ sections:
 
 ### Macro statistics
 
-- Number of stories committed vs. done 
-- Total points committed vs. done 
-- Nr of hours planned vs. spent (as a team)
+- Number of stories committed: 5 vs. done: 5
+- Total points committed: 45 vs. done: 45
+- Nr of hours planned: 75.5  vs. spent: 81.91 (as a team)
 
-**Remember**a story is done ONLY if it fits the Definition of Done:
+**Remember** a story is done ONLY if it fits the Definition of Done:
  
 - Unit Tests passing
 - Code review completed
@@ -29,34 +29,33 @@ sections:
 
 | Story  | # Tasks | Points | Hours est. | Hours actual |
 |--------|---------|--------|------------|--------------|
-| _#0_   |         |       |            |              |
-| n      |         |        |            |              |
-   
+| _#0_   |     7   |    /   |      53.5      |     55.33         |
+| KX5    |      3   |   13     |       3.5     |        4.16      |
+| KX6  |      1   |   2     |      2      |       2.5       |
+| KX7  |      3   |      11  |        7.5    |       12.92       |
+| KX8   |     1    |     8   |        6    |         6     |
+| KX9   |       3  |     11   |        3    |        1      |
 
 > story `#0` is for technical tasks, leave out story points (not applicable in this case)
 
-- Hours per task average, standard deviation (estimate and actual)
-- Total estimation error ratio: sum of total hours spent / sum of total hours effort - 1
-
-    $$\frac{\sum_i spent_{task_i}}{\sum_i estimation_{task_i}} - 1$$
-    
-- Absolute relative task estimation error: sum( abs( spent-task-i / estimation-task-i - 1))/n
-
-    $$\frac{1}{n}\sum_i^n \left| \frac{spent_{task_i}}{estimation_task_i}-1 \right| $$
+- Hours per task average: 4.19 (estimate), 4.55 (actual)
+- Standard deviation: 4.18 (estimate), 4.99 (actual)
+- Total estimation error ratio: 0.085
+- Absolute relative task estimation error: 0.479
   
 ## QUALITY MEASURES 
 
 - Unit Testing:
-  - Total hours estimated
-  - Total hours spent
-  - Nr of automated unit test cases 
-  - Coverage (if available)
+  - Total hours estimated: 5.5
+  - Total hours spent: 7.17
+  - Nr of automated unit test cases: ???
+  - Coverage (if available) ???
 - E2E testing:
-  - Total hours estimated
-  - Total hours spent
+  - Total hours estimated: 4
+  - Total hours spent: 2.08
 - Code review 
-  - Total hours estimated 
-  - Total hours spent
+  - Total hours estimated: 8
+  - Total hours spent: 10.83
   
 
 
