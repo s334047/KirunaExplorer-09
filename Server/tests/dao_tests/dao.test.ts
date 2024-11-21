@@ -40,7 +40,7 @@ describe("DaoStory1 Test", () => {
             expect(mockRun).toHaveBeenCalled();
             expect(mockRun).toHaveBeenCalledWith(
                 expect.any(String), // SQL query
-                ["Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, "[ 123, 456 ]", idArea, "Test Description"],
+                ["Test Title", "Test SH", "Test SC", "2023-01-01", "Test Type", "EN", 1, "[123,456]", idArea, "Test Description"],
                 expect.any(Function) // Callback function
             );
         });
