@@ -1,41 +1,62 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, LayersControl, Polygon } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-markercluster';
 import L from 'leaflet';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
+import 'react-leaflet-markercluster/dist/styles.min.css';
 import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import DocumentCard from './DocCard'
+import DocumentCard from './DocCard';
 import API from '../../API.mjs';
 
-
 function MapViewer(props) {
-    const navigate=useNavigate();
+    const navigate = useNavigate();
     const position = [67.8558, 20.2253];
     const bounds = [
         [67, 20],
         [68, 21]
     ];
-    const [docs,setDocs] = useState([]); 
-    useEffect(()=>{
-        const getDocs = async()=>{
-          const documents = await API.getAllDocs();
-          setDocs(documents);
-        }
+    const [docs, setDocs] = useState([]);
+    const [selectedDoc, setSelectedDoc] = useState(null);
+
+    useEffect(() => {
+        const getDocs = async () => {
+            const documents = await API.getAllDocs();
+            setDocs(documents);
+        };
         getDocs();
-      },[]) 
+    }, []);
+
     const customIcon = new L.Icon({
         iconUrl: 'file.png',
         iconSize: [35, 35],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
     });
-    const areaIcon = new L.Icon({
-        iconUrl: 'drawing.svg',
-        iconSize: [35, 35],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-    });
+    const createClusterCustomIcon = (cluster) => {
+        const count = cluster.getChildCount();
+
+        // Stile personalizzato del cluster
+        return L.divIcon({
+            html: `<div style="
+                background-color: #4285F4; /* Colore del cluster */
+                color: white; /* Colore del testo */
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: 2px solid white;
+            ">
+                ${count}
+            </div>`,
+            className: 'custom-cluster-icon', // Classe opzionale per ulteriori stili
+            iconSize: L.point(40, 40), // Dimensione del cluster
+        });
+    };
+
     const documentsByArea = new Map();
 
     docs.filter(doc => doc.coordinate == null).forEach((doc) => {
@@ -62,8 +83,8 @@ function MapViewer(props) {
     
         return positions;
     }
-    const [selectedDoc, setSelectedDoc] = useState(null);
     const { BaseLayer } = LayersControl;
+
     return (
         <div style={{ display: 'flex', flex: 1, position: 'relative', height: '90vh' }}>
             <MapContainer
@@ -74,7 +95,7 @@ function MapViewer(props) {
                 style={{ flex: 1, height: "100%", width: "100%", borderRadius: '10px' }}
                 scrollWheelZoom={false}
             >
-                 <LayersControl position="topright">
+                <LayersControl position="topright">
                     <BaseLayer name="Street">
                         <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -88,36 +109,43 @@ function MapViewer(props) {
                         />
                     </BaseLayer>
                 </LayersControl>
-                 {docs.filter(doc => doc.coordinate != null).map(doc => (
-                    <Marker key={doc.title} position={doc.coordinate} icon={customIcon} eventHandlers={{
-                        click: () => {
-                            setSelectedDoc(doc);
-                        },
-                    }}>
-                    </Marker>
-                ))}
-  {Array.from(documentsByArea.entries()).map(([areaKey, areaDocuments]) => {
-    const areaVertices = JSON.parse(areaKey);
 
-    // Crea posizioni per i documenti nell'area in modo da non sovrapporli
-    const positions = generateNonOverlappingPositions(areaVertices, areaDocuments.length);
+                {/* Marker Cluster Group */}
+                <MarkerClusterGroup showCoverageOnHover={false} disableClusteringAtZoom={16} iconCreateFunction={createClusterCustomIcon}>
+                    {docs.filter(doc => doc.coordinate != null).map(doc => (
+                        <Marker key={doc.title} position={doc.coordinate} icon={customIcon} eventHandlers={{
+                            click: () => {
+                                setSelectedDoc(doc);
+                            },
+                        }}>
+                        </Marker>
+                    ))}
+                    {Array.from(documentsByArea.entries()).map(([areaKey, areaDocuments]) => {
+                        const areaVertices = JSON.parse(areaKey);
+                        const positions = generateNonOverlappingPositions(areaVertices, areaDocuments.length);
 
-    return (
-        <React.Fragment key={areaKey}>
-            {areaDocuments.map((document, index) => (
-                <Marker key={document.id} position={positions[index]} icon={customIcon} eventHandlers={{
-                    click: () => {
-                        setSelectedDoc(document);
-                    },
-                }}>
-                </Marker>
-            ))}
-        </React.Fragment>
-    );
-    })}
-                {selectedDoc && selectedDoc.area && <Polygon positions={selectedDoc.area} color="red"></Polygon>}
+                        return (
+                            <React.Fragment key={areaKey}>
+                                {areaDocuments.map((document, index) => (
+                                    <Marker key={document.id} position={positions[index]} icon={customIcon} eventHandlers={{
+                                        click: () => {
+                                            setSelectedDoc(document);
+                                        },
+                                    }}>
+                                    </Marker>
+                                ))}
+                            </React.Fragment>
+                        );
+                    })}
+                </MarkerClusterGroup>
+
+                {/* Selected Area Polygon */}
+                {selectedDoc && selectedDoc.area && (
+                    <Polygon positions={selectedDoc.area} color="red"></Polygon>
+                )}
             </MapContainer>
 
+            {/* Document Card */}
             {selectedDoc && (
                 <div style={{
                     position: 'absolute',
@@ -126,33 +154,68 @@ function MapViewer(props) {
                     right: 20,
                     zIndex: 1000,
                 }}>
-                    <DocumentCard selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} setShowAddLink={props.setShowAddLink} user={props.user} excludeTitle={props.setTitle} />
+                    <DocumentCard
+                        selectedDoc={selectedDoc}
+                        setSelectedDoc={setSelectedDoc}
+                        setShowAddLink={props.setShowAddLink}
+                        user={props.user}
+                        excludeTitle={props.setTitle}
+                    />
                 </div>
             )}
-            {/*Only a Urban Planner can add a document, see props.user.role*/}
-            {!selectedDoc  && props.user.role === 'Urban Planner' && <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000 }}>
-                <Button variant="light" onClick={() => { navigate("/addDoc") }} style={{ border: '2px solid gray', display: 'flex', justifyContent: 'center', alignItems: 'center', width: "100px" }}>
-                    <div style={{ textAlign: 'left' }}>
-                        <span style={{ display: 'block', fontSize: '12px' }}>Add</span>
-                        <span style={{ display: 'block', fontSize: '12px' }}>doc</span>
-                    </div>
-                    <i className="bi bi-file-earmark-plus fs-3" style={{ marginLeft: '15px' }}></i>
-                </Button>
-            </div>}
-            {!selectedDoc && props.user.role === 'Urban Planner' && <div style={{ position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000 }}>
-                <Button variant="light" onClick={() => {navigate("/addArea") }} style={{ border: '2px solid gray', display: 'flex', justifyContent: 'center', alignItems: 'center', width: "100px" }}>
-                    <div style={{ textAlign: 'left' }}>
-                        <span style={{ display: 'block', fontSize: '12px' }}>Draw</span>
-                        <span style={{ display: 'block', fontSize: '12px' }}>area</span>
-                    </div>
 
-                    <i className="bi bi-bounding-box-circles fs-3" style={{ marginLeft: '15px' }}></i>
-                </Button>
-            </div>}
+            {/* Add Document Button */}
+            {!selectedDoc && props.user.role === 'Urban Planner' && (
+                <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000 }}>
+                    <Button
+                        variant="light"
+                        onClick={() => navigate("/addDoc")}
+                        style={{
+                            border: '2px solid gray',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            width: "100px"
+                        }}
+                    >
+                        <div style={{ textAlign: 'left' }}>
+                            <span style={{ display: 'block', fontSize: '12px' }}>Add</span>
+                            <span style={{ display: 'block', fontSize: '12px' }}>doc</span>
+                        </div>
+                        <i className="bi bi-file-earmark-plus fs-3" style={{ marginLeft: '15px' }}></i>
+                    </Button>
+                </div>
+            )}
+
+            {/* Add Area Button */}
+            {!selectedDoc && props.user.role === 'Urban Planner' && (
+                <div style={{ position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000 }}>
+                    <Button
+                        variant="light"
+                        onClick={() => navigate("/addArea")}
+                        style={{
+                            border: '2px solid gray',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            width: "100px"
+                        }}
+                    >
+                        <div style={{ textAlign: 'left' }}>
+                            <span style={{ display: 'block', fontSize: '12px' }}>Draw</span>
+                            <span style={{ display: 'block', fontSize: '12px' }}>area</span>
+                        </div>
+                        <i className="bi bi-bounding-box-circles fs-3" style={{ marginLeft: '15px' }}></i>
+                    </Button>
+                </div>
+            )}
         </div>
     );
 }
 
-
-
 export default MapViewer;
+
+
+
+
+
