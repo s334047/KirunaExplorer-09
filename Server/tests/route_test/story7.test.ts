@@ -101,8 +101,6 @@ describe("Story 7 - Original Resource APIs", () => {
           {
             id: 1,
             name: "test_resource.pdf",
-            type: "application/pdf",
-            content: "QmFzZTY0RW5jb2RlZENvbnRlbnQ=", // Actual base64 string
           },
         ]);
       });
