@@ -254,44 +254,47 @@ function AdditionalInfo({ selectedDoc, setSelectedDoc, documents, setShowAddLink
 
                         <li><strong>Scale:</strong> {selectedDoc.scale}</li>
                         <li><strong>Type:</strong> {selectedDoc.type}</li>
-                        <li><strong>Connections:</strong>
-                        <ul>
-                            {connections.map(connection => (
-                                <li key={connection.id}>
-                                    <Button
-                                            variant="link"
-                                            style={{color:"#154109"}}
-                                            onClick={() => setSelectedDoc(documents.find((d) => d.id === connection.id))}
-                                        >
-                                            {connection.title} - {connection.type}
-                                        </Button>
-                                </li>
-                            ))}
-                        </ul>
-                    </li>
                         {selectedDoc.language && <li><strong>Language:</strong> {selectedDoc.language}</li>}
                         {selectedDoc.page && <li><strong>Pages:</strong> {selectedDoc.page}</li>}
 
                         <li><strong>Description:</strong>{selectedDoc.description}</li>
 
-                        <li><strong>Resources:</strong> </li>
-                        {resources.length > 0 ? (
+                        {connections.length>0 &&
+                        <li><strong>Connections:</strong>
                             <ul>
-                                {resources.map((resource) => (
-                                    <li key={resource.id}>
+                                {connections.map(connection => (
+                                    <li key={connection.id}>
                                         <Button
-                                            variant="link"
-                                            style={{color:"#154109"}}
-                                            onClick={() => handleDownload(resource.id)}
-                                        >
-                                            {resource.name}
-                                        </Button>
+                                                variant="link"
+                                                style={{color:"#154109"}}
+                                                onClick={() => setSelectedDoc(documents.find((d) => d.id === connection.id))}
+                                            >
+                                                {connection.title} - {connection.type}
+                                            </Button>
                                     </li>
                                 ))}
                             </ul>
-                        ) : (
-                            <p>No resources found for this document.</p>
-                        )}
+                        </li>
+                        }
+
+                        
+                        {resources.length>0 &&
+                            <li><strong>Resources:</strong>
+                                <ul>
+                                    {resources.map((resource) => (
+                                        <li key={resource.id}>
+                                            <Button
+                                                variant="link"
+                                                style={{color:"#154109"}}
+                                                onClick={() => handleDownload(resource.id)}
+                                            >
+                                                {resource.name}
+                                            </Button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </li>
+                        }
 
                     </ul>
 
