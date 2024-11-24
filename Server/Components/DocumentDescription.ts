@@ -29,7 +29,12 @@ class DocumentDescription {
         } else if (dayjs(date, 'YYYY', true).isValid()) {
             parsedDate = dayjs(date, 'YYYY');
             this.date = parsedDate.format('YYYY');
-        } else {
+        }
+        else if(dayjs(date, 'YYYY-MM', true).isValid()){
+            parsedDate = dayjs(date, 'YYYY-MM');
+            this.date = parsedDate.format('MM-YYYY');
+        }
+        else {
             this.date = 'Invalid Date';
             console.warn(`Invalid date format for input: ${date}`);
         }

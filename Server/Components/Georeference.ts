@@ -1,12 +1,3 @@
-
-class Coordinates{
-    coords : [number, number]
- 
-     constructor(lat: number, lon: number){
-       this.coords = [lat, lon];
-     }
- }
- 
 class Area{
    id: number
    name: string
@@ -19,4 +10,4 @@ class Area{
     }
 }
 
-export {Area, Coordinates};
+export {Area};

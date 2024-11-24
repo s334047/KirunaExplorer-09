@@ -9,8 +9,10 @@ dayjs.extend(customParseFormat);
 function DescriptionComponent(props) {
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
-  const [isDate, setIsDate] = useState(true);
   const [mode, setMode] = useState("")
+  const [year, setYear] = useState(null);
+  const [month, setMonth] = useState(null);
+  const [day, setDay] = useState(null);
   const [links, setLinks] = useState([]);
   const [item, setItem] = useState({ document: "", type: "" });
   const [formData, setFormData] = useState({
@@ -62,9 +64,14 @@ function DescriptionComponent(props) {
       if (!formData.scale) newErrors.scale = "The scale is mandatory.";
       if (!scaleRegex.test(formData.scale) && !allowedScales.includes(formData.scale) && formData.scale) newErrors.scale = "The format is not correct.";
       if (!formData.type) newErrors.type = "The type is mandatory.";
-      if (isDate && !formData.issuanceDate) newErrors.date = "The date is mandatory.";
-      if (!isDate && !formData.issuanceDate) newErrors.year = "The year is mandatory.";
-      if (!isDate && formData.issuanceDate && dayjs(formData.issuanceDate, 'YYYY', true).isValid() == false) newErrors.year = "The format is not correct."
+      if (!year) newErrors.date = "The year is mandatory";
+      if (year && day && !month) newErrors.date = "Month must be present";
+      if (year && dayjs(year, 'YYYY', true).isValid() == false) newErrors.date = "Date format not correct";
+      else if(!month && year && !day) setFormData({...formData,issuanceDate:`${year}`})
+      if (month && year && dayjs(year + "-" + month, 'YYYY-MM', true).isValid() == false) newErrors.date = "Date format not correct"
+      else if(month && year && !day) setFormData({...formData,issuanceDate:`${year}-${month}`})
+      if (day && month && year && dayjs(year + "-" + month + "-" + day, 'YYYY-MM-DD', true).isValid() == false) newErrors.date = "Date format not correct"
+      else if(month && year && day)setFormData({...formData,issuanceDate:`${year}-${month}-${day}`})
       if (formData.pages !== undefined && formData.pages !== null) {
         if (isNaN(Number(formData.pages))) {
           newErrors.pages = "The field must be a number.";
@@ -160,13 +167,6 @@ function DescriptionComponent(props) {
     );
   };
 
-  const handleToggleDate = () => {
-    setIsDate(!isDate);
-    setFormData({
-      ...formData,
-      issuanceDate: "",
-    });
-  };
 
   return (
     <Container>
@@ -220,46 +220,38 @@ function DescriptionComponent(props) {
                     {errors.scale}
                   </Form.Control.Feedback>
                 </Form.Group>
-
-
                 <Form.Group className="mb-3">
                   <Row>
-                    <Form.Label className="custom-label-color">Issuance {isDate ? 'date' : 'year'}:</Form.Label>
-                    <Col md={8}>
-                      {isDate ? (
-                        <Form.Control
-                          type="date"
-                          name="issuanceDate"
-                          onChange={handleChange}
-                          isInvalid={!!errors.date}
-                        />
-                      ) : (
-                        <Form.Control
-                          type="text"
-                          name="issuanceDate"
-                          placeholder="aaaa"
-                          onChange={handleChange}
-                          isInvalid={!!errors.year}
-                        />
-                      )}
-                      <Form.Control.Feedback type="invalid">
-                        {errors.date || errors.year}
-                      </Form.Control.Feedback>
-                    </Col>
-
+                    <Form.Label className="custom-label-color">Issuance date:</Form.Label>
                     <Col md={4} className="d-flex align-items-center">
-                      <Form.Check
-                        type="switch"
-                        id="date-format-switch"
-                        label={'Full date'}
-                        onChange={handleToggleDate}
-                        checked={isDate}
-                        className="custom-toggle"
+                      <Form.Control
+                        type="text"
+                        placeholder="dd"
+                        onChange={(e) => setDay(e.target.value)}
+                        isInvalid={!!errors.date}
+                      />
+                    </Col>
+                    <Col md={4} className="d-flex align-items-center">
+                      <Form.Control
+                        type="text"
+                        placeholder="mm"
+                        onChange={(e) => setMonth(e.target.value)}
+                        isInvalid={!!errors.date}
+                      />
+                    </Col>
+                    <Col md={4} className="d-flex align-items-center">
+                      <Form.Control
+                        type="text"
+                        placeholder="yyyy"
+                        onChange={(e) => setYear(e.target.value)}
+                        isInvalid={!!errors.date}
                       />
                     </Col>
                   </Row>
+                  <Form.Control.Feedback type="invalid" className="d-block">
+                    {errors.date}
+                  </Form.Control.Feedback>
                 </Form.Group>
-
                 <Form.Group className="mb-3">
                   <Form.Label className="custom-label-color">Type:</Form.Label>
                   <Form.Select
