@@ -188,7 +188,7 @@ function DocumentTable() {
                                         <td>{doc.type}</td>
                                     </tr>
                                     {selectedDoc?.id === doc.id && (
-                                        <AdditionalInfo selectedDoc={selectedDoc} setShowAddLinkModal={setShowAddLinkModal} />
+                                        <AdditionalInfo selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} documents={documents} setShowAddLinkModal={setShowAddLinkModal} />
                                     )}
                                 </React.Fragment>
                             ))}
@@ -205,7 +205,7 @@ function DocumentTable() {
     );
 };
 
-function AdditionalInfo({ selectedDoc, setShowAddLinkModal }) {
+function AdditionalInfo({ selectedDoc, setSelectedDoc, documents, setShowAddLinkModal }) {
     const [showFileUploader, setShowFileUploader] = useState(false);
     const [triggerFileInput, setTriggerFileInput] = useState(false);
     const [resources, setResources] = useState([]);
@@ -235,13 +235,15 @@ function AdditionalInfo({ selectedDoc, setShowAddLinkModal }) {
         setTriggerFileInput(true);
         setShowFileUploader(true);
     };
-    const [n, setN] = useState(0);
+    
+    const [connections, setConnections] = useState([]);
+    
     useEffect(() => {
-        const getNConnection = async () => {
-            const n = await API.GetDocumentConnections(selectedDoc.title);
-            setN(n);
+        const getConnections = async () => {
+            const connectionsInfo = await API.GetDocumentInfoConnections(selectedDoc.id);
+            setConnections(connectionsInfo);
         }
-        getNConnection();
+        getConnections();
     }, [selectedDoc])
 
     return (
@@ -252,7 +254,21 @@ function AdditionalInfo({ selectedDoc, setShowAddLinkModal }) {
 
                         <li><strong>Scale:</strong> {selectedDoc.scale}</li>
                         <li><strong>Type:</strong> {selectedDoc.type}</li>
-                        <li><strong>Connections:</strong> {n}</li>
+                        <li><strong>Connections:</strong>
+                        <ul>
+                            {connections.map(connection => (
+                                <li key={connection.id}>
+                                    <Button
+                                            variant="link"
+                                            style={{color:"#154109"}}
+                                            onClick={() => setSelectedDoc(documents.find((d) => d.id === connection.id))}
+                                        >
+                                            {connection.title} - {connection.type}
+                                        </Button>
+                                </li>
+                            ))}
+                        </ul>
+                    </li>
                         {selectedDoc.language && <li><strong>Language:</strong> {selectedDoc.language}</li>}
                         {selectedDoc.page && <li><strong>Pages:</strong> {selectedDoc.page}</li>}
 

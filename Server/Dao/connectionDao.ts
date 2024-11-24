@@ -9,7 +9,7 @@ export default class DaoConnection {
      * @param Type 
      * @returns Boolean
      */
-    SetDocumentsConnection(SourceDoc: String, TargetDoc: String, Type: String){
+    SetDocumentsConnection(SourceDoc: String, TargetDoc: String, Type: String) {
         return new Promise<boolean>(async (resolve, reject) => {
             const SourceDocId = await this.GetDocumentsId(SourceDoc);
             const TargetDocId = await this.GetDocumentsId(TargetDoc);
@@ -44,7 +44,7 @@ export default class DaoConnection {
         return new Promise(async (resolve, reject) => {
             const SourceDocId = await this.GetDocumentsId(SourceDoc);
             if (SourceDocId) {
-                db.get(`SELECT  COUNT(*) as n FROM Connection WHERE SourceDocId = ? OR TargetDocId = ?`, [SourceDocId,SourceDocId], (err, row:any) => {
+                db.get(`SELECT  COUNT(*) as n FROM Connection WHERE SourceDocId = ? OR TargetDocId = ?`, [SourceDocId, SourceDocId], (err, row: any) => {
                     if (err) {
                         reject(err);
                         return false;
@@ -59,6 +59,33 @@ export default class DaoConnection {
             }
         });
     };
+
+    GetDocumentInfoConnections = async (SourceDocId: Number): Promise<{ id: number, title: string, type: string }[]> => {
+        return new Promise(async (resolve, reject) => {
+            const query = `
+                SELECT 
+                    d.Id as id, 
+                    d.Title as title, 
+                    c.Type as type
+                FROM Connection c
+                JOIN Document d ON c.SourceDocId = d.Id OR c.TargetDocId = d.Id
+                WHERE (c.SourceDocId = ? OR c.TargetDocId = ?)
+                  AND d.Id != ?`;
+
+            db.all(query, [SourceDocId, SourceDocId, SourceDocId], (err, rows: { id: number, title: string, type: string }[]) => {
+                if (err) {
+                    console.error("Database error:", err);
+                    return reject(err);
+                }
+                else {
+                    resolve(rows);
+                }
+            });
+        });
+    };
+
+
+
     /* Secondary functions */
     /**
      * Gets the Id of a document
@@ -67,7 +94,7 @@ export default class DaoConnection {
      */
     GetDocumentsId = async (Title: String): Promise<Number> => {
         return new Promise((resolve, reject) => {
-            db.get(`SELECT Id FROM Document WHERE Title = ?`, [Title], (err, row:any) => {
+            db.get(`SELECT Id FROM Document WHERE Title = ?`, [Title], (err, row: any) => {
                 if (err) {
                     reject(err);
                     return false;

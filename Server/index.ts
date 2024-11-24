@@ -210,6 +210,16 @@ app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
     }
 });
 
+app.get('/api/connections/info/:SourceDocId', async (req: any, res: any) => {
+    try {
+        const { SourceDocId } = req.params;
+        const connections = await daoConnection.GetDocumentInfoConnections(SourceDocId);
+        res.json(connections);
+    } catch (error) {
+        res.status(503).json({ error: Error });
+    }
+});
+
 
 /** Areas' APIs */
 
