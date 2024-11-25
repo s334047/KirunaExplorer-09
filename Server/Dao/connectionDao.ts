@@ -61,7 +61,7 @@ export default class DaoConnection {
     };
 
     GetDocumentInfoConnections = async (SourceDocId: Number): Promise<{ id: number, title: string, type: string }[]> => {
-        return new Promise(async (resolve, reject) => {
+        return new Promise((resolve, reject) => {
             const query = `
                 SELECT 
                     d.Id as id, 
