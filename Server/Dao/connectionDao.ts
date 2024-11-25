@@ -9,7 +9,7 @@ export default class DaoConnection {
      * @param Type 
      * @returns Boolean
      */
-    SetDocumentsConnection(SourceDoc: String, TargetDoc: String, Type: String) {
+    SetDocumentsConnection(SourceDoc: string, TargetDoc: string, Type: string) {
         return new Promise<boolean>(async (resolve, reject) => {
             const SourceDocId = await this.GetDocumentsId(SourceDoc);
             const TargetDocId = await this.GetDocumentsId(TargetDoc);
@@ -22,7 +22,6 @@ export default class DaoConnection {
                             return false;
                         } else {
                             resolve(true);
-                            return true;
                         }
                     });
                 } else {
@@ -40,27 +39,23 @@ export default class DaoConnection {
      * @param SourceDocId 
      * @returns all Connection[] from a SourceDocId
      */
-    GetDocumentConnections = async (SourceDoc: String): Promise<Number> => {
+    GetDocumentConnections = async (SourceDoc: string): Promise<number> => {
         return new Promise(async (resolve, reject) => {
             const SourceDocId = await this.GetDocumentsId(SourceDoc);
             if (SourceDocId) {
                 db.get(`SELECT  COUNT(*) as n FROM Connection WHERE SourceDocId = ? OR TargetDocId = ?`, [SourceDocId, SourceDocId], (err, row: any) => {
                     if (err) {
                         reject(new Error('Database error'));
-                        return false;
-                    } else {
-                        resolve(row.n as Number);
-                        return true;
-                    }
+                    } else 
+                        resolve(row.n as number);
                 });
             } else {
                 reject("SourceDocId not found");
-                return false;
             }
         });
     };
 
-    GetDocumentInfoConnections = async (SourceDocId: Number): Promise<{ id: number, title: string, type: string }[]> => {
+    GetDocumentInfoConnections = async (SourceDocId: number): Promise<{ id: number, title: string, type: string }[]> => {
         return new Promise((resolve, reject) => {
             const query = `
                 SELECT 
@@ -75,11 +70,10 @@ export default class DaoConnection {
             db.all(query, [SourceDocId, SourceDocId, SourceDocId], (err, rows: { id: number, title: string, type: string }[]) => {
                 if (err) {
                     console.error("Database error:", err);
-                    return reject(err);
+                    reject(new Error('Database error'));
                 }
-                else {
+                else
                     resolve(rows);
-                }
             });
         });
     };
@@ -92,15 +86,13 @@ export default class DaoConnection {
      * @param Title 
      * @returns DocumentId from Title
      */
-    GetDocumentsId = async (Title: String): Promise<Number> => {
+    GetDocumentsId = async (Title: string): Promise<number> => {
         return new Promise((resolve, reject) => {
             db.get(`SELECT Id FROM Document WHERE Title = ?`, [Title], (err, row: any) => {
                 if (err) {
-                    reject(err);
-                    return false;
+                    reject(new Error('Database error'));
                 } else {
-                    resolve(row.Id as Number);
-                    return true;
+                    resolve(row.Id as number);
                 }
             });
         });
@@ -111,19 +103,16 @@ export default class DaoConnection {
      * @param TargetDocId 
      * @returns Boolean
      */
-    FindDuplicatedDocument = async (SourceDocId: Number, TargetDocId: Number): Promise<Boolean> => {
+    FindDuplicatedDocument = async (SourceDocId: number, TargetDocId: number): Promise<boolean> => {
         return new Promise((resolve, reject) => {
             db.all(`SELECT Id FROM Connection WHERE SourceDocId = ? AND TargetDocId = ?`, [TargetDocId, SourceDocId], (err, rows) => {
                 if (err) {
-                    reject(err);
-                    return false;
+                    reject(new Error('Database error'));
                 } else {
                     if (rows.length > 0) {
                         resolve(false);
-                        return false;
                     } else {
                         resolve(true);
-                        return true;
                     }
                 }
             });
