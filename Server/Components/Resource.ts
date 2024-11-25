@@ -4,8 +4,8 @@ export default class Resource {
     docId: Number
 
     constructor(id: Number, path: string, docId: Number){
-        this.id = id,
-        this.path = path,
+        this.id = id
+        this.path = path
         this.docId = docId
     }
 }

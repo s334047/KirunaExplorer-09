@@ -47,7 +47,7 @@ describe("Class DaoKX2, function SetDocumentsConnection", () => {
         const targetMock = 'doc2';
         const docIds = [1, 2];
         const typeMock = 'tipoConnessione'; 
-        const mockError = 'Database error';
+        const mockError = new Error('DocumentsConnection: Database error');
 
         jest.spyOn(daoConnection, "GetDocumentsId")
         .mockResolvedValueOnce(docIds[0])
@@ -61,7 +61,7 @@ describe("Class DaoKX2, function SetDocumentsConnection", () => {
             return {} as Database;
         });
 
-        await expect(daoConnection.SetDocumentsConnection(sourceMock, targetMock, typeMock)).rejects.toEqual("DocumentsConnection: "+mockError);
+        await expect(daoConnection.SetDocumentsConnection(sourceMock, targetMock, typeMock)).rejects.toEqual(mockError);
     })
 
     test("it should return false if there's a duplicate in the db ", async() => {
@@ -123,7 +123,7 @@ describe("Class DaoKX2, function GetDocumentConnections", () => {
     test("it should return false if the documents exists but there's an error in the db", async() => {
         const sourceDocMock = 'doc1';
         const sourceDocIdMock = 1;
-        const mockError = 'Database error';
+        const mockError = new Error('Database error');
 
         const spySourceDocId = jest.spyOn(daoConnection, "GetDocumentsId")
         .mockResolvedValueOnce(sourceDocIdMock);

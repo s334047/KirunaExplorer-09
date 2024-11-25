@@ -4,9 +4,9 @@ class Area{
    vertex: Number[][];
 
     constructor(id: number, name: string, vertex: number[][]){
-        this.id = id,
-        this.name = name,
-        this.vertex = vertex;        
+        this.id = id
+        this.name = name
+        this.vertex = vertex      
     }
 }
 

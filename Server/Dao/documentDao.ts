@@ -14,7 +14,7 @@ export default class DaoDocument {
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
             db.run(query, [title, sh, sc, date, type, lang, page, coordTemp,area, descr], function(err){
                 if(err)
-                    reject(err);
+                    reject(new Error('Database error'));
                 else
                     resolve();
             });
@@ -29,7 +29,7 @@ export default class DaoDocument {
                             ON D.Area = A.Id;`;
             db.all(query, [], (err: any, rows: any[]) => {
                 if(err)
-                    reject(err);
+                    reject(new Error('Database error'));
                 else{
                     let docs: DocumentDescription[] = rows.map(row => 
                         new DocumentDescription(
@@ -66,7 +66,7 @@ export default class DaoDocument {
                             WHERE D.Id = A.DocumentId AND A.AreaId = ?`;
             db.all(query, [id], (err: any, rows: any[]) => {
                 if(err)
-                    reject(err);
+                    reject(new Error('Database error'));
                 else{
                     let docs=rows.map(row=>row.Title);
                     resolve(docs)
@@ -82,7 +82,7 @@ export default class DaoDocument {
                             WHERE Title = ?`;
             db.get(query, [title], (err: any, row: any) => {
                 if(err)
-                    reject(err);
+                    reject(new Error('Database error'));
                 else
                     resolve(row.Id);
             })

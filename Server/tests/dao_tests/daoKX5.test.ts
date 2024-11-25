@@ -35,7 +35,7 @@ describe("DaoArea.modifyGeoreference", () => {
     });
 
     test("should throw an error if database fails during coordinate update", async () => {
-        const mockError = "Database error";
+        const mockError = new Error("Database error");
         jest.spyOn(db, "run").mockImplementation((query, params, callback) => {
             callback(mockError);
             return {} as Database;
@@ -74,7 +74,7 @@ describe("DaoArea.modifyGeoreference", () => {
     });
 
     test("should throw an error if database fails during area update", async () => {
-        const mockError = "Database error";
+        const mockError = new Error("Database error");
         jest.spyOn(db, "run").mockImplementation((query, params, callback) => {
             callback(mockError);
             return {} as Database;
@@ -86,7 +86,7 @@ describe("DaoArea.modifyGeoreference", () => {
         const area = [[10, 20], [30, 40]];
         const oldArea = [[5, 15], [25, 35]];
 
-        const getAreaIdSpy = jest.spyOn(daoArea, "getAreaIdByCoordinate").mockResolvedValueOnce(2);
+        jest.spyOn(daoArea, "getAreaIdByCoordinate").mockResolvedValueOnce(2);
 
         await expect(daoArea.modifyGeoreference(id, coordinate, oldCoordinate, area, oldArea)).rejects.toEqual(mockError);
     });

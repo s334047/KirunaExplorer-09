@@ -58,4 +58,3 @@ describe("PUT /api/modifyGeoreference", () => {
         expect(response.status).toBe(503);
     });
 });
-``

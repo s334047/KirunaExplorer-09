@@ -5,11 +5,11 @@ import passport from 'passport';
 import * as LocalStrategy from 'passport-local';
 
 export default class Authenticator {
-    private app: express.Application
-    private dao : UserDao
+    private readonly app: express.Application
+    private readonly dao : UserDao
 
     constructor(app: express.Application){
-        this.app = app,
+        this.app = app
         this.dao = new UserDao()
         this.initAuth()
     }

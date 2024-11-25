@@ -1,4 +1,3 @@
-import { Coordinates } from "../../Components/Georeference.ts";
 import DaoDocument from "../../Dao/documentDao.ts";
 import { db } from "../../DB/db.ts";
 import { describe, test, expect, jest, beforeEach, afterEach, } from "@jest/globals";
@@ -87,7 +86,7 @@ describe("DaoStory3 Test",() =>{
                 callback(new Error("Database Error"));
                 return db;
             });
-            await expect(daoArea.addAreaToDoc(12,12)).rejects.toThrow('Database Error');;
+            await expect(daoArea.addAreaToDoc(12,12)).rejects.toThrow('Database error');;
             expect(mockRun).toHaveBeenCalled();
         })
     })
@@ -106,7 +105,7 @@ describe("DaoStory3 Test",() =>{
                 callback(new Error("Database Error"));
                 return db;
             });
-            await expect(daoArea.addArea("Test",[[12,12],[12,12]])).rejects.toThrow('Database Error');;
+            await expect(daoArea.addArea("Test",[[12,12],[12,12]])).rejects.toThrow('Database error');;
             expect(mockRun).toHaveBeenCalled();
         })
     })
@@ -125,7 +124,7 @@ describe("DaoStory3 Test",() =>{
                 callback(new Error("Database Error"));
                 return db;
             });
-            await expect(daoArea.getAllAreas()).rejects.toThrow('Database Error');;
+            await expect(daoArea.getAllAreas()).rejects.toThrow('Database error');;
             expect(mockRun).toHaveBeenCalled();
         }) 
     })
@@ -144,7 +143,7 @@ describe("DaoStory3 Test",() =>{
                 callback(new Error("Database Error"));
                 return db;
             });
-            await expect(daoArea.getAreaIdFromName("Area 1")).rejects.toThrow('Database Error');;
+            await expect(daoArea.getAreaIdFromName("Area 1")).rejects.toThrow('Database error');;
             expect(mockRun).toHaveBeenCalled();
         }) 
     })
@@ -163,7 +162,7 @@ describe("DaoStory3 Test",() =>{
                 callback(new Error("Database Error"));
                 return db;
             });
-            await expect(daoArea.getAreaIdFromName("Title 1")).rejects.toThrow('Database Error');;
+            await expect(daoArea.getAreaIdFromName("Title 1")).rejects.toThrow('Database error');;
             expect(mockRun).toHaveBeenCalled();
         }) 
     })

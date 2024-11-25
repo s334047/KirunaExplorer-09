@@ -8,7 +8,7 @@ export default class DaoResource {
                             VALUES (?, ?)`;
             db.run(query, [path, docId], function(err){
                 if(err)
-                    reject(err);
+                    reject(new Error('Database error'));
                 resolve();
             })
         })
@@ -21,7 +21,7 @@ export default class DaoResource {
                             WHERE DocumentId = ?`;
             db.all(query, [docId], (err: any, rows: any[]) => {
                 if(err)
-                    reject(err);
+                    reject(new Error('Database error'));
                 const result: Resource[] = rows.map(row => new Resource(row.Id, row.Path, row.DocumentId));
                 resolve(result);
             })
@@ -35,7 +35,7 @@ export default class DaoResource {
                             WHERE Id = ?`;
             db.get(query, [id], (err: any, row: any) => {
                 if(err)
-                    reject(err);
+                    reject(new Error('Database error'));
                 const result: Resource = new Resource(row.Id, row.Path, row.DocumentId);
                 resolve(result);
             })

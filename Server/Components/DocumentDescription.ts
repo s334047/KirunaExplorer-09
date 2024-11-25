@@ -38,12 +38,12 @@ class DocumentDescription {
             this.date = 'Invalid Date';
             console.warn(`Invalid date format for input: ${date}`);
         }
-        this.type = type,
-            this.language = language,
-            this.page = page,
-            this.coordinate = coordinate,
-            this.area = area,
-            this.description = description
+        this.type = type
+        this.language = language
+        this.page = page
+        this.coordinate = coordinate
+        this.area = area
+        this.description = description
     }
 }
 

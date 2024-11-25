@@ -18,7 +18,7 @@ export default class DaoConnection {
                     const query = `INSERT INTO Connection (SourceDocId, TargetDocId, Type) VALUES (?, ?, ?)`;
                     db.run(query, [SourceDocId, TargetDocId, Type], (err) => {
                         if (err) {
-                            reject("DocumentsConnection: " + err);
+                            reject(new Error('DocumentsConnection: Database error'));
                             return false;
                         } else {
                             resolve(true);
@@ -46,7 +46,7 @@ export default class DaoConnection {
             if (SourceDocId) {
                 db.get(`SELECT  COUNT(*) as n FROM Connection WHERE SourceDocId = ? OR TargetDocId = ?`, [SourceDocId, SourceDocId], (err, row: any) => {
                     if (err) {
-                        reject(err);
+                        reject(new Error('Database error'));
                         return false;
                     } else {
                         resolve(row.n as Number);

@@ -40,7 +40,7 @@ describe("daoStory4", () => {
                 return {} as Database;
             });
 
-            await expect(dao.getAllDoc()).rejects.toThrow("Database Error");
+            await expect(dao.getAllDoc()).rejects.toThrow("Database error");
             
         });
     });

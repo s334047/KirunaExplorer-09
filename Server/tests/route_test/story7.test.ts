@@ -81,13 +81,7 @@ describe("Story 7 - Original Resource APIs", () => {
 
     test("it should retrieve all original resources for a document", async () => {
         jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => next());
-        jest.spyOn(DaoResource.prototype, "getResourcesByDoc").mockResolvedValue([
-          {
-            id: 1,
-            path: "OriginalResources/test_resource.pdf",
-            docId: mockDocId,
-          },
-        ]);
+        jest.spyOn(DaoResource.prototype, "getResourcesByDoc").mockResolvedValue(mockResources);
       
         jest.spyOn(fs, "existsSync").mockReturnValue(true);
         jest.spyOn(fs, "readFileSync").mockReturnValue(Buffer.from("Base64EncodedContent"));
