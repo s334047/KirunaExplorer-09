@@ -304,7 +304,6 @@ app.get('/api/originalResources/:docId', auth.isLoggedIn, async (req: any, res: 
         }).filter((file) => file != null)
         res.json(files);
     } catch (err) {
-        console.error('Error reading file: ', err);
         res.status(503).json({ error: Error })
     }
 })
@@ -326,7 +325,6 @@ app.get('/api/originalResources/download/:id', auth.isLoggedIn, async (req: any,
             res.status(404).json({ error: 'File not found' });
         }
     } catch (err) {
-        console.error('Error reading file: ', err);
         res.status(503).json({ error: Error })
     }
 })

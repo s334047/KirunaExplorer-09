@@ -25,11 +25,11 @@ export default class DaoConnection {
                         }
                     });
                 } else {
-                    reject("Duplicate connection on FindDuplicatedDocument\n");
+                    reject(new Error("Duplicate connection on FindDuplicatedDocument"));
                     return false;
                 }
             } else {
-                reject("SourceDocId or TargetDocId not found");
+                reject(new Error("SourceDocId or TargetDocId not found"));
                 return false;
             }
         });
@@ -50,7 +50,7 @@ export default class DaoConnection {
                         resolve(row.n as number);
                 });
             } else {
-                reject("SourceDocId not found");
+                reject(new Error("SourceDocId not found"));
             }
         });
     };
