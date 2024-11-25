@@ -2,6 +2,7 @@ import { describe, test, expect, jest, beforeEach, afterEach, } from "@jest/glob
 import request from "supertest";
 import Authenticator from "../../auth.ts";
 import { app } from "../../index.ts";
+require('dotenv').config();
 
 jest.mock("../../auth");
 
@@ -19,17 +20,20 @@ afterEach(() => {
 });
 
 describe('POST /api/sessions', () => {
-    const mockUser = { username: "user1", password: "password1" };
+    const mockUser = { 
+        username: process.env.MOCK_USERNAME, 
+        password: process.env.MOCK_PASSWORD
+        };
 
     test("it should return 200 if login is successful", async () => {
         jest.spyOn(Authenticator.prototype, "login").mockImplementation((req, res) => {
-            return res.status(200).json({ id: 1, username: "user1" });
+            return res.status(200).json({ id: 1, username: mockUser.username });
         });
 
         const response = await request(app).post("/api/sessions").send(mockUser);
 
         expect(response.status).toBe(200);
-        expect(response.body.username).toBe("user1");
+        expect(response.body.username).toBe(mockUser.username);
     });
 
     test("it should return 401 if login fails", async () => {
