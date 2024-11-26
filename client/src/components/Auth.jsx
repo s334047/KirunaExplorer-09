@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Container, Row, Col, Card, Button, Form, Modal } from 'react-bootstrap';
+import { Row, Col, Button, Form, Modal } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
 function LoginComponent(props) {
 
@@ -91,5 +92,11 @@ function LoginComponent(props) {
 
     );
 }
+LoginComponent.propTypes = {
+    show: PropTypes.bool.isRequired,
+    setShow: PropTypes.func.isRequired,
+    login: PropTypes.func.isRequired,
+    message: PropTypes.object.isRequired,
+};
 
 export default LoginComponent;

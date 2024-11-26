@@ -1,9 +1,10 @@
 import { Modal, Button, Form, Container, Row, Col, ListGroup } from 'react-bootstrap';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 import API from '../../API.mjs';
+import PropTypes from 'prop-types';
 
 dayjs.extend(customParseFormat);
 function DescriptionComponent(props) {
@@ -67,11 +68,11 @@ function DescriptionComponent(props) {
       if (!year) newErrors.date = "The year is mandatory";
       if (year && day && !month) newErrors.date = "Month must be present";
       if (year && dayjs(year, 'YYYY', true).isValid() == false) newErrors.date = "Date format not correct";
-      else if(!month && year && !day) setFormData({...formData,issuanceDate:`${year}`})
+      else if (!month && year && !day) setFormData({ ...formData, issuanceDate: `${year}` })
       if (month && year && dayjs(year + "-" + month, 'YYYY-MM', true).isValid() == false) newErrors.date = "Date format not correct"
-      else if(month && year && !day) setFormData({...formData,issuanceDate:`${year}-${month}`})
+      else if (month && year && !day) setFormData({ ...formData, issuanceDate: `${year}-${month}` })
       if (day && month && year && dayjs(year + "-" + month + "-" + day, 'YYYY-MM-DD', true).isValid() == false) newErrors.date = "Date format not correct"
-      else if(month && year && day)setFormData({...formData,issuanceDate:`${year}-${month}-${day}`})
+      else if (month && year && day) setFormData({ ...formData, issuanceDate: `${year}-${month}-${day}` })
       if (formData.pages !== undefined && formData.pages !== null) {
         if (isNaN(Number(formData.pages))) {
           newErrors.pages = "The field must be a number.";
@@ -128,7 +129,7 @@ function DescriptionComponent(props) {
     });
   };
   const handleChangeMode = (e) => {
-    const { _, value } = e.target;
+    const { value } = e.target;
     setMode(value);
   }
   const handleAddLink = () => {
@@ -403,4 +404,14 @@ function DescriptionComponent(props) {
     </Container>
   );
 }
+
+DescriptionComponent.propTypes = {
+  setMode: PropTypes.func.isRequired,
+  setFormData: PropTypes.func.isRequired,
+  setFormLink: PropTypes.func.isRequired,
+  setShow: PropTypes.func.isRequired,
+  show: PropTypes.bool.isRequired,
+  title: PropTypes.string.isRequired,
+};
+
 export default DescriptionComponent;

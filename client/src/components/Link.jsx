@@ -1,6 +1,7 @@
-import React, { useState,useEffect } from 'react';
+import { useState,useEffect } from 'react';
 import { Modal, Button, Form, ListGroup } from 'react-bootstrap';
 import API from '../../API.mjs';
+import PropTypes from 'prop-types';
 
 const ListDocumentLink = (props) => {
 
@@ -148,6 +149,12 @@ const ListDocumentLink = (props) => {
       </Modal.Footer>
     </Modal>
   );
+};
+
+ListDocumentLink.propTypes = {
+  title: PropTypes.string.isRequired,
+  show: PropTypes.bool.isRequired,
+  setShow: PropTypes.func.isRequired,
 };
 
 export default ListDocumentLink;
