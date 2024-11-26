@@ -1,8 +1,10 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Alert, Button, Container, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import API from '../../API.mjs';
+import PropTypes from 'prop-types';
+
 
 function Login({ setUser }) {
   const [username, setUsername] = useState('');
@@ -77,5 +79,9 @@ function Login({ setUser }) {
     </Container>
   );
 }
+
+Login.propTypes = {
+  setUser: PropTypes.func.isRequired,
+};
 
 export default Login;

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal, Button, ListGroup, Toast } from 'react-bootstrap';
 import API from '../../API.mjs';
+import PropTypes from 'prop-types';
 
 const FileUploader = ({ show, onClose, triggerFileInput, documentId }) => {
     const [files, setFiles] = useState([]);
@@ -39,6 +40,7 @@ const FileUploader = ({ show, onClose, triggerFileInput, documentId }) => {
                     break;
                 }
             } catch (error) {
+                console.error(error);
                 success = false;
                 setUploadMessage(`Error uploading: ${file.name}`);
                 break;
@@ -120,6 +122,13 @@ const FileUploader = ({ show, onClose, triggerFileInput, documentId }) => {
             </Toast>
         </>
     );
+};
+
+FileUploader.propTypes = {
+    show: PropTypes.bool.isRequired,
+    documentId: PropTypes.string.isRequired,
+    onClose: PropTypes.func.isRequired,
+    triggerFileInput: PropTypes.bool.isRequired,
 };
 
 export default FileUploader;
