@@ -63,7 +63,7 @@ function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user, exclu
                     </Col>
                 </Row>
                 {user.role === 'Urban Planner' &&
-                    <div class="d-flex justify-content-end">
+                    <div className="d-flex justify-content-end">
                         <Button variant="light" style={{ color: "#154109", borderColor: "#154109" }}
                             onClick={() => {
                                 excludeTitle(selectedDoc)

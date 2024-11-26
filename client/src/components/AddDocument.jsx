@@ -52,18 +52,9 @@ function AddDocument(props) {
             } else if (mode === 'Area') {
                 API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, null, selectedArea.name, formData.description);
             }
-
-            formLink.forEach((link) => {
-                API.SetDocumentsConnection(formData.title, link.document, link.type)
-                    .catch((error) => {
-                        console.error("Error submitting link:", error);
-                        setErrors((prevErrors) => ({
-                            ...prevErrors,
-                            submit: "An error occurred while submitting the links.",
-                        }));
-                    });
-            });
-
+            for (let link of formLink){
+                API.SetDocumentsConnection(formData.title,link.document,link.type)
+            }
 
             // Reset degli stati
             setFormData(null);
