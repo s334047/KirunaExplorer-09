@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, LayersControl, Polygon } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, LayersControl, Polygon} from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import L from 'leaflet';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'react-leaflet-markercluster/dist/styles.min.css';
-import { Button } from 'react-bootstrap';
+import { Button, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import DocumentCard from './DocCard';
 import API from '../../API.mjs';
@@ -34,6 +34,15 @@ function MapViewer(props) {
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
     });
+    const icons = {
+        'Informative document': new L.Icon({ iconUrl: 'icon_doc_blue.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34]}),
+        'Prescriptive document': new L.Icon({ iconUrl: 'icon_doc_green.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34]}),
+        'Design document': new L.Icon({ iconUrl: 'icon_doc_orange.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34]}),
+        'Technical document': new L.Icon({ iconUrl: 'icon_doc_red.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34]}),
+        'Material effect': new L.Icon({ iconUrl: 'icon_doc_yellow.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34]}),
+    };
+    const getIconByType = (type) => icons[type];
+
     const createClusterCustomIcon = (cluster) => {
         const count = cluster.getChildCount();
 
@@ -95,7 +104,7 @@ function MapViewer(props) {
                 style={{ flex: 1, height: "100%", width: "100%", borderRadius: '10px' }}
                 scrollWheelZoom={false}
             >
-                <LayersControl position="topright">
+                <LayersControl position="bottomright">
                     <BaseLayer name="Street">
                         <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -113,7 +122,7 @@ function MapViewer(props) {
                 {/* Marker Cluster Group */}
                 <MarkerClusterGroup showCoverageOnHover={false} disableClusteringAtZoom={16} iconCreateFunction={createClusterCustomIcon}>
                     {docs.filter(doc => doc.coordinate != null).map(doc => (
-                        <Marker key={doc.title} position={doc.coordinate} icon={customIcon} eventHandlers={{
+                        <Marker key={doc.title} position={doc.coordinate} icon={getIconByType(doc.type)} eventHandlers={{
                             click: () => {
                                 setSelectedDoc(doc);
                             },
@@ -127,7 +136,7 @@ function MapViewer(props) {
                         return (
                             <React.Fragment key={areaKey}>
                                 {areaDocuments.map((document, index) => (
-                                    <Marker key={document.id} position={positions[index]} icon={customIcon} eventHandlers={{
+                                    <Marker key={document.id} position={positions[index]} icon={getIconByType(document.type)} eventHandlers={{
                                         click: () => {
                                             setSelectedDoc(document);
                                         },
@@ -143,6 +152,7 @@ function MapViewer(props) {
                 {selectedDoc && selectedDoc.area && (
                     <Polygon positions={selectedDoc.area} color="red"></Polygon>
                 )}
+                <Legend icons={icons} />
             </MapContainer>
 
             {/* Document Card */}
@@ -166,7 +176,7 @@ function MapViewer(props) {
 
             {/* Add Document Button */}
             {!selectedDoc && props.user.role === 'Urban Planner' && (
-                <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000 }}>
+                <div style={{ position: 'absolute', bottom: '20px', left: '10px', zIndex: 1000 }}>
                     <Button
                         variant="light"
                         onClick={() => navigate("/addDoc")}
@@ -189,7 +199,7 @@ function MapViewer(props) {
 
             {/* Add Area Button */}
             {!selectedDoc && props.user.role === 'Urban Planner' && (
-                <div style={{ position: 'absolute', bottom: '20px', right: '20px', zIndex: 1000 }}>
+                <div style={{ position: 'absolute', bottom: '80px', left: '10px', zIndex: 1000 }}>
                     <Button
                         variant="light"
                         onClick={() => navigate("/addArea")}
@@ -210,6 +220,26 @@ function MapViewer(props) {
                 </div>
             )}
         </div>
+    );
+}
+
+function Legend({ icons }) {
+    return (
+        
+            <Card style={{position: 'absolute', top: '15px', right: '15px', zIndex: 1000}}>
+                <Card.Body>
+                    <Card.Title>Legend:</Card.Title>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        {Object.entries(icons).map(([type, icon]) => (
+                            <div key={type} style={{ display: 'flex', alignItems: 'center', marginTop: '5px', marginBottom: '5px' }}>
+                                <img src={icon.options.iconUrl} alt={type} style={{ width: '20px', height: '20px', marginRight: '10px' }} />
+                                <span>{type}</span>
+                            </div>
+                        ))}
+                    </div>
+                </Card.Body>
+            </Card>
+        
     );
 }
 
