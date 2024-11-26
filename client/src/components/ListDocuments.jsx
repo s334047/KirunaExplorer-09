@@ -5,6 +5,7 @@ import API from '../../API.mjs';
 import ListDocumentLink from './Link';
 import FileUploader from './AddResources';
 
+
 function DocumentTable() {
 
     const [selectedDoc, setSelectedDoc] = useState(null);
@@ -235,9 +236,9 @@ function AdditionalInfo({ selectedDoc, setSelectedDoc, documents, setShowAddLink
         setTriggerFileInput(true);
         setShowFileUploader(true);
     };
-    
+
     const [connections, setConnections] = useState([]);
-    
+
     useEffect(() => {
         const getConnections = async () => {
             const connectionsInfo = await API.GetDocumentInfoConnections(selectedDoc.id);
@@ -259,33 +260,33 @@ function AdditionalInfo({ selectedDoc, setSelectedDoc, documents, setShowAddLink
 
                         <li><strong>Description:</strong>{selectedDoc.description}</li>
 
-                        {connections.length>0 &&
-                        <li><strong>Connections:</strong>
-                            <ul>
-                                {connections.map(connection => (
-                                    <li key={connection.id}>
-                                        <Button
+                        {connections.length > 0 &&
+                            <li><strong>Connections:</strong>
+                                <ul>
+                                    {connections.map(connection => (
+                                        <li key={connection.id}>
+                                            <Button
                                                 variant="link"
-                                                style={{color:"#154109"}}
+                                                style={{ color: "#154109" }}
                                                 onClick={() => setSelectedDoc(documents.find((d) => d.id === connection.id))}
                                             >
                                                 {connection.title} - {connection.type}
                                             </Button>
-                                    </li>
-                                ))}
-                            </ul>
-                        </li>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </li>
                         }
 
-                        
-                        {resources.length>0 &&
+
+                        {resources.length > 0 &&
                             <li><strong>Resources:</strong>
                                 <ul>
                                     {resources.map((resource) => (
                                         <li key={resource.id}>
                                             <Button
                                                 variant="link"
-                                                style={{color:"#154109"}}
+                                                style={{ color: "#154109" }}
                                                 onClick={() => handleDownload(resource.id)}
                                             >
                                                 {resource.name}
@@ -342,6 +343,33 @@ AdditionalInfo.propTypes = {
         id: PropTypes.number.isRequired,
     }).isRequired,
     setShowAddLinkModal: PropTypes.func.isRequired,
+    setSelectedDoc: PropTypes.func.isRequired,
+    documents: PropTypes.array.isRequired,
+};
+
+DocumentTable.propTypes = {
+    selectedDoc: PropTypes.object.isRequired,
+    setSelectedDoc: PropTypes.func.isRequired,
+    showAddLink: PropTypes.bool.isRequired,
+    setShowAddLinkModal: PropTypes.func.isRequired,
+    documents: PropTypes.array.isRequired,
+    searchMode: PropTypes.string.isRequired,
+    setSearchMode: PropTypes.func.isRequired,
+    searchDoc: PropTypes.string.isRequired,
+    setSearchDoc: PropTypes.func.isRequired,
+    searchStakeholder: PropTypes.string.isRequired,
+    setSearchStakeholder: PropTypes.func.isRequired,
+    searchYear: PropTypes.string.isRequired,
+    setSearchYear: PropTypes.func.isRequired,
+    searchDescription: PropTypes.string.isRequired,
+    setSearchDescription: PropTypes.func.isRequired,
+    searchType: PropTypes.string.isRequired,
+    setSearchType: PropTypes.func.isRequired,
+    searchScale: PropTypes.string.isRequired,
+    setSearchScale: PropTypes.func.isRequired,
+    searchLanguage: PropTypes.string.isRequired,
+    setSearchLanguage: PropTypes.func.isRequired,
+
 };
 
 export default DocumentTable;
