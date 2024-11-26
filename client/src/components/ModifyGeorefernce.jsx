@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, FeatureGroup, Marker,Polygon} from 'react-leaflet';
+import { MapContainer, TileLayer, FeatureGroup, Marker, Polygon } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-markercluster';
 import { EditControl } from 'react-leaflet-draw';
-import L from 'leaflet';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { Modal, Button, Form } from 'react-bootstrap';
 import API from '../../API.mjs';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
-function ModifyGeoreference(props){
-    const [mode,setMode]=useState(null);
-    const [show,setShow]=useState(true);
-    const [lat,setLat]=useState(67.8525);
-    const [lng,setLng]=useState(20.2255);
+function ModifyGeoreference(props) {
+    const [mode, setMode] = useState(null);
+    const [show, setShow] = useState(true);
+    const [lat, setLat] = useState(67.8525);
+    const [lng, setLng] = useState(20.2255);
     const [selectedArea, setSelectedArea] = useState(null)
     const [selectedPoint, setSelectedPoint] = useState()
     const [resetDrawing, setResetDrawing] = useState(false);
@@ -22,47 +23,79 @@ function ModifyGeoreference(props){
         [67, 20],
         [68, 21]
     ];
-    const navigate= useNavigate();
-    const [aree,setAree] = useState([]); 
-    useEffect(()=>{
-        const getAreas = async()=>{
-          const areas = await API.getAllAreas()
-          setAree(areas)
+const createClusterCustomIcon = (cluster) => {
+        const count = cluster.getChildCount();
+
+        // Stile personalizzato del cluster
+        return L.divIcon({
+            html: `<div style="
+                background-color: #4285F4; /* Colore del cluster */
+                color: white; /* Colore del testo */
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: 2px solid white;
+            ">
+                ${count}
+            </div>`,
+            className: 'custom-cluster-icon', // Classe opzionale per ulteriori stili
+            iconSize: L.point(40, 40), // Dimensione del cluster
+        });
+    };
+    const redIcon =
+        new L.Icon({
+            iconUrl: 'gps.png',
+            iconSize: [35, 35],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+        });
+    const navigate = useNavigate();
+    const [aree, setAree] = useState([]);
+    const [docs, setDocs] = useState([]);
+    useEffect(() => {
+        const getAreas = async () => {
+            const documents = await API.getAllDocs();
+            setDocs(documents)
+            const areas = await API.getAllAreas()
+            setAree(areas)
         }
         getAreas()
-      },[]) 
+    }, [])
     const handleChangeArea = (e) => {
         const selectedNome = e.target.value;
         const foundArea = aree.find(area => area.name === selectedNome);
         setSelectedArea(foundArea);
     }
     const handleChangeMode = (e) => {
-        const { _, value } = e.target;
+        const { value } = e.target;
         setMode(value);
-      }
-    const handleSaveMode = ()=>{
+    }
+    const handleSaveMode = () => {
         const newErrors = {};
         if (!mode) newErrors.mode = "The mode is mandatory.";
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length > 0) {
-          // Se ci sono errori, non proseguire
-          return;
+            // Se ci sono errori, non proseguire
+            return;
         }
-        if(mode === 'Area' && !props.doc.area){
+        if (mode === 'Area' && !props.doc.area) {
             setMode('AreaNew')
         }
-        if(mode === 'Area' && props.doc.area){
+        if (mode === 'Area' && props.doc.area) {
             setSelectedArea(props.doc.area)
             setMode('AreaOld')
         }
-        if(mode === 'Point' && props.doc.coordinate){
+        if (mode === 'Point' && props.doc.coordinate) {
             setSelectedPoint(props.doc.coordinate)
             setLat(props.doc.coordinate[0])
             setLng(props.doc.coordinate[1])
             setMode('PointOld')
         }
-        if(mode === 'Point' && !props.doc.coordinate){
+        if (mode === 'Point' && !props.doc.coordinate) {
             setMode('PointNew')
         }
         setShow(false)
@@ -81,34 +114,34 @@ function ModifyGeoreference(props){
         setLng(newLatLng.lng.toFixed(4))
         setSelectedPoint([newLatLng.lat, newLatLng.lng]); // Aggiorna lo stato con le nuove coordinate
     };
-    const handleClose =()=>{
+    const handleClose = () => {
         navigate("/")
     }
-    const handleSave =()=>{
+    const handleSave = () => {
         try {
-            if(mode === 'PointOld'){
-                API.modifyGeoreference(props.doc.title,selectedPoint,props.doc.coordinate,null,null)
+            if (mode === 'PointOld') {
+                API.modifyGeoreference(props.doc.title, selectedPoint, props.doc.coordinate, null, null)
             }
-            if(mode === 'PointNew'){
-                API.modifyGeoreference(props.doc.title,selectedPoint,null,null,null)
-            } 
-            if(mode === 'AreaNew'){
-                API.modifyGeoreference(props.doc.title,null,null,selectedArea.vertex,null)
-            } 
-            if(mode === 'AreaOld'){
-                API.modifyGeoreference(props.doc.title,null,null,selectedArea,props.doc.area)
-            } 
+            if (mode === 'PointNew') {
+                API.modifyGeoreference(props.doc.title, selectedPoint, null, null, null)
+            }
+            if (mode === 'AreaNew') {
+                API.modifyGeoreference(props.doc.title, null, null, selectedArea.vertex, null)
+            }
+            if (mode === 'AreaOld') {
+                API.modifyGeoreference(props.doc.title, null, null, selectedArea, props.doc.area)
+            }
         } catch (error) {
             console.log(error)
         }
         navigate("/")
     }
-    useEffect(()=>{
-        setSelectedPoint([lat,lng]);
-    },[lat,lng])
-    return(   
-    <div style={{ display: 'flex', flex: 1, position: 'relative', height: '90vh' }}>
-        {mode === "AreaNew" && <div style={{
+    useEffect(() => {
+        setSelectedPoint([lat, lng]);
+    }, [lat, lng])
+    return (
+        <div style={{ display: 'flex', flex: 1, position: 'relative', height: '90vh' }}>
+            {mode === "AreaNew" && <div style={{
                 position: 'absolute',
                 top: '20px',
                 left: '50%',
@@ -154,7 +187,7 @@ function ModifyGeoreference(props){
                     <Button variant="secondary" onClick={handleClose} style={{ flexGrow: 1 }}>Close</Button>
                 </div>
             </div>}
-            {(mode === "PointOld" || mode== "PointNew")&& <div style={{
+            {(mode === "PointOld" || mode == "PointNew") && <div style={{
                 position: 'absolute',
                 top: '20px',
                 left: '50%',
@@ -166,36 +199,21 @@ function ModifyGeoreference(props){
                 borderRadius: '5px',
                 boxShadow: '0 0 10px rgba(0,0,0,0.1)' // Optional: shadow effect
             }}>
-                    <Form>
+                <Form>
                     <Form.Group controlId="latitude">
-                <Form.Label>Latitude: {lat}</Form.Label>
-                <Form.Range
-                    min={67.8211}
-                    max={67.8844}
-                    value={lat}
-                    step={0.0001}
-                    onChange={(e) => setLat(e.target.value)}
-                />
-            </Form.Group>
-
-            <Form.Group controlId="longitude" style={{ marginTop: '10px' }}>
-                <Form.Label>Longitude: {lng} </Form.Label>
-                <Form.Range
-                   min={20.1098}
-                   max={20.3417}
-                   step={0.0001}
-                   value={lng}
-                    onChange={(e) => setLng(e.target.value)}
-                />
-            </Form.Group>
-        </Form>
+                        <Form.Label>Latitude: {lat}</Form.Label>
+                    </Form.Group>
+                    <Form.Group controlId="longitude" style={{ marginTop: '10px' }}>
+                        <Form.Label>Longitude: {lng} </Form.Label>
+                    </Form.Group>
+                </Form>
                 <div style={{ display: 'flex', marginTop: '10px', gap: "5px" }}>
                     <Button variant="primary" onClick={handleSave} disabled={!selectedPoint} style={{ backgroundColor: "#154109", borderColor: "#154109", flexGrow: 1 }}>Confirm</Button>{' '}
                     <Button variant="secondary" onClick={handleClose} style={{ flexGrow: 1 }}>Close</Button>
                 </div>
             </div>}
 
-        <MapContainer
+            <MapContainer
                 center={position}
                 minZoom={12}
                 zoom={13}
@@ -203,38 +221,38 @@ function ModifyGeoreference(props){
                 style={{ flex: 1, height: "100%", width: "100%", borderRadius: '10px' }}
                 scrollWheelZoom={false}
             >
-                    <Modal show={show} onHide={handleClose} centered>
-          <Modal.Header className="custom-modal" style={{ borderBottom: 'none' }} closeButton>
-          <Modal.Title style={{ color: "#154109" }}>Edit georeference</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form>
-          <Form.Group className="mb-3">
-                <Form.Label style={{ color: "#154109" }}><strong>Mode:</strong></Form.Label>
-                <Form.Select name="type" onChange={handleChangeMode} isInvalid={!!errors.mode}>
-                  <option value="">Select a mode</option>
-                  <option value="Point">Point</option>
-                  <option value="Area">Area</option>
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  {errors.mode}
-                </Form.Control.Feedback>
-              </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer style={{paddingTop: '0.1rem', borderTop: 'none' }}>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button
-            style={{ backgroundColor: "#154109", borderColor: "#154109" }}
-            onClick={handleSaveMode}
-          >
-            Confirm
-          </Button>
-        </Modal.Footer>
-        </Modal>
-            {( mode === 'AreaOld') && <FeatureGroup key={resetDrawing ? 'reset' : 'normal'}>
+                <Modal show={show} onHide={handleClose} centered>
+                    <Modal.Header className="custom-modal" style={{ borderBottom: 'none' }} closeButton>
+                        <Modal.Title style={{ color: "#154109" }}>Edit georeference</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form>
+                            <Form.Group className="mb-3">
+                                <Form.Label style={{ color: "#154109" }}><strong>Mode:</strong></Form.Label>
+                                <Form.Select name="type" onChange={handleChangeMode} isInvalid={!!errors.mode}>
+                                    <option value="">Select a mode</option>
+                                    <option value="Point">Point</option>
+                                    <option value="Area">Area</option>
+                                </Form.Select>
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.mode}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                        </Form>
+                    </Modal.Body>
+                    <Modal.Footer style={{ paddingTop: '0.1rem', borderTop: 'none' }}>
+                        <Button variant="secondary" onClick={handleClose}>
+                            Close
+                        </Button>
+                        <Button
+                            style={{ backgroundColor: "#154109", borderColor: "#154109" }}
+                            onClick={handleSaveMode}
+                        >
+                            Confirm
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+                {(mode === 'AreaOld') && <FeatureGroup key={resetDrawing ? 'reset' : 'normal'}>
                     <EditControl
                         position="topright"
                         onEdited={handleEdit}
@@ -243,11 +261,11 @@ function ModifyGeoreference(props){
                             polyline: false,
                             circle: false,
                             circlemarker: false,
-                            marker: false ,
-                            polygon:false
+                            marker: false,
+                            polygon: false
                         }}
                         edit={{
-                            edit: mode === 'AreaOld' ? {} : false, 
+                            edit: mode === 'AreaOld' ? {} : false,
                             remove: false
                         }}
                     />
@@ -258,9 +276,26 @@ function ModifyGeoreference(props){
                     attribution='&copy; <a href="https://www.esri.com/">Esri</a>, Sources: Esri, Garmin, GEBCO, NOAA NGDC, and other contributors'
                 />
                 {mode === "AreaNew" && selectedArea && <Polygon positions={selectedArea.vertex} color="red"></Polygon>}
-                {(mode === "PointOld" || mode === 'PointNew')  && <Marker position={selectedPoint} draggable={true} eventHandlers={{dragend: handleMarkerDragEnd}}></Marker>}
-        </MapContainer>
-   </div>
+                {(mode === "PointOld" || mode === 'PointNew') && <MarkerClusterGroup showCoverageOnHover={false} disableClusteringAtZoom={16} iconCreateFunction={createClusterCustomIcon}>
+                    {docs.filter(doc => doc.coordinate != null).filter(doc => doc.title != props.doc.title).map(doc => (
+                        <Marker key={doc.title} position={doc.coordinate} eventHandlers={{
+                            click: () => {
+                                setSelectedPoint(doc.coordinate)
+                                setLat(doc.coordinate[0])
+                                setLng(doc.coordinate[1])
+                            },
+                        }}>
+                        </Marker>
+                    ))}
+                                    {(mode === "PointOld" || mode === 'PointNew') && <Marker position={selectedPoint} draggable={true} icon={redIcon} eventHandlers={{ dragend: handleMarkerDragEnd }}></Marker>}
+                </MarkerClusterGroup>}
+            </MapContainer>
+        </div>
     )
 }
+
+ModifyGeoreference.propTypes = {
+    doc: PropTypes.object.isRequired,
+};
+
 export default ModifyGeoreference

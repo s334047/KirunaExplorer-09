@@ -9,6 +9,8 @@ import { Button, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import DocumentCard from './DocCard';
 import API from '../../API.mjs';
+import PropTypes from 'prop-types';
+
 
 function MapViewer(props) {
     const navigate = useNavigate();
@@ -79,17 +81,17 @@ function MapViewer(props) {
         const bounds = L.latLngBounds(vertices);
         const positions = [];
         const padding = 0.0001; // Distanza minima tra i marker
-    
+
         for (let i = 0; i < count; i++) {
             // Posizionamento radiale per evitare sovrapposizioni
             const angle = (i / count) * 2 * Math.PI;
             const offsetX = padding * Math.cos(angle);
             const offsetY = padding * Math.sin(angle);
             const center = bounds.getCenter();
-            
+
             positions.push([center.lat + offsetX, center.lng + offsetY]);
         }
-    
+
         return positions;
     }
     const { BaseLayer } = LayersControl;
@@ -223,6 +225,12 @@ function MapViewer(props) {
     );
 }
 
+MapViewer.propTypes = {
+    user: PropTypes.object.isRequired,
+    setTitle: PropTypes.func.isRequired,
+    setShowAddLink: PropTypes.func.isRequired,
+};
+
 function Legend({ icons }) {
     return (
         
@@ -244,8 +252,3 @@ function Legend({ icons }) {
 }
 
 export default MapViewer;
-
-
-
-
-

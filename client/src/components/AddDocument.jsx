@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, LayersControl, Popup, FeatureGroup, Polygon } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-markercluster';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import { Card, Button, Row, Col, Form } from 'react-bootstrap';
@@ -36,7 +37,35 @@ function AddDocument(props) {
         }
         getDocsAreas();
     }, []);
+    const createClusterCustomIcon = (cluster) => {
+        const count = cluster.getChildCount();
 
+        // Stile personalizzato del cluster
+        return L.divIcon({
+            html: `<div style="
+                background-color: #4285F4; /* Colore del cluster */
+                color: white; /* Colore del testo */
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: 2px solid white;
+            ">
+                ${count}
+            </div>`,
+            className: 'custom-cluster-icon', // Classe opzionale per ulteriori stili
+            iconSize: L.point(40, 40), // Dimensione del cluster
+        });
+    };
+    const redIcon=
+        new L.Icon({
+            iconUrl: 'gps.png',
+            iconSize: [35, 35],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+        });
     const handleChangeArea = (e) => {
         const selectedNome = e.target.value;
         const foundArea = aree.find(area => area.name === selectedNome);
@@ -122,24 +151,10 @@ function AddDocument(props) {
                 <Form>
                     <Form.Group controlId="latitude">
                         <Form.Label>Latitude: {lat}</Form.Label>
-                        <Form.Range
-                            min={67.8211}
-                            max={67.8844}
-                            step={0.0001}
-                            value={lat}
-                            onChange={(e) => setLat(e.target.value)}
-                        />
                     </Form.Group>
 
                     <Form.Group controlId="longitude" style={{ marginTop: '10px' }}>
                         <Form.Label>Longitude: {lng} </Form.Label>
-                        <Form.Range
-                            min={20.1098}
-                            max={20.3417}
-                            step={0.0001}
-                            value={lng}
-                            onChange={(e) => setLng(e.target.value)}
-                        />
                     </Form.Group>
                 </Form>
                 <div style={{ display: 'flex', marginTop: '10px', gap: "5px" }}>
@@ -160,7 +175,19 @@ function AddDocument(props) {
                     attribution='&copy; <a href="https://www.esri.com/">Esri</a>, Sources: Esri, Garmin, GEBCO, NOAA NGDC, and other contributors'
                 />
                 {mode === "Area" && selectedArea && <Polygon positions={selectedArea.vertex} color="red"></Polygon>}
-                {mode === "Point" && selectedPoint && <Marker position={selectedPoint} draggable={true} eventHandlers={{ dragend: handleMarkerDragEnd }}></Marker>}
+                {mode ==="Point" &&  <MarkerClusterGroup showCoverageOnHover={false} disableClusteringAtZoom={16} iconCreateFunction={createClusterCustomIcon}>
+                    {docs.filter(doc => doc.coordinate != null).map(doc => (
+                        <Marker key={doc.title} position={doc.coordinate}  eventHandlers={{
+                            click: () => {
+                                setSelectedPoint(doc.coordinate)
+                                setLat(doc.coordinate[0])
+                                setLng(doc.coordinate[1])
+                            },
+                        }}>
+                        </Marker>
+                    ))}
+                                    {mode === "Point" && selectedPoint && <Marker position={selectedPoint} draggable={true} icon={redIcon}  eventHandlers={{ dragend: handleMarkerDragEnd }}></Marker>}
+                </MarkerClusterGroup>}
                 <DescriptionComponent show={show} setShow={setShow} item={docs} setMode={setMode} setFormData={setFormData} setFormLink={setFormLink} />
             </MapContainer>
         </div>)

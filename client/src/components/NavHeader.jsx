@@ -1,4 +1,5 @@
 import { Nav, Navbar, Container, Button } from 'react-bootstrap'
+import PropTypes from 'prop-types';
 
 function NavHeader(props) {
     return (
@@ -30,5 +31,11 @@ function NavHeader(props) {
         </Navbar>
     );
 }
+
+NavHeader.propTypes = {
+    loggedIn: PropTypes.bool.isRequired,
+    setShow: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired,
+};
 
 export default NavHeader;

@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, Row, Col, Button } from 'react-bootstrap';
 import API from '../../API.mjs';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
-function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user, excludeTitle }) {
+
+function DocumentCard({ selectedDoc, setSelectedDoc, user, excludeTitle }) {
     const [n, setN] = useState(0);
     const navigate = useNavigate();
     useEffect(() => {
@@ -76,6 +78,14 @@ function DocumentCard({ selectedDoc, setSelectedDoc, setShowAddLink, user, exclu
             </Card.Body>
         </Card>
     );
+}
+
+DocumentCard.propTypes = {
+    selectedDoc: PropTypes.object.isRequired,
+    setSelectedDoc: PropTypes.func.isRequired,
+    setShowAddLink: PropTypes.func.isRequired,
+    user: PropTypes.object.isRequired,
+    excludeTitle: PropTypes.func.isRequired,
 }
 
 export default DocumentCard;

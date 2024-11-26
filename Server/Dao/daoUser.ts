@@ -16,7 +16,7 @@ export default class UserDao {
                 if (err) {
                     return reject(err);
                 }
-                
+
                 if (!row || !row.Salt) {
                     return resolve(false);
                 }
@@ -24,7 +24,7 @@ export default class UserDao {
                 const user: User = new User(row.Id, row.Username, row.Role);
                 crypto.scrypt(password, row.Salt, 32, (err, hashedPassword) => {
                     if (err) {
-                        return reject(err);
+                        return reject(err as Error);
                     }
 
                     if (!crypto.timingSafeEqual(Buffer.from(row.Password, 'hex'), hashedPassword)) {
