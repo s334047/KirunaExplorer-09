@@ -32,17 +32,9 @@ const ListDocumentLink = (props) => {
     }
 
     setErrors({});
-
-    links.forEach((link) => {
-      API.SetDocumentsConnection(props.title, link.document, link.type)
-        .catch((error) => {
-          console.error("Error submitting link:", error);
-          setErrors((prevErrors) => ({
-            ...prevErrors,
-            submit: "An error occurred while submitting the links.",
-          }));
-        });
-    });
+    for (let link of links){
+      API.SetDocumentsConnection(props.title,link.document,link.type)
+  }
 
     setItem({ document: "", type: "" })
     setLinks([]);
