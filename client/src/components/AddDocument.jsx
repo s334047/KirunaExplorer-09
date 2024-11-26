@@ -61,11 +61,7 @@ function AddDocument(props) {
     };
     const redIcon=
         new L.Icon({
-            iconUrl: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 35 35">
-                  <circle cx="17.5" cy="17.5" r="15" fill="red" />
-                </svg>
-              `),
+            iconUrl: 'gps.png',
             iconSize: [35, 35],
             iconAnchor: [12, 41],
             popupAnchor: [1, -34],
@@ -190,7 +186,7 @@ function AddDocument(props) {
                         }}>
                         </Marker>
                     ))}
-                                    {mode === "Point" && selectedPoint && <Marker position={selectedPoint} draggable={true} icon={redIcon} eventHandlers={{ dragend: handleMarkerDragEnd }}></Marker>}
+                                    {mode === "Point" && selectedPoint && <Marker position={selectedPoint} draggable={true} icon={redIcon}  eventHandlers={{ dragend: handleMarkerDragEnd }}></Marker>}
                 </MarkerClusterGroup>}
                 <DescriptionComponent show={show} setShow={setShow} item={docs} setMode={setMode} setFormData={setFormData} setFormLink={setFormLink} />
             </MapContainer>

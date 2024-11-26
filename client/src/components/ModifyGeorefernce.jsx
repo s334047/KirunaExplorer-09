@@ -1,11 +1,6 @@
-<<<<<<< HEAD
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, FeatureGroup, Marker, Polygon } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
-=======
-import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, FeatureGroup, Marker, Polygon } from 'react-leaflet';
->>>>>>> cd362e67ea790167465122b5651e64a81cd856b8
 import { EditControl } from 'react-leaflet-draw';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -28,8 +23,7 @@ function ModifyGeoreference(props) {
         [67, 20],
         [68, 21]
     ];
-<<<<<<< HEAD
-    const createClusterCustomIcon = (cluster) => {
+const createClusterCustomIcon = (cluster) => {
         const count = cluster.getChildCount();
 
         // Stile personalizzato del cluster
@@ -70,12 +64,6 @@ function ModifyGeoreference(props) {
         const getAreas = async () => {
             const documents = await API.getAllDocs();
             setDocs(documents)
-=======
-    const navigate = useNavigate();
-    const [aree, setAree] = useState([]);
-    useEffect(() => {
-        const getAreas = async () => {
->>>>>>> cd362e67ea790167465122b5651e64a81cd856b8
             const areas = await API.getAllAreas()
             setAree(areas)
         }
@@ -219,30 +207,9 @@ function ModifyGeoreference(props) {
                 <Form>
                     <Form.Group controlId="latitude">
                         <Form.Label>Latitude: {lat}</Form.Label>
-<<<<<<< HEAD
-=======
-                        <Form.Range
-                            min={67.8211}
-                            max={67.8844}
-                            value={lat}
-                            step={0.0001}
-                            onChange={(e) => setLat(e.target.value)}
-                        />
->>>>>>> cd362e67ea790167465122b5651e64a81cd856b8
                     </Form.Group>
-
                     <Form.Group controlId="longitude" style={{ marginTop: '10px' }}>
                         <Form.Label>Longitude: {lng} </Form.Label>
-<<<<<<< HEAD
-=======
-                        <Form.Range
-                            min={20.1098}
-                            max={20.3417}
-                            step={0.0001}
-                            value={lng}
-                            onChange={(e) => setLng(e.target.value)}
-                        />
->>>>>>> cd362e67ea790167465122b5651e64a81cd856b8
                     </Form.Group>
                 </Form>
                 <div style={{ display: 'flex', marginTop: '10px', gap: "5px" }}>
@@ -314,7 +281,6 @@ function ModifyGeoreference(props) {
                     attribution='&copy; <a href="https://www.esri.com/">Esri</a>, Sources: Esri, Garmin, GEBCO, NOAA NGDC, and other contributors'
                 />
                 {mode === "AreaNew" && selectedArea && <Polygon positions={selectedArea.vertex} color="red"></Polygon>}
-<<<<<<< HEAD
                 {(mode === "PointOld" || mode === 'PointNew') && <MarkerClusterGroup showCoverageOnHover={false} disableClusteringAtZoom={16} iconCreateFunction={createClusterCustomIcon}>
                     {docs.filter(doc => doc.coordinate != null).filter(doc => doc.title != props.doc.title).map(doc => (
                         <Marker key={doc.title} position={doc.coordinate} eventHandlers={{
@@ -328,9 +294,6 @@ function ModifyGeoreference(props) {
                     ))}
                                     {(mode === "PointOld" || mode === 'PointNew') && <Marker position={selectedPoint} draggable={true} icon={redIcon} eventHandlers={{ dragend: handleMarkerDragEnd }}></Marker>}
                 </MarkerClusterGroup>}
-=======
-                {(mode === "PointOld" || mode === 'PointNew') && <Marker position={selectedPoint} draggable={true} eventHandlers={{ dragend: handleMarkerDragEnd }}></Marker>}
->>>>>>> cd362e67ea790167465122b5651e64a81cd856b8
             </MapContainer>
         </div>
     )
