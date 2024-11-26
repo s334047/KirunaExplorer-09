@@ -47,12 +47,7 @@ const createClusterCustomIcon = (cluster) => {
     };
     const redIcon =
         new L.Icon({
-            iconUrl: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="41" viewBox="0 0 25 41">
-                  <path d="M12.5,0c-2.8,0-5,2.2-5,5c0,2.8,5,10.4,5,10.4s5-7.7,5-10.4C17.5,2.2,15.3,0,12.5,0z M12.5,9.8 c-1.4,0-2.5-1.1-2.5-2.5s1.1-2.5,2.5-2.5s2.5,1.1,2.5,2.5S13.9,9.8,12.5,9.8z" fill="red"/>
-                  <path d="M12.5,11.3c-4.1,0-7.5,3.4-7.5,7.5c0,5.1,7.5,19.7,7.5,19.7s7.5-14.6,7.5-19.7C20,14.7,16.6,11.3,12.5,11.3z" fill="red"/>
-                </svg>
-              `),
+            iconUrl: 'gps.png',
             iconSize: [35, 35],
             iconAnchor: [12, 41],
             popupAnchor: [1, -34],
