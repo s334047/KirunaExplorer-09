@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, LayersControl, Polygon} from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, LayersControl, Polygon } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import L from 'leaflet';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'react-leaflet-markercluster/dist/styles.min.css';
-import { Button, Card } from 'react-bootstrap';
+import { Button, Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import DocumentCard from './DocCard';
 import API from '../../API.mjs';
@@ -37,11 +37,11 @@ function MapViewer(props) {
         popupAnchor: [1, -34],
     });
     const icons = {
-        'Informative document': new L.Icon({ iconUrl: 'icon_doc_blue.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34]}),
-        'Prescriptive document': new L.Icon({ iconUrl: 'icon_doc_green.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34]}),
-        'Design document': new L.Icon({ iconUrl: 'icon_doc_orange.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34]}),
-        'Technical document': new L.Icon({ iconUrl: 'icon_doc_red.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34]}),
-        'Material effect': new L.Icon({ iconUrl: 'icon_doc_yellow.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34]}),
+        'Informative document': new L.Icon({ iconUrl: 'icon_doc_blue.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
+        'Prescriptive document': new L.Icon({ iconUrl: 'icon_doc_green.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
+        'Design document': new L.Icon({ iconUrl: 'icon_doc_orange.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
+        'Technical document': new L.Icon({ iconUrl: 'icon_doc_red.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
+        'Material effect': new L.Icon({ iconUrl: 'icon_doc_yellow.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
     };
     const getIconByType = (type) => icons[type];
 
@@ -179,46 +179,45 @@ function MapViewer(props) {
             {/* Add Document Button */}
             {!selectedDoc && props.user.role === 'Urban Planner' && (
                 <div style={{ position: 'absolute', bottom: '20px', left: '10px', zIndex: 1000 }}>
+                    <OverlayTrigger
+                        placement="right"
+                        overlay={
+                            <Tooltip id="tooltip-draw-area">
+                                Add document
+                            </Tooltip>
+                        }
+                    >
                     <Button
                         variant="light"
                         onClick={() => navigate("/addDoc")}
-                        style={{
-                            border: '2px solid gray',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            width: "100px"
-                        }}
+                        style={{ borderRadius: '50%'}}
                     >
-                        <div style={{ textAlign: 'left' }}>
-                            <span style={{ display: 'block', fontSize: '12px' }}>Add</span>
-                            <span style={{ display: 'block', fontSize: '12px' }}>doc</span>
-                        </div>
-                        <i className="bi bi-file-earmark-plus fs-3" style={{ marginLeft: '15px' }}></i>
+                        <i className="bi bi-file-earmark-plus fs-3"></i>
                     </Button>
+                    </OverlayTrigger>
                 </div>
             )}
 
             {/* Add Area Button */}
             {!selectedDoc && props.user.role === 'Urban Planner' && (
                 <div style={{ position: 'absolute', bottom: '80px', left: '10px', zIndex: 1000 }}>
+                    <OverlayTrigger
+                        placement="right"
+                        overlay={
+                            <Tooltip id="tooltip-draw-area">
+                                Draw area
+                            </Tooltip>
+                        }
+                    >
                     <Button
                         variant="light"
                         onClick={() => navigate("/addArea")}
-                        style={{
-                            border: '2px solid gray',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            width: "100px"
-                        }}
+                        style={{ borderRadius: '50%' }}
+                        title="Draw Area"
                     >
-                        <div style={{ textAlign: 'left' }}>
-                            <span style={{ display: 'block', fontSize: '12px' }}>Draw</span>
-                            <span style={{ display: 'block', fontSize: '12px' }}>area</span>
-                        </div>
-                        <i className="bi bi-bounding-box-circles fs-3" style={{ marginLeft: '15px' }}></i>
+                        <i className="bi bi-bounding-box-circles fs-3"></i>
                     </Button>
+                    </OverlayTrigger>
                 </div>
             )}
         </div>
@@ -233,21 +232,20 @@ MapViewer.propTypes = {
 
 function Legend({ icons }) {
     return (
-        
-            <Card style={{position: 'absolute', top: '15px', right: '15px', zIndex: 1000}}>
-                <Card.Body>
-                    <Card.Title>Legend:</Card.Title>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        {Object.entries(icons).map(([type, icon]) => (
-                            <div key={type} style={{ display: 'flex', alignItems: 'center', marginTop: '5px', marginBottom: '5px' }}>
-                                <img src={icon.options.iconUrl} alt={type} style={{ width: '20px', height: '20px', marginRight: '10px' }} />
-                                <span>{type}</span>
-                            </div>
-                        ))}
-                    </div>
-                </Card.Body>
-            </Card>
-        
+
+        <Card style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 1000 }}>
+            <Card.Body>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    {Object.entries(icons).map(([type, icon]) => (
+                        <div key={type} style={{ display: 'flex', alignItems: 'center', marginTop: '1px', marginBottom: '1px'}}>
+                            <img src={icon.options.iconUrl} alt={type} style={{ width: '20px', height: '20px', marginRight: '10px' }} />
+                            <span>{type}</span>
+                        </div>
+                    ))}
+                </div>
+            </Card.Body>
+        </Card>
+
     );
 }
 
