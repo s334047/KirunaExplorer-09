@@ -163,7 +163,6 @@ app.post('/api/documents', auth.isLoggedIn, docValidation, async (req: any, res:
 app.get('/api/documents', async (req: any, res: any) => {
     try {
         const docs = await daoDocument.getAllDoc();
-        console.log(docs[1])
         res.json(docs);
     } catch (error) {
         res.status(503).json({ error: Error });
@@ -194,16 +193,19 @@ app.post('/api/connections', auth.isLoggedIn, connectionValidation, async (req: 
         const Type = req.body.ConnectionType;
         const SourceDocId = await daoConnection.GetDocumentsId(req.body.SourceDocument);
         const TargetDocId = await daoConnection.GetDocumentsId(req.body.TargetDocument);
-        console.log("ciao ", Type, SourceDocId, TargetDocId);
+        console.log(Type, SourceDocId, TargetDocId);
         if(SourceDocId && TargetDocId){
-            if(await daoConnection.FindDuplicatedDocument(SourceDocId, TargetDocId))
+            if(await daoConnection.FindDuplicatedDocument(SourceDocId, TargetDocId, Type)){
+                console.log("ciao1")
                 await daoConnection.SetDocumentsConnection(SourceDocId, TargetDocId, Type);
+                console.log("ciao2")
+                res.status(200).json({ message: 'Connection add successfully' });
+            }
             else
                 res.status(409).json({ message: "Duplicate connection on FindDuplicatedDocument" });
         }else{
             res.status(404).json({ message: "SourceDocId or TargetDocId not found" });
         }
-        res.status(200).json({ message: 'Connection add successfully' });
     } catch (error) {
         res.status(503).json({ error: Error });
     }
@@ -287,7 +289,6 @@ app.put('/api/modifyGeoreference', auth.isLoggedIn, async (req: any, res: any) =
 
 /** Original Resources' APIs */
 app.post('/api/originalResources', auth.isLoggedIn, upload.single('file'), async (req: any, res: any) => {
-    console.log(req.body)
     if (!req.file)
         return res.status(400).json({ message: 'No file updated' });
     try {

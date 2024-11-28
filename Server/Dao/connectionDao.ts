@@ -12,13 +12,11 @@ export default class DaoConnection {
     SetDocumentsConnection(SourceDocId: number, TargetDocId: number, Type: string) {
         return new Promise<boolean>((resolve, reject) => {
             const query = `INSERT INTO Connection (SourceDocId, TargetDocId, Type) VALUES (?, ?, ?)`;
-                    db.run(query, [SourceDocId, TargetDocId, Type], (err) => {
-                        if (err) {
-                            reject(new Error('DocumentsConnection: Database error'));
-                            return false;
-                        } else {
-                            resolve(true);
-                        }
+            db.run(query, [SourceDocId, TargetDocId, Type], (err) => {
+                if (err) {
+                    reject(new Error('DocumentsConnection: Database error'));
+                } else
+                    resolve(true);
             });
         })
     };
@@ -86,9 +84,9 @@ export default class DaoConnection {
      * @param TargetDocId 
      * @returns Boolean
      */
-    FindDuplicatedDocument(SourceDocId: number, TargetDocId: number){
+    FindDuplicatedDocument(SourceDocId: number, TargetDocId: number, Type: string){
         return new Promise<boolean>((resolve, reject) => {
-            db.all(`SELECT Id FROM Connection WHERE SourceDocId = ? AND TargetDocId = ?`, [TargetDocId, SourceDocId], (err, rows) => {
+            db.all(`SELECT Id FROM Connection WHERE SourceDocId = ? AND TargetDocId = ? AND Type = ?`, [TargetDocId, SourceDocId, Type], (err, rows) => {
                 if (err) {
                     reject(new Error('Database error'));
                 } else if (rows.length > 0)
