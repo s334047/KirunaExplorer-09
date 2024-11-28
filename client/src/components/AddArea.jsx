@@ -39,9 +39,8 @@ function AddArea(){
     const handleDrawCreated = (e) => {
         const layer = e.layer;
         if (layer instanceof L.Polygon) {
-            const latlngs = layer.getLatLngs();
-            const newPolygon = latlngs[0].map((latlng) => [latlng.lat, latlng.lng]);
-            setSelectedArea(newPolygon);
+            const GeoJSON = layer.toGeoJSON();
+            setSelectedArea(GeoJSON);
         }
 
     }

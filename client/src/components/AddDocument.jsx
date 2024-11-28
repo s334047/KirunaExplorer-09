@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, LayersControl, Popup, FeatureGroup, Polygon } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, LayersControl, Popup, FeatureGroup, Polygon,GeoJSON } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -174,7 +174,7 @@ function AddDocument(props) {
                     url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                     attribution='&copy; <a href="https://www.esri.com/">Esri</a>, Sources: Esri, Garmin, GEBCO, NOAA NGDC, and other contributors'
                 />
-                {mode === "Area" && selectedArea && <Polygon positions={selectedArea.vertex} color="red"></Polygon>}
+                {mode === "Area" && selectedArea && <GeoJSON key={selectedArea.id} data={selectedArea.vertex} color="red"/>}
                 {mode ==="Point" &&  <MarkerClusterGroup showCoverageOnHover={false} disableClusteringAtZoom={16} iconCreateFunction={createClusterCustomIcon}>
                     {docs.filter(doc => doc.coordinate != null).map(doc => (
                         <Marker key={doc.title} position={doc.coordinate}  eventHandlers={{
@@ -186,7 +186,7 @@ function AddDocument(props) {
                         }}>
                         </Marker>
                     ))}
-                                    {mode === "Point" && selectedPoint && <Marker position={selectedPoint} draggable={true} icon={redIcon}  eventHandlers={{ dragend: handleMarkerDragEnd }}></Marker>}
+                    {mode === "Point" && selectedPoint && <Marker position={selectedPoint} draggable={true} icon={redIcon}  eventHandlers={{ dragend: handleMarkerDragEnd }}></Marker>}
                 </MarkerClusterGroup>}
                 <DescriptionComponent show={show} setShow={setShow} item={docs} setMode={setMode} setFormData={setFormData} setFormLink={setFormLink} />
             </MapContainer>

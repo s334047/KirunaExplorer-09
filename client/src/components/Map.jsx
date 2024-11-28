@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, LayersControl, Polygon } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, LayersControl, Polygon,GeoJSON } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import L from 'leaflet';
 import 'leaflet-draw';
@@ -70,39 +70,73 @@ function MapViewer(props) {
 
     const documentsByArea = new Map();
 
-    docs.filter(doc => doc.coordinate == null).forEach((doc) => {
+    docs.filter(doc => doc.area).forEach((doc) => {
         const areaKey = JSON.stringify(doc.area);
         if (!documentsByArea.has(areaKey)) {
             documentsByArea.set(areaKey, []);
         }
         documentsByArea.get(areaKey)?.push(doc);
     });
-    function generateNonOverlappingPositions(vertices, count) {
-        const bounds = L.latLngBounds(vertices);
+    function generateNonOverlappingPositions(geojson, count) {
+        // Estrai i vertici dalla geometria GeoJSON
+        let vertices = [];
+        if (geojson.type === "FeatureCollection") {
+            geojson.features.forEach(feature => {
+                vertices.push(...extractVertices(feature.geometry));
+            });
+        } else if (geojson.type === "Feature") {
+            vertices = extractVertices(geojson.geometry);
+        } else {
+            vertices = extractVertices(geojson);
+        }
+    
+        if (vertices.length === 0) {
+            throw new Error("Il GeoJSON non contiene vertici validi.");
+        }
+    
+        const bounds = L.latLngBounds(vertices.map(([lng, lat]) => L.latLng(lat, lng)));
         const positions = [];
         const padding = 0.0001; // Distanza minima tra i marker
-
+    
         for (let i = 0; i < count; i++) {
-            // Posizionamento radiale per evitare sovrapposizioni
             const angle = (i / count) * 2 * Math.PI;
             const offsetX = padding * Math.cos(angle);
             const offsetY = padding * Math.sin(angle);
             const center = bounds.getCenter();
-
+    
             positions.push([center.lat + offsetX, center.lng + offsetY]);
         }
-
+    
         return positions;
     }
+    
+    // Funzione di supporto per estrarre i vertici dalla geometria GeoJSON
+    function extractVertices(geometry) {
+        let vertices = [];
+    
+        switch (geometry.type) {
+            case "Polygon":
+                vertices = geometry.coordinates[0]; // Prendi il primo anello del poligono
+                break;
+            case "MultiPolygon":
+                geometry.coordinates.forEach(polygon => {
+                    vertices.push(...polygon[0]); // Unisci i vertici del primo anello di ogni poligono
+                });
+                break;
+            default:
+                throw new Error(`Tipo di geometria ${geometry.type} non supportato.`);
+        }
+    
+        return vertices;
+    }
+    
     const { BaseLayer } = LayersControl;
 
     return (
         <div style={{ display: 'flex', flex: 1, position: 'relative', height: '90vh' }}>
             <MapContainer
                 center={position}
-                minZoom={12}
                 zoom={13}
-                maxBounds={bounds}
                 style={{ flex: 1, height: "100%", width: "100%", borderRadius: '10px' }}
                 scrollWheelZoom={false}
             >
@@ -126,6 +160,7 @@ function MapViewer(props) {
                     {docs.filter(doc => doc.coordinate != null).map(doc => (
                         <Marker key={doc.title} position={doc.coordinate} icon={getIconByType(doc.type)} eventHandlers={{
                             click: () => {
+                                setSelectedDoc(null)
                                 setSelectedDoc(doc);
                             },
                         }}>
@@ -140,6 +175,7 @@ function MapViewer(props) {
                                 {areaDocuments.map((document, index) => (
                                     <Marker key={document.id} position={positions[index]} icon={getIconByType(document.type)} eventHandlers={{
                                         click: () => {
+                                            setSelectedDoc(null)
                                             setSelectedDoc(document);
                                         },
                                     }}>
@@ -152,7 +188,7 @@ function MapViewer(props) {
 
                 {/* Selected Area Polygon */}
                 {selectedDoc && selectedDoc.area && (
-                    <Polygon positions={selectedDoc.area} color="red"></Polygon>
+                    <GeoJSON key={selectedDoc.id} data={selectedDoc.area} color="red"/>
                 )}
                 <Legend icons={icons} />
             </MapContainer>

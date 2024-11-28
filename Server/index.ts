@@ -23,7 +23,8 @@ const daoResource = new DaoResource();
 const app = express();
 const port = 3001;
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(morgan('dev'));
 const corsOption = {
     origin: "http://localhost:5173",
@@ -162,6 +163,7 @@ app.post('/api/documents', auth.isLoggedIn, docValidation, async (req: any, res:
 app.get('/api/documents', async (req: any, res: any) => {
     try {
         const docs = await daoDocument.getAllDoc();
+        console.log(docs[1])
         res.json(docs);
     } catch (error) {
         res.status(503).json({ error: Error });

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, FeatureGroup, Marker, Polygon } from 'react-leaflet';
+import { MapContainer, TileLayer, FeatureGroup, Marker, Polygon, GeoJSON } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import { EditControl } from 'react-leaflet-draw';
 import 'leaflet-draw';
@@ -23,7 +23,10 @@ function ModifyGeoreference(props) {
         [67, 20],
         [68, 21]
     ];
-const createClusterCustomIcon = (cluster) => {
+    const invertCoordinates = (coords) => {
+        return coords.map(([lng, lat]) => [lat, lng]);
+    };
+    const createClusterCustomIcon = (cluster) => {
         const count = cluster.getChildCount();
 
         // Stile personalizzato del cluster
@@ -103,9 +106,8 @@ const createClusterCustomIcon = (cluster) => {
     const handleEdit = (e) => {
         const layers = e.layers;
         layers.eachLayer((layer) => {
-            const latlngs = layer.getLatLngs(); // Ottieni le nuove coordinate dell'area modificata
-            const newPolygon = latlngs[0].map((latlng) => [latlng.lat, latlng.lng]);
-            setSelectedArea(newPolygon); // Aggiorna lo stato con le nuove coordinate
+            const geojson = layer.toGeoJSON(); // Ottieni le nuove coordinate dell'area modificata
+            setSelectedArea(geojson); // Aggiorna lo stato con le nuove coordinate
         });
     };
     const handleMarkerDragEnd = (event) => {
@@ -215,7 +217,6 @@ const createClusterCustomIcon = (cluster) => {
 
             <MapContainer
                 center={position}
-                minZoom={12}
                 zoom={13}
                 maxBounds={bounds}
                 style={{ flex: 1, height: "100%", width: "100%", borderRadius: '10px' }}
@@ -269,13 +270,22 @@ const createClusterCustomIcon = (cluster) => {
                             remove: false
                         }}
                     />
-                    {mode === "AreaOld" && props.doc.area && <Polygon positions={props.doc.area} color="red"></Polygon>}
+                    {selectedArea.type === 'Feature' && <Polygon positions={invertCoordinates(selectedArea.geometry.coordinates[0])} color='red'></Polygon>}
+                    {selectedArea.type === 'FeatureCollection' && (
+                        selectedArea.features[0].geometry.coordinates.map((polygon, index) => (
+                            <Polygon
+                                key={index}
+                                positions={polygon[0].map(([lng, lat]) => [lat, lng])} // Converte [lng, lat] in [lat, lng]
+                                color="red"
+                            />
+                        ))
+                    )}
                 </FeatureGroup >}
                 <TileLayer
                     url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                     attribution='&copy; <a href="https://www.esri.com/">Esri</a>, Sources: Esri, Garmin, GEBCO, NOAA NGDC, and other contributors'
                 />
-                {mode === "AreaNew" && selectedArea && <Polygon positions={selectedArea.vertex} color="red"></Polygon>}
+                {mode === "AreaNew" && selectedArea && <GeoJSON key={selectedArea.id} data={selectedArea.vertex} color="red" />}
                 {(mode === "PointOld" || mode === 'PointNew') && <MarkerClusterGroup showCoverageOnHover={false} disableClusteringAtZoom={16} iconCreateFunction={createClusterCustomIcon}>
                     {docs.filter(doc => doc.coordinate != null).filter(doc => doc.title != props.doc.title).map(doc => (
                         <Marker key={doc.title} position={doc.coordinate} eventHandlers={{
@@ -287,7 +297,7 @@ const createClusterCustomIcon = (cluster) => {
                         }}>
                         </Marker>
                     ))}
-                                    {(mode === "PointOld" || mode === 'PointNew') && <Marker position={selectedPoint} draggable={true} icon={redIcon} eventHandlers={{ dragend: handleMarkerDragEnd }}></Marker>}
+                    {(mode === "PointOld" || mode === 'PointNew') && <Marker position={selectedPoint} draggable={true} icon={redIcon} eventHandlers={{ dragend: handleMarkerDragEnd }}></Marker>}
                 </MarkerClusterGroup>}
             </MapContainer>
         </div>

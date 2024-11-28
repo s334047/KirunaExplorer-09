@@ -44,10 +44,7 @@ export default class DaoDocument {
                             JSON.parse(row.Coordinate),
                             row.Vertex 
                                 ? JSON.parse(
-                                    row.Vertex.replace(/\]\s*\[/g, '],[')
-                                        .replace(/'/g, '"')
-                                        .replace(/(\[\s*)/g, '[')
-                                        .replace(/(\s*\])/g, ']')
+                                    row.Vertex
                                   )
                                 : null,
                             row.Description
