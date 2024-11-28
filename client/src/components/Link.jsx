@@ -152,7 +152,7 @@ const ListDocumentLink = (props) => {
 };
 
 ListDocumentLink.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.object,
   show: PropTypes.bool.isRequired,
   setShow: PropTypes.func.isRequired,
 };

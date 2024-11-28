@@ -9,7 +9,7 @@ import { Button, Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import DocumentCard from './DocCard';
 import API from '../../API.mjs';
-import PropTypes from 'prop-types';
+import propTypes from "prop-types";
 
 
 function MapViewer(props) {
@@ -21,11 +21,23 @@ function MapViewer(props) {
     ];
     const [docs, setDocs] = useState([]);
     const [selectedDoc, setSelectedDoc] = useState(null);
+    const [documentsByArea, setDocumentsByArea] = useState(new Map());
 
     useEffect(() => {
         const getDocs = async () => {
             const documents = await API.getAllDocs();
             setDocs(documents);
+            const areaMap = new Map();
+    
+            documents.filter(doc => doc.area).forEach((doc) => {
+                const areaKey = JSON.stringify(doc.area);
+                if (!areaMap.has(areaKey)) {
+                    areaMap.set(areaKey, []);
+                }
+                areaMap.get(areaKey)?.push(doc);
+            });
+    
+            setDocumentsByArea(areaMap);
         };
         getDocs();
     }, []);
@@ -68,15 +80,7 @@ function MapViewer(props) {
         });
     };
 
-    const documentsByArea = new Map();
 
-    docs.filter(doc => doc.area).forEach((doc) => {
-        const areaKey = JSON.stringify(doc.area);
-        if (!documentsByArea.has(areaKey)) {
-            documentsByArea.set(areaKey, []);
-        }
-        documentsByArea.get(areaKey)?.push(doc);
-    });
     function generateNonOverlappingPositions(geojson, count) {
         // Estrai i vertici dalla geometria GeoJSON
         let vertices = [];
@@ -261,9 +265,9 @@ function MapViewer(props) {
 }
 
 MapViewer.propTypes = {
-    user: PropTypes.object.isRequired,
-    setTitle: PropTypes.func.isRequired,
-    setShowAddLink: PropTypes.func.isRequired,
+    user: propTypes.object.isRequired,
+    setTitle: propTypes.func.isRequired,
+    setShowAddLink: propTypes.func.isRequired,
 };
 
 function Legend({ icons }) {

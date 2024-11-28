@@ -441,7 +441,7 @@ DescriptionComponent.propTypes = {
   setFormLink: PropTypes.func.isRequired,
   setShow: PropTypes.func.isRequired,
   show: PropTypes.bool.isRequired,
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
 };
 
 export default DescriptionComponent;

@@ -18,12 +18,10 @@ import ModifyGeoreference from './components/ModifyGeorefernce';
 
 function App() {
   const [showAddLink, setShowAddLink] = useState(false) //state for showing the modal for linking documents
-  const [documents, setDocument] = useState([]);
-  const [areas,setAreas]=useState([]);
-  const [excludeDoc, setExcludeDoc] = useState("");
+  const [excludeDoc, setExcludeDoc] = useState({});
   const[message, setMessage] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
-  const [user, setUser] = useState('')
+  const [user, setUser] = useState({})
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   const nav = useNavigate();
@@ -39,13 +37,6 @@ function App() {
             setLoggedIn(false); 
             setUser('');
         });
-        const getDocsandAreas= async()=>{
-          let docs= await API.getAllDocs();
-          setDocument(docs)
-          let areas= await API.getAllAreas();
-          setAreas(areas)
-        }
-        getDocsandAreas();
 }, []);
 
 

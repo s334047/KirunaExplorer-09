@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import DescriptionComponent from './AddDescription';
 
 
-function AddDocument(props) {
+function AddDocument() {
 
     const position = [67.8558, 20.2253];
     const bounds = [

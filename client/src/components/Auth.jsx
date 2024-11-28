@@ -96,7 +96,7 @@ LoginComponent.propTypes = {
     show: PropTypes.bool.isRequired,
     setShow: PropTypes.func.isRequired,
     login: PropTypes.func.isRequired,
-    message: PropTypes.object.isRequired,
+    message: PropTypes.string.isRequired,
 };
 
 export default LoginComponent;

@@ -198,7 +198,7 @@ function DocumentTable() {
                 <ListDocumentLink
                     show={showAddLink}
                     setShow={setShowAddLinkModal}
-                    title={selectedDoc?.title}
+                    title={selectedDoc}
                     item={documents}
                 />
             </Card>
@@ -264,7 +264,7 @@ function AdditionalInfo({ selectedDoc, setSelectedDoc, documents, setShowAddLink
                             <li><strong>Connections:</strong>
                                 <ul>
                                     {connections.map(connection => (
-                                        <li key={connection.id}>
+                                        <li key={`${connection.id}-${connection.type}`}>
                                             <Button
                                                 variant="link"
                                                 style={{ color: "#154109" }}
@@ -333,43 +333,9 @@ function AdditionalInfo({ selectedDoc, setSelectedDoc, documents, setShowAddLink
     );
 }
 AdditionalInfo.propTypes = {
-    selectedDoc: PropTypes.shape({
-        title: PropTypes.string.isRequired,
-        scale: PropTypes.string,
-        type: PropTypes.string,
-        language: PropTypes.string,
-        page: PropTypes.number,
-        description: PropTypes.string,
-        id: PropTypes.number.isRequired,
-    }).isRequired,
-    setShowAddLinkModal: PropTypes.func.isRequired,
-    setSelectedDoc: PropTypes.func.isRequired,
-    documents: PropTypes.array.isRequired,
-};
-
-DocumentTable.propTypes = {
     selectedDoc: PropTypes.object.isRequired,
-    setSelectedDoc: PropTypes.func.isRequired,
-    showAddLink: PropTypes.bool.isRequired,
     setShowAddLinkModal: PropTypes.func.isRequired,
+    setSelectedDoc: PropTypes.func.isRequired,
     documents: PropTypes.array.isRequired,
-    searchMode: PropTypes.string.isRequired,
-    setSearchMode: PropTypes.func.isRequired,
-    searchDoc: PropTypes.string.isRequired,
-    setSearchDoc: PropTypes.func.isRequired,
-    searchStakeholder: PropTypes.string.isRequired,
-    setSearchStakeholder: PropTypes.func.isRequired,
-    searchYear: PropTypes.string.isRequired,
-    setSearchYear: PropTypes.func.isRequired,
-    searchDescription: PropTypes.string.isRequired,
-    setSearchDescription: PropTypes.func.isRequired,
-    searchType: PropTypes.string.isRequired,
-    setSearchType: PropTypes.func.isRequired,
-    searchScale: PropTypes.string.isRequired,
-    setSearchScale: PropTypes.func.isRequired,
-    searchLanguage: PropTypes.string.isRequired,
-    setSearchLanguage: PropTypes.func.isRequired,
-
 };
-
 export default DocumentTable;

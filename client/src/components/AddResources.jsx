@@ -126,7 +126,7 @@ const FileUploader = ({ show, onClose, triggerFileInput, documentId }) => {
 
 FileUploader.propTypes = {
     show: PropTypes.bool.isRequired,
-    documentId: PropTypes.string.isRequired,
+    documentId: PropTypes.number.isRequired,
     onClose: PropTypes.func.isRequired,
     triggerFileInput: PropTypes.bool.isRequired,
 };
