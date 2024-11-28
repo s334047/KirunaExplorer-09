@@ -191,10 +191,18 @@ app.post('/api/connections', auth.isLoggedIn, connectionValidation, async (req: 
         return res.status(422).json({ message: 'invalid field' });
     }
     try {
-        const SourceDoc = req.body.SourceDocument;
-        const TargetDoc = req.body.TargetDocument;
         const Type = req.body.ConnectionType;
-        await daoConnection.SetDocumentsConnection(SourceDoc, TargetDoc, Type);
+        const SourceDocId = await daoConnection.GetDocumentsId(req.body.SourceDocument);
+        const TargetDocId = await daoConnection.GetDocumentsId(req.body.TargetDocument);
+        console.log("ciao ", Type, SourceDocId, TargetDocId);
+        if(SourceDocId && TargetDocId){
+            if(await daoConnection.FindDuplicatedDocument(SourceDocId, TargetDocId))
+                await daoConnection.SetDocumentsConnection(SourceDocId, TargetDocId, Type);
+            else
+                res.status(409).json({ message: "Duplicate connection on FindDuplicatedDocument" });
+        }else{
+            res.status(404).json({ message: "SourceDocId or TargetDocId not found" });
+        }
         res.status(200).json({ message: 'Connection add successfully' });
     } catch (error) {
         res.status(503).json({ error: Error });
@@ -204,9 +212,13 @@ app.post('/api/connections', auth.isLoggedIn, connectionValidation, async (req: 
 //get the number of connection associate to a document
 app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
     try {
-        const { SourceDoc } = req.params;
-        const connections = await daoConnection.GetDocumentConnections(SourceDoc);
-        res.json(connections);
+        const SourceDocId = await daoConnection.GetDocumentsId(req.params.SourceDoc);
+        if(SourceDocId){
+            const connections = await daoConnection.GetDocumentConnections(SourceDocId);
+            res.json(connections);
+        } else 
+            res.status(404).json({message: "SourceDocId not found"});
+
     } catch (error) {
         res.status(503).json({ error: Error });
     }
@@ -261,18 +273,19 @@ app.post('/api/areas', auth.isLoggedIn, areaValidation, async (req: any, res: an
     }
 });
 
-//modify the coordinates of an area  (Story 5 routes)
+//modify the coordinates of an area
 app.put('/api/modifyGeoreference', auth.isLoggedIn, async (req: any, res: any) => {
     try {
+        const areaId = await daoArea.getAreaIdByCoordinate(req.body.oldArea ? req.body.oldArea : req.body.area);
         const id = await daoDocument.getDocumentIdFromTitle(req.body.name);
-        await daoArea.modifyGeoreference(id, req.body.coord, req.body.oldCoord, req.body.area, req.body.oldArea)
+        await daoArea.modifyGeoreference(id, req.body.coord, req.body.oldCoord, req.body.area, req.body.oldArea, areaId);
         res.status(200).json({ message: 'Georeference modified successfully' });
     } catch (error) {
         res.status(503).json({ error: Error });
     }
 })
 
-/** Original Resources' APIs - Story 7 */
+/** Original Resources' APIs */
 app.post('/api/originalResources', auth.isLoggedIn, upload.single('file'), async (req: any, res: any) => {
     console.log(req.body)
     if (!req.file)

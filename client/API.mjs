@@ -32,6 +32,7 @@ async function getAreasDoc(name) {                  //get docs of an area
 
 /** API Connections */
 async function SetDocumentsConnection(SourceDocument, TargetDocument, ConnectionType) { // all parameters are strings
+  console.log(SourceDocument, TargetDocument, ConnectionType);
   return await fetch(`${SERVER_URL}/connections`, {
     method: 'POST',
     headers: {

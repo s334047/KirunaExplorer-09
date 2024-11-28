@@ -45,8 +45,8 @@ export default class DaoArea {
         });
     };
 
-    modifyGeoreference(id:number,coordinate:number[],oldCoordinate:number[],area:object,oldArea:object){
-        return new Promise<void>(async (resolve,reject)=>{
+    modifyGeoreference(id:number,coordinate:number[],oldCoordinate:number[],area:object,oldArea:object, a_id: number){
+        return new Promise<void>((resolve,reject) => {
             if(coordinate && !oldCoordinate){
                 const sql="UPDATE Document SET Coordinate = ?, Area = NULL WHERE Id = ?"
                 db.run(sql,[JSON.stringify(coordinate).replace(/"/g, ""),id],function(err){
@@ -66,7 +66,6 @@ export default class DaoArea {
                 })
             }
             if(area && oldArea){
-                const a_id = await this.getAreaIdByCoordinate(oldArea);
                 const sql="UPDATE Area SET Vertex = ? WHERE Id = ?"
                 db.run(sql,[JSON.stringify(area),a_id],function(err){
                     if(err)
@@ -76,7 +75,6 @@ export default class DaoArea {
                 })
             }
             if(area && !oldArea){
-                const a_id = await this.getAreaIdByCoordinate(area);
                 const sql="UPDATE Document SET Area = ?,  Coordinate = NULL WHERE Id = ?"
                 db.run(sql,[a_id,id],function(err){
                     if(err)
