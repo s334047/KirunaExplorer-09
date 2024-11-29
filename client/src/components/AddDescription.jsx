@@ -15,6 +15,7 @@ function DescriptionComponent(props) {
   const [month, setMonth] = useState(null);
   const [day, setDay] = useState(null);
   const [links, setLinks] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [item, setItem] = useState({ document: "", type: "" });
   const [formData, setFormData] = useState({
     title: '',
@@ -42,11 +43,11 @@ function DescriptionComponent(props) {
   };
 
   const [currentStep, setCurrentStep] = useState(1); // Step tracking state
-  const [filteredItems, setItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
   useEffect(() => {
     const getDocs = async () => {
       const docs = await API.getAllDocs();
-      setItems(docs)
+      setFilteredItems(docs)
     }
     getDocs()
   }, [])
@@ -375,12 +376,18 @@ function DescriptionComponent(props) {
               <div className="row">
                 <div className="col-4">
                   <Form.Label className="custom-label-color">Document:</Form.Label>
-                  <Form.Select name="document" onChange={handleChangeLink} isInvalid={!!errors.document}>
+                  <Form.Select className="mb-3" name="document" onChange={handleChangeLink} isInvalid={!!errors.document}>
                     <option value="">Select a doc</option>
-                    {filteredItems.filter((item) => item.title !== props.title).map((item) => (
+                    {filteredItems.filter((item) => item.title !== props.title).filter((doc) => !searchQuery || doc.title.toLowerCase().includes(searchQuery.toLowerCase())).map((item) => (
                       <option key={item.title} value={item.title}>{item.title}</option>
                     ))}
                   </Form.Select>
+                  <Form.Control
+                    type="text"
+                    placeholder="Search title..."
+                    value={searchQuery}
+                    onChange={(e)=>setSearchQuery(e.target.value)}
+                  />
                   <Form.Control.Feedback type="invalid">
                     {errors.document}
                   </Form.Control.Feedback>

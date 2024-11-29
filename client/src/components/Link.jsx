@@ -10,6 +10,7 @@ const ListDocumentLink = (props) => {
   const [item, setItem] = useState({ document: "", type: "" });
   const [links, setLinks] = useState([]);
   const [filteredItems,setItems]=useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   useEffect(()=>{
     const getDocs = async()=>{
       const docs = await API.getAllDocs();
@@ -33,7 +34,7 @@ const ListDocumentLink = (props) => {
 
     setErrors({});
     for (let link of links){
-      API.SetDocumentsConnection(props.title,link.document,link.type)
+      API.SetDocumentsConnection(props.title.title,link.document,link.type)
   }
 
     setItem({ document: "", type: "" })
@@ -89,12 +90,18 @@ const ListDocumentLink = (props) => {
           <div className="row">
             <div className="col-4">
               <Form.Label className="custom-label-color">Document:</Form.Label>
-              <Form.Select name="document" onChange={handleChange} isInvalid={!!errors.document}>
-                <option value="">Select a doc</option>
-                {filteredItems.filter((item) => item.title !== props.title).map((item) => (
-                  <option key={item.title} value={item.title}>{item.title}</option>
-                ))}
-              </Form.Select>
+              <Form.Select className="mb-3" name="document" onChange={handleChange} isInvalid={!!errors.document}>
+                    <option value="">Select a doc</option>
+                    {filteredItems.filter((item) => item.title !== props.title.title).filter((doc) => !searchQuery || doc.title.toLowerCase().includes(searchQuery.toLowerCase())).map((item) => (
+                      <option key={item.title} value={item.title}>{item.title}</option>
+                    ))}
+                  </Form.Select>
+              <Form.Control
+                    type="text"
+                    placeholder="Search title..."
+                    value={searchQuery}
+                    onChange={(e)=>setSearchQuery(e.target.value)}
+                  />
               <Form.Control.Feedback type="invalid">
                 {errors.document}
               </Form.Control.Feedback>

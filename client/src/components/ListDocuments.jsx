@@ -195,12 +195,12 @@ function DocumentTable() {
                             ))}
                     </tbody>
                 </Table>
-                <ListDocumentLink
+                {showAddLink && <ListDocumentLink
                     show={showAddLink}
                     setShow={setShowAddLinkModal}
                     title={selectedDoc}
                     item={documents}
-                />
+                />}
             </Card>
         </Container>
     );
