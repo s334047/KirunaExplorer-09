@@ -239,23 +239,27 @@ function DescriptionComponent(props) {
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label className="custom-label-color">Stakeholders:</Form.Label>
-                  <Dropdown>
-                    <Dropdown.Toggle id="dropdown-basic" variant="white" className="text-dark  border rounded" >
-                      Select Stakeholders
-                    </Dropdown.Toggle>
+                  <Form.Control
+                    as="div"
+                    isInvalid={!!errors.stakeholders} // Verifica se c'è un errore
+                  >
+                    <Dropdown>
+                      <Dropdown.Toggle id="dropdown-basic" variant="white" className="text-dark " >
+                        {formData.stakeholders ? formData.stakeholders : "Select Stakeholders"}
+                      </Dropdown.Toggle>
 
-                    <Dropdown.Menu className="custom-dropdown-menu">
-                      <Form.Check type='checkbox' label={"Kiruna kommun"} value={"Kiruna kommun"} checked={formData.stakeholders.includes("Kiruna kommun")}
-                        onChange={handleStakeholders}></Form.Check>
-                      <Form.Check type='checkbox' label={"LKAB"} value={"LKAB"} checked={formData.stakeholders.includes("LKAB")}
-                        onChange={handleStakeholders}></Form.Check>
-                      <Form.Check type='checkbox' label={"White Arkitekter"} value={"White Arkitekter"} checked={formData.stakeholders.includes("White Arkitekter")}
-                        onChange={handleStakeholders}></Form.Check>
-                      <Form.Check type='checkbox' label={"Residents"} value={"Residents"} checked={formData.stakeholders.includes("Residents")}
-                        onChange={handleStakeholders}></Form.Check>
-                    </Dropdown.Menu>
-                  </Dropdown>
-
+                      <Dropdown.Menu className="custom-dropdown-menu">
+                        <Form.Check type='checkbox' label={"Kiruna kommun"} value={"Kiruna kommun"} checked={formData.stakeholders.includes("Kiruna kommun")}
+                          onChange={handleStakeholders}></Form.Check>
+                        <Form.Check type='checkbox' label={"LKAB"} value={"LKAB"} checked={formData.stakeholders.includes("LKAB")}
+                          onChange={handleStakeholders}></Form.Check>
+                        <Form.Check type='checkbox' label={"White Arkitekter"} value={"White Arkitekter"} checked={formData.stakeholders.includes("White Arkitekter")}
+                          onChange={handleStakeholders}></Form.Check>
+                        <Form.Check type='checkbox' label={"Residents"} value={"Residents"} checked={formData.stakeholders.includes("Residents")}
+                          onChange={handleStakeholders}></Form.Check>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </Form.Control>
                   <Form.Control.Feedback type="invalid">
                     {errors.stakeholders}
                   </Form.Control.Feedback>

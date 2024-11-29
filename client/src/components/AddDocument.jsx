@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, LayersControl, Popup, FeatureGroup, Polygon,GeoJSON } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, LayersControl, Popup, FeatureGroup, Polygon,GeoJSON,useMapEvents } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -105,6 +105,19 @@ function AddDocument() {
         setLng(newLatLng.lng.toFixed(4))
         setSelectedPoint([newLatLng.lat, newLatLng.lng]); // Aggiorna lo stato con le nuove coordinate
     };
+    const HandleMapClick = () => {
+        useMapEvents({
+            click(e){
+                if(mode === "Point"){
+                 const { lat, lng } = e.latlng;
+                 setSelectedPoint([lat,lng])
+                 setLat(lat.toFixed(4))
+                 setLng(lng.toFixed(4));
+                }
+            }
+        })
+        return null;
+      };
     return (
         <div style={{ display: 'flex', flex: 1, position: 'relative', height: '90vh' }}>
             {mode === "Area" && <div style={{
@@ -170,6 +183,7 @@ function AddDocument() {
                 style={{ flex: 1, height: "100%", width: "100%", borderRadius: '10px' }}
                 scrollWheelZoom={false}
             >
+                <HandleMapClick />
                 <TileLayer
                     url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                     attribution='&copy; <a href="https://www.esri.com/">Esri</a>, Sources: Esri, Garmin, GEBCO, NOAA NGDC, and other contributors'

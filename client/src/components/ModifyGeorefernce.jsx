@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, FeatureGroup, Marker, Polygon, GeoJSON } from 'react-leaflet';
+import { MapContainer, TileLayer, FeatureGroup, Marker, Polygon, GeoJSON, useMapEvents } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import { EditControl } from 'react-leaflet-draw';
 import 'leaflet-draw';
@@ -141,6 +141,20 @@ function ModifyGeoreference(props) {
     useEffect(() => {
         setSelectedPoint([lat, lng]);
     }, [lat, lng])
+
+    const HandleMapClick = () => {
+        useMapEvents({
+            click(e){
+                if(mode === "PointOld" || mode == "PointNew"){
+                 const { lat, lng } = e.latlng;
+                 setSelectedPoint([lat,lng])
+                 setLat(lat.toFixed(4))
+                 setLng(lng.toFixed(4));
+                }
+            }
+        })
+        return null;
+      };
     return (
         <div style={{ display: 'flex', flex: 1, position: 'relative', height: '90vh' }}>
             {mode === "AreaNew" && <div style={{
@@ -222,6 +236,7 @@ function ModifyGeoreference(props) {
                 style={{ flex: 1, height: "100%", width: "100%", borderRadius: '10px' }}
                 scrollWheelZoom={false}
             >
+                <HandleMapClick />
                 <Modal show={show} onHide={handleClose} centered>
                     <Modal.Header className="custom-modal" style={{ borderBottom: 'none' }} closeButton>
                         <Modal.Title style={{ color: "#154109" }}>Edit georeference</Modal.Title>
