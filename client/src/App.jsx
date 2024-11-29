@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import { Routes, Route, Outlet, Navigate, useNavigate } from 'react-router-dom';
-import { Container, Row, Alert } from 'react-bootstrap';
+import { Routes, Route, Outlet, useNavigate } from 'react-router-dom';
+import { Container } from 'react-bootstrap';
 import NavHeader from './components/NavHeader';
 import MapViewer from './components/Map';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import 'leaflet/dist/leaflet.css';
 import ListDocumentLink from './components/Link';
 import LoginComponent from './components/Auth';

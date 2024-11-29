@@ -386,7 +386,7 @@ function DescriptionComponent(props) {
                     type="text"
                     placeholder="Search title..."
                     value={searchQuery}
-                    onChange={(e)=>setSearchQuery(e.target.value)}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.document}
@@ -426,11 +426,13 @@ function DescriptionComponent(props) {
                     className="d-flex justify-content-between align-items-center"
                     style={{ fontSize: '0.7rem' }}>
                     <div>{link.document} - {link.type}</div>
-                    <span
+                    <button
                       onClick={() => handleDeleteLink(index)}
+                      className="btn btn-link p-0 text-black"
                     >
                       <i className="bi bi-x"></i>
-                    </span>
+                    </button>
+
                   </ListGroup.Item>
                 ))}
               </ListGroup></>)}
