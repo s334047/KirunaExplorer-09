@@ -1,4 +1,4 @@
-import { Modal, Button, Form, Container, Row, Col, ListGroup } from 'react-bootstrap';
+import { Modal, Button, Form, Container, Row, Col, ListGroup, Dropdown } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -53,7 +53,7 @@ function DescriptionComponent(props) {
   const closeModal = () => {
     navigate("/")
   };
-  const checkDate = () =>{
+  const checkDate = () => {
     const newErrors = {};
     if (!year) newErrors.date = "The year is mandatory";
     if (year && day && !month) newErrors.date = "Month must be present";
@@ -65,7 +65,7 @@ function DescriptionComponent(props) {
     else if (month && year && day) setFormData({ ...formData, issuanceDate: `${year}-${month}-${day}` })
     return newErrors.date
   }
-  const checkStep1 = () =>{
+  const checkStep1 = () => {
     const allowedScales = ["blueprint/effects", "concept", "text"]; // sostituisci con le stringhe consentite
     const scaleRegex = /^1:\d+([.,]\d+)?$/;
     const newErrors = {};
@@ -75,7 +75,7 @@ function DescriptionComponent(props) {
     if (!scaleRegex.test(formData.scale) && !allowedScales.includes(formData.scale) && formData.scale) newErrors.scale = "The format is not correct.";
     if (!formData.type) newErrors.type = "The type is mandatory.";
     let dateError = checkDate();
-    if(dateError){
+    if (dateError) {
       newErrors.date = dateError
     }
     if (formData.pages !== undefined && formData.pages !== null) {
@@ -85,41 +85,41 @@ function DescriptionComponent(props) {
     }
     return newErrors;
   }
-  const checkStep2 = ()=>{
+  const checkStep2 = () => {
     const newErrors = {};
     if (!formData.description) newErrors.description = "The description is mandatory.";
     return newErrors;
   }
-  const checkStep3 = ()=>{
+  const checkStep3 = () => {
     const newErrors = {};
     if ((!item.document && item.type)) newErrors.linkTitle = "All two field are mandatoriy.";
     if ((item.document && !item.type)) newErrors.linkType = "All two field are mandatoriy.";
     return newErrors;
   }
-  const checkStep4 = ()=>{
+  const checkStep4 = () => {
     const newErrors = {};
     if (!mode) newErrors.mode = "The mode is mandatory.";
     return newErrors;
   }
-  const checkSteps = ()=>{
+  const checkSteps = () => {
     let newErrors = {};
     // Validazione dei campi obbligatori
     if (currentStep === 1) {
-      newErrors=checkStep1();
+      newErrors = checkStep1();
     }
     else if (currentStep === 2) {
-      newErrors=checkStep2();
+      newErrors = checkStep2();
     }
     else if (currentStep === 3) {
-      newErrors=checkStep3();
+      newErrors = checkStep3();
     }
     else if (currentStep === 4) {
-      newErrors=checkStep4();
+      newErrors = checkStep4();
     }
     return newErrors;
   }
   const handleSave = () => {
-    const newErrors=checkSteps();
+    const newErrors = checkSteps();
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length > 0) {
@@ -149,6 +149,18 @@ function DescriptionComponent(props) {
       ...formData,
       [name]: value,
     });
+  };
+
+  const handleStakeholders = (e) => {
+    const { value, checked } = e.target;
+    let stakeholdersArray = formData.stakeholders ? formData.stakeholders.split("/") : [];
+
+    if (checked) {
+      stakeholdersArray.push(value);
+    } else {
+      stakeholdersArray = stakeholdersArray.filter(item => item !== value);
+    }
+    setFormData({ ...formData, stakeholders: stakeholdersArray.join("/") })
   };
 
   const handleChangeLink = (e) => {
@@ -225,15 +237,25 @@ function DescriptionComponent(props) {
                     {errors.title}
                   </Form.Control.Feedback>
                 </Form.Group>
-
                 <Form.Group className="mb-3">
                   <Form.Label className="custom-label-color">Stakeholders:</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="stakeholders"
-                    onChange={handleChange}
-                    isInvalid={!!errors.stakeholders}
-                  />
+                  <Dropdown>
+                    <Dropdown.Toggle id="dropdown-basic" variant="white" className="text-dark  border rounded" >
+                      Select Stakeholders
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu className="custom-dropdown-menu">
+                      <Form.Check type='checkbox' label={"Kiruna kommun"} value={"Kiruna kommun"} checked={formData.stakeholders.includes("Kiruna kommun")}
+                        onChange={handleStakeholders}></Form.Check>
+                      <Form.Check type='checkbox' label={"LKAB"} value={"LKAB"} checked={formData.stakeholders.includes("LKAB")}
+                        onChange={handleStakeholders}></Form.Check>
+                      <Form.Check type='checkbox' label={"White Arkitekter"} value={"White Arkitekter"} checked={formData.stakeholders.includes("White Arkitekter")}
+                        onChange={handleStakeholders}></Form.Check>
+                      <Form.Check type='checkbox' label={"Residents"} value={"Residents"} checked={formData.stakeholders.includes("Residents")}
+                        onChange={handleStakeholders}></Form.Check>
+                    </Dropdown.Menu>
+                  </Dropdown>
+
                   <Form.Control.Feedback type="invalid">
                     {errors.stakeholders}
                   </Form.Control.Feedback>
