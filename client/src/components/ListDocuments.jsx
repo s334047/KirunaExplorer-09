@@ -9,7 +9,7 @@ import FileUploader from './AddResources';
 function DocumentTable() {
 
     const [selectedDoc, setSelectedDoc] = useState(null);
-    const [showAddLink, setShowAddLinkModal] = useState(false);
+    const [showAddLinkModal, setShowAddLinkModal] = useState(false);
     const [documents, setDocuments] = useState([]);
     const [searchMode, setSearchMode] = useState("Simple");
     const [searchDoc, setSearchDoc] = useState("");
@@ -136,7 +136,8 @@ function DocumentTable() {
                                         setSearchStakeholder(""); setSearchYear("");
                                         setSearchType(""); setSearchLanguage(""); setSearchScale("");
                                     }}
-                                ><i className="bi bi-arrow-counterclockwise me-2"></i>
+                                >
+                                    <i className="bi bi-arrow-counterclockwise me-2"></i>
                                     Default
                                 </Button>
                             </Col>
@@ -195,8 +196,8 @@ function DocumentTable() {
                             ))}
                     </tbody>
                 </Table>
-                {showAddLink && <ListDocumentLink
-                    show={showAddLink}
+                {showAddLinkModal && <ListDocumentLink
+                    show={showAddLinkModal}
                     setShow={setShowAddLinkModal}
                     title={selectedDoc}
                     item={documents}

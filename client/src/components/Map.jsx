@@ -15,10 +15,6 @@ import propTypes from "prop-types";
 function MapViewer(props) {
     const navigate = useNavigate();
     const position = [67.8558, 20.2253];
-    const bounds = [
-        [67, 20],
-        [68, 21]
-    ];
     const [docs, setDocs] = useState([]);
     const [selectedDoc, setSelectedDoc] = useState(null);
     const [documentsByArea, setDocumentsByArea] = useState(new Map());
@@ -42,12 +38,6 @@ function MapViewer(props) {
         getDocs();
     }, []);
 
-    const customIcon = new L.Icon({
-        iconUrl: 'file.png',
-        iconSize: [35, 35],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-    });
     const icons = {
         'Informative document': new L.Icon({ iconUrl: 'icon_doc_blue.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
         'Prescriptive document': new L.Icon({ iconUrl: 'icon_doc_green.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
@@ -270,7 +260,7 @@ MapViewer.propTypes = {
     setShowAddLink: propTypes.func.isRequired,
 };
 
-function Legend({ icons }) {
+function Legend({icons}) {
     return (
 
         <Card style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 1000 }}>
