@@ -56,15 +56,30 @@ function DescriptionComponent(props) {
   };
   const checkDate = () => {
     const newErrors = {};
-    if (!year) newErrors.date = "The year is mandatory";
-    if (year && day && !month) newErrors.date = "Month must be present";
-    if (year && dayjs(year, 'YYYY', true).isValid() == false) newErrors.date = "Date format not correct";
-    else if (!month && year && !day) setFormData({ ...formData, issuanceDate: `${year}` })
-    if (month && year && dayjs(year + "-" + month, 'YYYY-MM', true).isValid() == false) newErrors.date = "Date format not correct"
-    else if (month && year && !day) setFormData({ ...formData, issuanceDate: `${year}-${month}` })
-    if (day && month && year && dayjs(year + "-" + month + "-" + day, 'YYYY-MM-DD', true).isValid() == false) newErrors.date = "Date format not correct"
-    else if (month && year && day) setFormData({ ...formData, issuanceDate: `${year}-${month}-${day}` })
-    return newErrors.date
+    //Validation of year (mandatory)
+    if (!year) {
+      newErrors.date = "The year is mandatory";
+    } else if (!dayjs(year, 'YYYY', true).isValid()) {
+      newErrors.date = "Year format is not correct";
+    }
+    //Validation of month (if there is)
+    if (month && !dayjs(`${year}-${month}`, 'YYYY-MM', true).isValid()) {
+      newErrors.date = "Month format is not correct";
+    }
+    //Validation of day (if there is)
+    if (day && !dayjs(`${year}-${month}-${day}`, 'YYYY-MM-DD', true).isValid()) {
+      newErrors.date = "Day format is not correct";
+    }
+
+    if (!newErrors.date) {
+      let issuanceDate = year;
+      if (month) issuanceDate += `-${month}`;
+      if (day) issuanceDate += `-${day}`;
+
+      setFormData({ ...formData, issuanceDate });
+    }
+
+    return newErrors.date;
   }
   const checkStep1 = () => {
     const allowedScales = ["blueprint/effects", "concept", "text"]; // sostituisci con le stringhe consentite
