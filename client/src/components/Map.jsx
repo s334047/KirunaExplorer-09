@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, LayersControl, Polygon,GeoJSON } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, LayersControl,GeoJSON } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import L from 'leaflet';
 import 'leaflet-draw';
@@ -254,12 +254,6 @@ function MapViewer(props) {
     );
 }
 
-MapViewer.propTypes = {
-    user: propTypes.object.isRequired,
-    setTitle: propTypes.func.isRequired,
-    setShowAddLink: propTypes.func.isRequired,
-};
-
 function Legend({icons}) {
     return (
 
@@ -278,5 +272,15 @@ function Legend({icons}) {
 
     );
 }
+
+MapViewer.propTypes = {
+    user: propTypes.object.isRequired,
+    setTitle: propTypes.func.isRequired,
+    setShowAddLink: propTypes.func.isRequired,
+};
+
+Legend.propTypes = {
+    icons: propTypes.object.isRequired,
+};
 
 export default MapViewer;

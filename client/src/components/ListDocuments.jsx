@@ -137,8 +137,7 @@ function DocumentTable() {
                                         setSearchType(""); setSearchLanguage(""); setSearchScale("");
                                     }}
                                 >
-                                    <i className="bi bi-arrow-counterclockwise me-2"></i>
-                                    Default
+                                    <i className="bi bi-arrow-counterclockwise me-2"> Default</i>
                                 </Button>
                             </Col>
                         </Row>

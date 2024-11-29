@@ -436,18 +436,17 @@ function DescriptionComponent(props) {
             </Form.Group>
 
               <br /><ListGroup>
-                {links.map((link, index) => (
-                  <ListGroup.Item key={index}
+                {links.map((link) => (
+                  <ListGroup.Item key={`${link.document}-${link.type}`}
                     className="d-flex justify-content-between align-items-center"
                     style={{ fontSize: '0.7rem' }}>
                     <div>{link.document} - {link.type}</div>
                     <button
-                      onClick={() => handleDeleteLink(index)}
+                      onClick={() => handleDeleteLink(links.findIndex(l => l === link))}
                       className="btn btn-link p-0 text-black"
                     >
                       <i className="bi bi-x"></i>
                     </button>
-
                   </ListGroup.Item>
                 ))}
               </ListGroup></>)}

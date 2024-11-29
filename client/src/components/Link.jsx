@@ -1,4 +1,4 @@
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal, Button, Form, ListGroup } from 'react-bootstrap';
 import API from '../../API.mjs';
 import PropTypes from 'prop-types';
@@ -9,15 +9,15 @@ const ListDocumentLink = (props) => {
   const [errors, setErrors] = useState({});
   const [item, setItem] = useState({ document: "", type: "" });
   const [links, setLinks] = useState([]);
-  const [filteredItems,setItems]=useState([]);
+  const [items, setItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  useEffect(()=>{
-    const getDocs = async()=>{
+  useEffect(() => {
+    const getDocs = async () => {
       const docs = await API.getAllDocs();
       setItems(docs)
     }
     getDocs()
-  },[]) 
+  }, [])
   const handleSubmit = () => {
     const newErrors = {};
 
@@ -33,9 +33,9 @@ const ListDocumentLink = (props) => {
     }
 
     setErrors({});
-    for (let link of links){
-      API.SetDocumentsConnection(props.title.title,link.document,link.type)
-  }
+    for (let link of links) {
+      API.SetDocumentsConnection(props.title.title, link.document, link.type)
+    }
 
     setItem({ document: "", type: "" })
     setLinks([]);
@@ -91,17 +91,17 @@ const ListDocumentLink = (props) => {
             <div className="col-4">
               <Form.Label className="custom-label-color">Document:</Form.Label>
               <Form.Select className="mb-3" name="document" onChange={handleChange} isInvalid={!!errors.document}>
-                    <option value="">Select a doc</option>
-                    {filteredItems.filter((item) => item.title !== props.title.title).filter((doc) => !searchQuery || doc.title.toLowerCase().includes(searchQuery.toLowerCase())).map((item) => (
-                      <option key={item.title} value={item.title}>{item.title}</option>
-                    ))}
-                  </Form.Select>
+                <option value="">Select a doc</option>
+                {items.filter((item) => item.title !== props.title.title).filter((doc) => !searchQuery || doc.title.toLowerCase().includes(searchQuery.toLowerCase())).map((item) => (
+                  <option key={item.title} value={item.title}>{item.title}</option>
+                ))}
+              </Form.Select>
               <Form.Control
-                    type="text"
-                    placeholder="Search title..."
-                    value={searchQuery}
-                    onChange={(e)=>setSearchQuery(e.target.value)}
-                  />
+                type="text"
+                placeholder="Search title..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
               <Form.Control.Feedback type="invalid">
                 {errors.document}
               </Form.Control.Feedback>
@@ -135,16 +135,17 @@ const ListDocumentLink = (props) => {
         </Form.Group>
 
         <br /><ListGroup>
-          {links.map((link, index) => (
-            <ListGroup.Item key={index}
+          {links.map((link) => (
+            <ListGroup.Item key={`${link.document}-${link.type}`}
               className="d-flex justify-content-between align-items-center"
               style={{ fontSize: '0.7rem' }}>
               <div>{link.document} - {link.type}</div>
-              <span
-                onClick={() => handleDeleteLink(index)}
+              <button
+                onClick={() => handleDeleteLink(links.findIndex(l => l === link))}
+                className="btn btn-link p-0 text-black"
               >
                 <i className="bi bi-x"></i>
-              </span>
+              </button>
             </ListGroup.Item>
           ))}
         </ListGroup>
