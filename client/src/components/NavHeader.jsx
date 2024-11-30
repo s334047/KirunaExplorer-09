@@ -14,7 +14,7 @@ function NavHeader(props) {
                         <Nav className="me-auto">
                             <Nav.Link href="/">Map</Nav.Link>
                             <Nav.Link href="/documents">Documents</Nav.Link>
-                            <Nav.Link>Diagram</Nav.Link>
+                            <Nav.Link href="/diagram">Diagram</Nav.Link>
                         </Nav>
                     </Navbar.Collapse>
                 </>}

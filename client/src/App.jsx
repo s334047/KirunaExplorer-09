@@ -14,11 +14,13 @@ import API from '../API.mjs'
 import AddDocument from './components/AddDocument';
 import DocumentTable from './components/ListDocuments';
 import ModifyGeoreference from './components/ModifyGeorefernce';
+import Diagram from './components/Diagram';
+import Diagramma from './components/Diagramma';
 
 function App() {
   const [showAddLink, setShowAddLink] = useState(false) //state for showing the modal for linking documents
   const [excludeDoc, setExcludeDoc] = useState({});
-  const[message, setMessage] = useState('');
+  const [message, setMessage] = useState('');
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState({})
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -27,16 +29,16 @@ function App() {
 
   useEffect(() => {
     API.getUserInfo()
-        .then(user => {
-            setLoggedIn(true);
-            setUser(user); 
-        }).catch(e => {
-            if(loggedIn)
-                setFeedbackFromError(e);
-            setLoggedIn(false); 
-            setUser('');
-        });
-}, []);
+      .then(user => {
+        setLoggedIn(true);
+        setUser(user);
+      }).catch(e => {
+        if (loggedIn)
+          setFeedbackFromError(e);
+        setLoggedIn(false);
+        setUser('');
+      });
+  }, []);
 
 
   const handleLogin = async (credentials) => {
@@ -44,11 +46,11 @@ function App() {
       const user = await API.logIn(credentials);
       setLoggedIn(true);
       setShowLoginModal(false);
-      setMessage({msg: `Benvenuto, ${user.username}!`, type:'success'});
+      setMessage({ msg: `Benvenuto, ${user.username}!`, type: 'success' });
       setUser(user);
       setAuthFailed(false);
     } catch (err) {
-      setMessage({msg:`Incorrect username or password`, type: 'alert'});
+      setMessage({ msg: `Incorrect username or password`, type: 'alert' });
     }
   };
   const handleLogout = async () => {
@@ -64,29 +66,30 @@ function App() {
     <Routes>
       <Route element={
         <>
-          <NavHeader loggedIn={loggedIn} logout={handleLogout} setShow={() => setShowLoginModal(true)}/>
+          <NavHeader loggedIn={loggedIn} logout={handleLogout} setShow={() => setShowLoginModal(true)} />
           <Container fluid className='mt-3 justify-content-center align-items-center'>
             <Outlet />
           </Container>
         </>
       }>
         <Route index element={<>
-          <MapViewer user={user}  setTitle={setExcludeDoc}  showAddLink={showAddLink} setShowAddLink={setShowAddLink}/>
+          <MapViewer user={user} setTitle={setExcludeDoc} showAddLink={showAddLink} setShowAddLink={setShowAddLink} />
           <ListDocumentLink title={excludeDoc} show={showAddLink} setShow={setShowAddLink} />
-          <LoginComponent message={message} login={handleLogin} show={showLoginModal} setShow={setShowLoginModal}/>
+          <LoginComponent message={message} login={handleLogin} show={showLoginModal} setShow={setShowLoginModal} />
         </>
         }
         >
         </Route>
-        <Route path='/addArea' element={<AddArea/>}/>
-        <Route path='/addDoc' element={<AddDocument/>}/>
-        <Route path='/modifyGeoreference' element={<ModifyGeoreference doc={excludeDoc}/>}/>
+        <Route path='/addArea' element={<AddArea />} />
+        <Route path='/addDoc' element={<AddDocument />} />
+        <Route path='/modifyGeoreference' element={<ModifyGeoreference doc={excludeDoc} />} />
+        {user.role === "Urban Planner" && <Route path='/diagram' element={<Diagramma />} />}
 
         {user.role === 'Urban Planner' && <Route path='/documents' element={<>
-          <DocumentTable user={user} setTitle={setExcludeDoc} showAddLink={showAddLink}setShowAddLink={setShowAddLink}/>
-          <ListDocumentLink  title={excludeDoc} show={showAddLink} setShow={setShowAddLink} />
-          </>
-          }></Route>}
+          <DocumentTable user={user} setTitle={setExcludeDoc} showAddLink={showAddLink} setShowAddLink={setShowAddLink} />
+          <ListDocumentLink title={excludeDoc} show={showAddLink} setShow={setShowAddLink} />
+        </>
+        }></Route>}
       </Route>
     </Routes>
   );
