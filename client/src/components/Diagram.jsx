@@ -8,8 +8,8 @@ const Diagram = () => {
     const [links, setLinks] = useState([]);
 
     useEffect(() => {
-        //   Clear the SVG content before appending new elements
-        //   Cannot put it inside of the use effect
+        // Clear the SVG content before appending new elements
+        // Cannot put it inside of the use effect
         d3.select("#Diagram").selectAll("*").remove();
         // Carica i dati dal file CSV
         d3.csv("/suits.csv").then((data) => {
