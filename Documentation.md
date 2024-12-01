@@ -152,6 +152,8 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
 - **Response**:
   - Returns `200 OK` on successful logout.
 
+---
+
 ## Document Endpoints
 
 ### POST /api/documents
@@ -163,13 +165,28 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
   - `scale` (string): Scale of the document.
   - `date` (string): Date of the document.
   - `type` (string): Type of document.
-  - `language` (string): Language of the document.
-  - `page` (number): Number of pages in the document.
-  - `coordinate` (array of numbers): Geographic coordinates related to the document.
+  - `language` (string): Language of the document (optional).
+  - `page` (number): Number of pages in the document (optional).
+  - `coordinate` (array of numbers): Geographic coordinates related to the document (optional).
+  - `area` (string): Name of the associated area (optional).
   - `description` (string): Brief description of the document.
 - **Response**:
   - Returns `201 Created` on success.
   - Returns `503 Service Unavailable` if an error occurs.
+
+### GET /api/documents
+
+- **Description**: Retrieves all documents in the database.
+- **Response**:
+  - Returns an array of documents.
+
+### GET /api/documents/areas/:name
+
+- **Description**: Retrieves all documents associated with a specific area.
+- **Path Parameter**:
+  - `name` (string): Name of the area.
+- **Response**:
+  - Returns an array of document titles linked to the specified area.
 
 ### PUT /api/documents/area
 
@@ -181,13 +198,77 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
   - Returns `200 OK` on success.
   - Returns `503 Service Unavailable` if an error occurs.
 
-### GET /api/documents
+---
 
-- **Description**: Retrieves all documents in the database.
+## Connection Endpoints
+
+### POST /api/connections
+
+- **Description**: Creates a new connection between two documents.
+- **Request Body**:
+  - `SourceDocument` (string): Title of the source document.
+  - `TargetDocument` (string): Title of the target document.
+  - `ConnectionType` (string): Type of connection (e.g., "Direct Consequence").
 - **Response**:
-  - Returns an array of documents.
+  - Returns `200 OK` on success.
+  - Returns `409 Conflict` if the connection is duplicate.
+  - Returns `404 Not Found` if the source or target document is not found.
+  - Returns `503 Service Unavailable` if an error occurs.
 
-  ## API Original Resources  
+### GET /api/connections/:SourceDoc
+
+- **Description**: Retrieves all connections starting from a given source document.
+- **Path Parameter**:
+  - `SourceDoc` (string): Title of the source document.
+- **Response**:
+  - Returns an array of connections linked to the specified source document.
+  - Returns `404 Not Found` if the source document does not exist.
+
+### GET /api/connections/info/:SourceDocId
+
+- **Description**: Retrieves detailed information about all connections starting from a specific source document by its ID.
+- **Path Parameter**:
+  - `SourceDocId` (number): ID of the source document.
+- **Response**:
+  - Returns an array of detailed connection information.
+
+---
+
+## Area Endpoints
+
+### POST /api/areas
+
+- **Description**: Adds a new area to the database.
+- **Authentication**: Requires the user to be logged in.
+- **Request Body**:
+  - `name` (string): Name of the area.
+  - `vertex` (array of arrays of numbers): List of vertices defining the area.
+- **Response**:
+  - Returns `201 Created` on success with a message indicating the area was added.
+  - Returns `503 Service Unavailable` if an error occurs.
+
+### GET /api/areas
+
+- **Description**: Retrieves all areas from the database.
+- **Response**:
+  - Returns an array of areas.
+
+### PUT /api/modifyGeoreference
+
+- **Description**: Modifies the georeference (coordinates or area) of a document.
+- **Request Body**:
+  - `name` (string): Name of the document.
+  - `coord` (array): New coordinates.
+  - `oldCoord` (array): Old coordinates.
+  - `area` (string): New area name (optional).
+  - `oldArea` (string): Old area name (optional).
+- **Response**:
+  - Returns `200 OK` on success.
+  - Returns `503 Service Unavailable` if an error occurs.
+
+---
+
+## Original Resources Endpoints
 
 ### POST /api/originalResources
 
@@ -211,8 +292,6 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
   - Each resource contains:
     - `id` (number): ID of the resource.
     - `name` (string): Name of the resource file.
-    - `type` (string): MIME type of the file (e.g., "application/pdf").
-    - `content` (string): Base64-encoded content of the file.
   - Returns `503 Service Unavailable` if an error occurs.
 
 ### GET /api/originalResources/download/:id
@@ -224,60 +303,3 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
   - Returns the binary content of the file with appropriate headers.
   - Returns `404 Not Found` if the file is missing.
   - Returns `503 Service Unavailable` if an error occurs.
-
-## Area Endpoints
-
-### POST /api/areas
-
-- **Description**: Adds a new area to the database.
-- **Authentication**: Requires the user to be logged in.
-- **Request Body**:
-  - `name` (string): Name of the area.
-  - `vertex` (array of arrays of numbers): List of vertices defining the area.
-- **Response**:
-  - Returns `201 Created` on success with a message indicating the area was added.
-  - Returns `503 Service Unavailable` if an error occurs.
-
-### GET /api/areas
-
-- **Description**: Retrieves all areas from the database.
-- **Response**:
-  - Returns an array of areas.
-
-### GET /api/area/docs/:name
-
-- **Description**: Retrieves all documents associated with a specific area.
-- **Path Parameter**:
-  - `name` (string): Name of the area.
-- **Response**:
-  - Returns an array of document titles linked to the specified area.
-
-## Connection Endpoints
-
-### POST /api/connections
-
-- **Description**: Creates a new connection between two documents.
-- **Request Body**:
-  - `SourceDocument` (string): Title of the source document.
-  - `TargetDocument` (string): Title of the target document.
-  - `ConnectionType` (string): Type of connection (e.g., "Direct Consequence").
-- **Response**:
-  - Returns `200 OK` on success.
-  - Returns `503 Service Unavailable` if an error occurs.
-
-### GET /api/connections/:SourceDoc
-
-- **Description**: Retrieves all connections starting from a given source document.
-- **Path Parameter**:
-  - `SourceDoc` (string): Title of the source document.
-- **Response**:
-  - Returns an array of connections linked to the specified source document.
-
-## User Information Endpoints
-
-### GET /api/sessions/current
-
-- **Description**: Retrieves information about the logged-in user.
-- **Response**:
-  - Returns user information if the user is authenticated.
-  - Returns `401 Unauthorized` if the user is not authenticated.
