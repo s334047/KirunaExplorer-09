@@ -2,8 +2,11 @@ import { useState, useEffect } from "react";
 import * as d3 from "d3";
 
 const Diagram = () => {
-    const width = 928;
-    const height = 600;
+    // const width = 928;
+    // const height = 600;
+    const height = document.documentElement.clientHeight * 0.9;
+    const width = document.documentElement.clientWidth;
+
     const [nodes, setNodes] = useState([]);
     const [links, setLinks] = useState([]);
 
@@ -91,7 +94,8 @@ const Diagram = () => {
                 node.attr("transform", (d) => `translate(${d.x},${d.y})`);
             });
         });
-    }, []);
+        // set invalidation
+    }, [height, width]);
 
     const dragStarted = (event, d, simulation) => {
         if (!event.active) simulation.alphaTarget(0.3).restart();
