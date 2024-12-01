@@ -23,16 +23,17 @@ describe("UserDao", () => {
         jest.resetAllMocks();
     });
 
-    describe("getUser", () => {
-        test("should return a user object if username and password are correct", async () => {
-            const mockRow = {
-                Id: 1,
-                Username: "testuser",
-                Password: "hashedpassword",
-                Salt: "salt",
-                Role: "user",
-            };
+    const mockRow = {
+        Id: 1,
+        Username: "testuser",
+        Password: "hashedpassword",
+        Salt: "salt",
+        Role: "user",
+    };
 
+    describe("getUser", () => {
+        
+        test("should return a user object if username and password are correct", async () => {
             jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
                 return callback(null, mockRow);
             });
@@ -57,16 +58,15 @@ describe("UserDao", () => {
         });
 
         test("should return false if salt is not present in the database", async () => {
-            const mockRow = {
+            const mockWithoutSalt = {
                 Id: 1,
                 Username: "testuser",
                 Password: "hashedpassword",
-                Salt: null,
                 Role: "user",
             };
 
             jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
-                return callback(null, mockRow);
+                return callback(null, mockWithoutSalt);
             });
 
             const result = await userDao.getUser("testuser", "password");
@@ -74,14 +74,6 @@ describe("UserDao", () => {
         });
 
         test("should return false if password is incorrect", async () => {
-            const mockRow = {
-                Id: 1,
-                Username: "testuser",
-                Password: "hashedpassword",
-                Salt: "salt",
-                Role: "user",
-            };
-
             jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
                 return callback(null, mockRow);
             });
@@ -97,14 +89,6 @@ describe("UserDao", () => {
         });
 
         test("should handle error during crypto.scrypt", async () => {
-            const mockRow = {
-                Id: 1,
-                Username: "testuser",
-                Password: "hashedpassword",
-                Salt: "salt",
-                Role: "user",
-            };
-
             jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
                 return callback(null, mockRow);
             });

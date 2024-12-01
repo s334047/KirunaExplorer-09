@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe("POST /api/sessions", () => {
-  const mockUser = { username: "testuser", password: "password" };
+  const mockUser = { username: process.env.MOCK_USERNAME, password: process.env.MOCK_PASSWORD };
 
   test("should return 200 for successful login", async () => {
     jest.spyOn(Authenticator.prototype, "login").mockImplementation((req, res) => {
