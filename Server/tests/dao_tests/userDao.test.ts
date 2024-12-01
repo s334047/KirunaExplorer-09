@@ -1,7 +1,7 @@
+import { afterEach, beforeEach, describe, expect, jest, test } from "@jest/globals";
+import crypto from "crypto";
 import DaoUser from "../../Dao/daoUser.ts";
 import { db } from "../../DB/db.ts";
-import { describe, test, expect, jest, beforeEach, afterEach, } from "@jest/globals";
-import crypto from "crypto";
 
 jest.mock("sqlite3");
 jest.mock("crypto");
@@ -30,23 +30,21 @@ describe("UserDao", () => {
                 Username: "testuser",
                 Password: "hashedpassword",
                 Salt: "salt",
-                Role: "user"
+                Role: "user",
             };
 
             jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
-                // console.log("CALLBACK:\t" + callback);
                 return callback(null, mockRow);
             });
 
-            jest.spyOn(crypto, "scrypt").mockImplementation((password, salt, keylen) => {
-                return Buffer.from("hashedpassword", 'hex');
+            jest.spyOn(crypto, "scrypt").mockImplementation((password, salt, keylen, callback) => {
+                (callback as any)(null, Buffer.from("hashedpassword", "hex"));
             });
 
             jest.spyOn(crypto, "timingSafeEqual").mockReturnValue(true);
 
-            const result = userDao.getUser("testuser", "password");
-            // result is instance of Promise, but not User
-            expect(result).toBeInstanceOf(Promise);
+            const result = await userDao.getUser("testuser", "password");
+            expect(result).toEqual(expect.objectContaining({ username: "testuser", role: "user" }));
         });
 
         test("should return false if username does not exist", async () => {
@@ -58,29 +56,64 @@ describe("UserDao", () => {
             expect(result).toBe(false);
         });
 
+        test("should return false if salt is not present in the database", async () => {
+            const mockRow = {
+                Id: 1,
+                Username: "testuser",
+                Password: "hashedpassword",
+                Salt: null,
+                Role: "user",
+            };
+
+            jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
+                return callback(null, mockRow);
+            });
+
+            const result = await userDao.getUser("testuser", "password");
+            expect(result).toBe(false);
+        });
+
         test("should return false if password is incorrect", async () => {
             const mockRow = {
                 Id: 1,
                 Username: "testuser",
                 Password: "hashedpassword",
                 Salt: "salt",
-                Role: "user"
+                Role: "user",
             };
 
             jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
-                // console.log("CALLBACK:\t" + callback);
                 return callback(null, mockRow);
             });
 
-            jest.spyOn(crypto, "scrypt").mockImplementation((password, salt, keylen) => {
-                return Buffer.from("hashedpassword", 'hex');
+            jest.spyOn(crypto, "scrypt").mockImplementation((password, salt, keylen, callback) => {
+                (callback as any)(null, Buffer.from("differenthashedpassword", "hex"));
             });
 
             jest.spyOn(crypto, "timingSafeEqual").mockReturnValue(false);
-            console.log("FIN QUA OKAY");
-            const result = userDao.getUser("testuser", "password");
-            // should result false, but it's undefined
-            expect(result).toBeInstanceOf(Promise);
+
+            const result = await userDao.getUser("testuser", "password");
+            expect(result).toBe(false);
+        });
+
+        test("should handle error during crypto.scrypt", async () => {
+            const mockRow = {
+                Id: 1,
+                Username: "testuser",
+                Password: "hashedpassword",
+                Salt: "salt",
+                Role: "user",
+            };
+
+            jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
+                return callback(null, mockRow);
+            });
+
+            jest.spyOn(crypto, "scrypt").mockImplementation((password, salt, keylen, callback) => {
+                (callback as any)(new Error("Crypto error"), null);
+            });
+
+            await expect(userDao.getUser("testuser", "password")).rejects.toThrow("Crypto error");
         });
 
         test("should reject with an error if there is a database error", async () => {
