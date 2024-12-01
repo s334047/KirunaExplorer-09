@@ -45,8 +45,7 @@ const Barchart = () => {
                 .range([0, width])
                 .domain(data.map((d) => d.Country))
                 .padding(0.2);
-            svg
-                .append("g")
+            svg.append("g")
                 .attr("transform", `translate(0, ${height})`)
                 .call(d3.axisBottom(x))
                 .selectAll("text")
@@ -58,8 +57,7 @@ const Barchart = () => {
             svg.append("g").call(d3.axisLeft(y));
 
             // Bars
-            svg
-                .selectAll("mybar")
+            svg.selectAll("mybar")
                 .data(data)
                 .join("rect")
                 .attr("x", (d) => x(d.Country))
