@@ -26,6 +26,11 @@
   border: 1px solid rgba(0, 0, 0, 1);
 }
 
+.custom-checkbox .form-check-input:checked {
+  background-color: #154109;
+  border-color: #154109;
+}
+
 .custom-label-color {
   color: #154109;
   font-weight: bold;
@@ -88,6 +93,5 @@
 
 .selected-row td {
     
-    background-color: #dcede6 !important;
-    
+    background-color: #dcede6 !important;   
 }

@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 dayjs.extend(customParseFormat);
 function DescriptionComponent(props) {
   const navigate = useNavigate();
+  const [scaleType,setScaleType] = useState("Text")
   const [errors, setErrors] = useState({});
   const [mode, setMode] = useState("")
   const [year, setYear] = useState(null);
@@ -166,7 +167,15 @@ function DescriptionComponent(props) {
       [name]: value,
     });
   };
-
+  const changeScaleType = () =>{
+    if(scaleType === 'Text'){
+      setScaleType("List")
+    }
+    else if(scaleType === 'List'){
+      setScaleType("Text")
+    }
+    setFormData({ ...formData, scale:"" });
+  }
   const handleStakeholders = (e) => {
     const { value, checked } = e.target;
     let stakeholdersArray = formData.stakeholders ? formData.stakeholders.split("/") : [];
@@ -253,45 +262,59 @@ function DescriptionComponent(props) {
                     {errors.title}
                   </Form.Control.Feedback>
                 </Form.Group>
+
                 <Form.Group className="mb-3">
                   <Form.Label className="custom-label-color">Stakeholders:</Form.Label>
-                  <Form.Control
-                    as="div"
-                    isInvalid={!!errors.stakeholders} // Verifica se c'è un errore
-                  >
-                    <Dropdown>
-                      <Dropdown.Toggle id="dropdown-basic" variant="white" className="text-dark " >
-                        {formData.stakeholders ? formData.stakeholders : "Select Stakeholders"}
-                      </Dropdown.Toggle>
-
-                      <Dropdown.Menu className="custom-dropdown-menu">
-                        <Form.Check type='checkbox' label={"Kiruna kommun"} value={"Kiruna kommun"} checked={formData.stakeholders.includes("Kiruna kommun")}
-                          onChange={handleStakeholders}></Form.Check>
-                        <Form.Check type='checkbox' label={"LKAB"} value={"LKAB"} checked={formData.stakeholders.includes("LKAB")}
-                          onChange={handleStakeholders}></Form.Check>
-                        <Form.Check type='checkbox' label={"White Arkitekter"} value={"White Arkitekter"} checked={formData.stakeholders.includes("White Arkitekter")}
-                          onChange={handleStakeholders}></Form.Check>
-                        <Form.Check type='checkbox' label={"Residents"} value={"Residents"} checked={formData.stakeholders.includes("Residents")}
-                          onChange={handleStakeholders}></Form.Check>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </Form.Control>
-                  <Form.Control.Feedback type="invalid">
-                    {errors.stakeholders}
-                  </Form.Control.Feedback>
+                  <fieldset>
+                    <Row>
+                      {["Kiruna kommun", "LKAB", "White Arkitekter", "Residents"].map((stakeholder) => (
+                        <Col md={3} key={stakeholder}>
+                          <Form.Check
+                            className='custom-checkbox'
+                            key={stakeholder}
+                            type="checkbox"
+                            label={stakeholder}
+                            value={stakeholder}
+                            checked={formData.stakeholders.includes(stakeholder)}
+                            onChange={handleStakeholders}
+                          />
+                        </Col>
+                      ))}
+                    </Row>
+                    {errors.stakeholders && (
+                      <div className="invalid-feedback d-block">{errors.stakeholders}</div>
+                    )}
+                  </fieldset>
                 </Form.Group>
-
                 <Form.Group className="mb-3">
+                  <Row>
                   <Form.Label className="custom-label-color">Scale:</Form.Label>
+                  <Col md={10}>
+                  {scaleType==='Text' ?(
                   <Form.Control
                     type="text"
                     name="scale"
                     onChange={handleChange}
                     isInvalid={!!errors.scale}
-                  />
+                  />):( <Form.Select
+                    name="scale"
+                    onChange={handleChange}
+                    isInvalid={!!errors.scale}
+                  >
+                    <option value="">Select a scale</option>
+                    <option value="blueprint/effects">Blueprint/effects</option>
+                    <option value="concept">Concept</option>
+                    <option value="text">Text</option>
+                  </Form.Select>)}
                   <Form.Control.Feedback type="invalid">
                     {errors.scale}
                   </Form.Control.Feedback>
+    
+                  </Col>
+                  <Col>
+                  <Form.Switch onClick={changeScaleType}></Form.Switch>
+                  </Col>
+                  </Row>
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Row>
@@ -388,21 +411,27 @@ function DescriptionComponent(props) {
               </Form.Group>
             )}
             {currentStep === 3 && (<><Form.Group>
+              <div className="mb-3"></div>
               <div className="row">
-                <div className="col-4">
-                  <Form.Label className="custom-label-color">Document:</Form.Label>
-                  <Form.Select className="mb-3" name="document" onChange={handleChangeLink} isInvalid={!!errors.document}>
-                    <option value="">Select a doc</option>
-                    {filteredItems.filter((item) => item.title !== props.title).filter((doc) => !searchQuery || doc.title.toLowerCase().includes(searchQuery.toLowerCase())).map((item) => (
-                      <option key={item.title} value={item.title}>{item.title}</option>
-                    ))}
-                  </Form.Select>
+                <div className="col-12">
                   <Form.Control
                     type="text"
                     placeholder="Search title..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
+                </div>
+              </div>
+              <div className="mb-3"></div>
+              <div className="row">
+                <div className="col-4">
+                  <Form.Label className="custom-label-color">Document:</Form.Label>
+                  <Form.Select name="document" onChange={handleChangeLink} isInvalid={!!errors.document}>
+                    <option value="">Select a doc</option>
+                    {filteredItems.filter((item) => item.title !== props.title).filter((doc) => !searchQuery || doc.title.toLowerCase().includes(searchQuery.toLowerCase())).map((item) => (
+                      <option key={item.title} value={item.title}>{item.title}</option>
+                    ))}
+                  </Form.Select>
                   <Form.Control.Feedback type="invalid">
                     {errors.document}
                   </Form.Control.Feedback>
