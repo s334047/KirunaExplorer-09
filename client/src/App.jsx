@@ -25,6 +25,8 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState({})
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [documents, setDocuments] = useState([]);
+  const [connections, setConnections] = useState([]);
 
   const nav = useNavigate();
 
@@ -39,7 +41,7 @@ function App() {
         setLoggedIn(false);
         setUser('');
       });
-  }, []);
+  }, [loggedIn]);
 
 
   const handleLogin = async (credentials) => {
@@ -63,6 +65,20 @@ function App() {
     nav('/');
   };
 
+  useEffect(() => {
+    const fetchDocumentsAndConnections = async () => {
+      try {
+        const documents = await API.getAllDocs();
+        setDocuments(documents);
+        const allConnections =  await API.GetConnections();
+        setConnections(allConnections);
+      } catch (error) {
+        console.error('Error fetching documents and connections:', error);
+      }
+    };
+    fetchDocumentsAndConnections();
+  }, []);
+
   return (
     <Routes>
       <Route element={
@@ -84,7 +100,7 @@ function App() {
         <Route path='/addArea' element={<AddArea />} />
         <Route path='/addDoc' element={<AddDocument />} />
         <Route path='/modifyGeoreference' element={<ModifyGeoreference doc={excludeDoc} />} />
-        {user.role === "Urban Planner" && <Route path='/diagram' element={<DiagrammaNuovo />} />}
+        {user.role === "Urban Planner" && <Route path='/diagram' element={<DiagrammaNuovo documents={documents} connections={connections} />} />}
 
         {user.role === 'Urban Planner' && <Route path='/documents' element={<>
           <DocumentTable user={user} setTitle={setExcludeDoc} showAddLink={showAddLink} setShowAddLink={setShowAddLink} />

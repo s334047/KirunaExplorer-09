@@ -234,6 +234,16 @@ app.get('/api/connections/info/:SourceDocId', async (req: any, res: any) => {
     }
 });
 
+//get all the connections in the DB
+app.get('/api/connections', async (req: any, res: any) => {
+    try {
+        const connections = await daoConnection.GetConnections();
+        res.json(connections);
+    } catch (error) {
+        res.status(503).json({ error: Error });
+    }
+})
+
 
 /** Areas' APIs */
 

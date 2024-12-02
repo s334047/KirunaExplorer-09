@@ -25,18 +25,18 @@ export default class DaoConnection {
      * @param SourceDocId 
      * @returns all Connection[] from a SourceDocId
      */
-    GetDocumentConnections(SourceDocId: number){
+    GetDocumentConnections(SourceDocId: number) {
         return new Promise<number>((resolve, reject) => {
             db.get(`SELECT  COUNT(*) as n FROM Connection WHERE SourceDocId = ? OR TargetDocId = ?`, [SourceDocId, SourceDocId], (err, row: any) => {
                 if (err) {
                     reject(new Error('Database error'));
-                } else 
+                } else
                     resolve(row.n as number);
             });
         });
     };
 
-    GetDocumentInfoConnections(SourceDocId: number){
+    GetDocumentInfoConnections(SourceDocId: number) {
         return new Promise<{ id: number, title: string, type: string }[]>((resolve, reject) => {
             const query = `
                 SELECT 
@@ -67,7 +67,7 @@ export default class DaoConnection {
      * @param Title 
      * @returns DocumentId from Title
      */
-    GetDocumentsId(Title: string){
+    GetDocumentsId(Title: string) {
         return new Promise<number>((resolve, reject) => {
             db.get(`SELECT Id FROM Document WHERE Title = ?`, [Title], (err, row: any) => {
                 if (err) {
@@ -84,16 +84,31 @@ export default class DaoConnection {
      * @param TargetDocId 
      * @returns Boolean
      */
-    FindDuplicatedDocument(SourceDocId: number, TargetDocId: number, Type: string){
+    FindDuplicatedDocument(SourceDocId: number, TargetDocId: number, Type: string) {
         return new Promise<boolean>((resolve, reject) => {
             db.all(`SELECT Id FROM Connection WHERE SourceDocId = ? AND TargetDocId = ? AND Type = ?`, [TargetDocId, SourceDocId, Type], (err, rows) => {
                 if (err) {
                     reject(new Error('Database error'));
                 } else if (rows.length > 0)
-                        resolve(false);
-                    else
-                        resolve(true);
+                    resolve(false);
+                else
+                    resolve(true);
             });
         });
     };
+    /**
+     * Gets all the connections from the database
+     * @returns Connection[]
+     */
+    GetConnections() {
+        return new Promise<{ SourceDocId: number, TargetDocId: number, Type: string }[]>((resolve, reject) => {
+            db.all(`SELECT SourceDocId, TargetDocId, Type FROM Connection`, (err, rows: { SourceDocId: number, TargetDocId: number, Type: string }[]) => {
+                if (err) {
+                    reject(new Error('Database error'));
+                }
+                else
+                    resolve(rows);
+            });
+        });
+    }
 }

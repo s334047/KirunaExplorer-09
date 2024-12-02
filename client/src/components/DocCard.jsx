@@ -32,7 +32,7 @@ function DocumentCard({ selectedDoc, setSelectedDoc, user, excludeTitle }) {
                     <Col md={6} >
                         <ul style={{ listStyleType: 'none', paddingLeft: '30px' }}>
                             <li><strong>Title:</strong> {selectedDoc.title}</li>
-                            <li><strong>Stakehooolder:</strong> {selectedDoc.stakeholder}</li>
+                            <li><strong>Stakeholder:</strong> {selectedDoc.stakeholder}</li>
                             <li><strong>Scale:</strong> {selectedDoc.scale}</li>
                             <li><strong>Date:</strong> {selectedDoc.date}</li>
                             <li><strong>Type:</strong> {selectedDoc.type}</li>

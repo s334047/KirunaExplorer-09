@@ -61,6 +61,15 @@ async function GetDocumentInfoConnections(SourceDocumentId) { // SourceDocument 
   }).then(response => response.json())
 }
 
+async function GetConnections() {
+  return await fetch(`${SERVER_URL}/connections`, {
+    method: 'GET',
+    headers: {
+      'Content-type': 'application/json'
+    },
+  }).then(response => response.json())
+}
+
 /** API Areas */
 async function addAreaToDoc(title, area) {   //add an area to a document
   return await fetch(`${SERVER_URL}/documents/area`, {
@@ -216,6 +225,6 @@ const logOut = async () => {
 }
 
 
-const API = { addDocument, SetDocumentsConnection, GetDocumentConnections, GetDocumentInfoConnections, addAreaToDoc, getAllAreas, addArea, getAllDocs, getAreasDoc, modifyGeoreference, addOriginalResource, getOriginalResources, downloadResource, logIn, getUserInfo, logOut };
+const API = { addDocument, SetDocumentsConnection, GetDocumentConnections, GetDocumentInfoConnections, GetConnections, addAreaToDoc, getAllAreas, addArea, getAllDocs, getAreasDoc, modifyGeoreference, addOriginalResource, getOriginalResources, downloadResource, logIn, getUserInfo, logOut };
 
 export default API;
