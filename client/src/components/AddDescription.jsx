@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 dayjs.extend(customParseFormat);
 function DescriptionComponent(props) {
   const navigate = useNavigate();
+  const [scaleType,setScaleType] = useState("Text")
   const [errors, setErrors] = useState({});
   const [mode, setMode] = useState("")
   const [year, setYear] = useState(null);
@@ -166,7 +167,15 @@ function DescriptionComponent(props) {
       [name]: value,
     });
   };
-
+  const changeScaleType = () =>{
+    if(scaleType === 'Text'){
+      setScaleType("List")
+    }
+    else if(scaleType === 'List'){
+      setScaleType("Text")
+    }
+    setFormData({ ...formData, scale:"" });
+  }
   const handleStakeholders = (e) => {
     const { value, checked } = e.target;
     let stakeholdersArray = formData.stakeholders ? formData.stakeholders.split("/") : [];
@@ -277,18 +286,35 @@ function DescriptionComponent(props) {
                     )}
                   </fieldset>
                 </Form.Group>
-
                 <Form.Group className="mb-3">
+                  <Row>
                   <Form.Label className="custom-label-color">Scale:</Form.Label>
+                  <Col md={10}>
+                  {scaleType==='Text' ?(
                   <Form.Control
                     type="text"
                     name="scale"
                     onChange={handleChange}
                     isInvalid={!!errors.scale}
-                  />
+                  />):( <Form.Select
+                    name="scale"
+                    onChange={handleChange}
+                    isInvalid={!!errors.scale}
+                  >
+                    <option value="">Select a scale</option>
+                    <option value="blueprint/effects">Blueprint/effects</option>
+                    <option value="concept">Concept</option>
+                    <option value="text">Text</option>
+                  </Form.Select>)}
                   <Form.Control.Feedback type="invalid">
                     {errors.scale}
                   </Form.Control.Feedback>
+    
+                  </Col>
+                  <Col>
+                  <Form.Switch onClick={changeScaleType}></Form.Switch>
+                  </Col>
+                  </Row>
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Row>
