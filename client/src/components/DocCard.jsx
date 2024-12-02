@@ -83,7 +83,6 @@ function DocumentCard({ selectedDoc, setSelectedDoc, user, excludeTitle }) {
 DocumentCard.propTypes = {
     selectedDoc: PropTypes.object.isRequired,
     setSelectedDoc: PropTypes.func.isRequired,
-    setShowAddLink: PropTypes.func.isRequired,
     user: PropTypes.object.isRequired,
     excludeTitle: PropTypes.func.isRequired,
 }

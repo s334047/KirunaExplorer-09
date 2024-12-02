@@ -52,8 +52,7 @@ function DocumentTable() {
                                 style={{ color: "#154109", borderColor: "#154109" }}
                                 onClick={() => { setSearchMode("Advanced"); setSearchDoc(""); }}
                             >
-                                <i className="bi bi-sliders me-2"></i>
-                                Advanced
+                                <i className="bi bi-sliders me-2">&nbsp;Advanced</i>
                             </Button>
                         </Col>
                     </Row>}
@@ -137,7 +136,7 @@ function DocumentTable() {
                                         setSearchType(""); setSearchLanguage(""); setSearchScale("");
                                     }}
                                 >
-                                    <i className="bi bi-arrow-counterclockwise me-2"> Default</i>
+                                    <i className="bi bi-arrow-counterclockwise me-2">&nbsp;Default</i>
                                 </Button>
                             </Col>
                         </Row>

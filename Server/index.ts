@@ -2,9 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
 import multer from 'multer';
-import path from 'path';
 import fs from 'fs';
-import mime from 'mime-types';
 import { check, validationResult } from 'express-validator';
 import DaoDocument from './Dao/documentDao.ts';
 import DaoConnection from './Dao/connectionDao.ts';
@@ -12,7 +10,7 @@ import DaoArea from './Dao/areaDao.ts';
 import DaoResource from './Dao/resourceDao.ts';
 import Authenticator from './auth.ts';
 import Resource from './Components/Resource.ts';
-import { dirname, resolve } from 'path';
+import path, { dirname, resolve } from 'path';
 
 
 const daoDocument = new DaoDocument();

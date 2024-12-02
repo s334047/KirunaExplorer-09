@@ -1,9 +1,9 @@
 export default class Resource {
-    id: Number
+    id: number
     path: string
-    docId: Number
+    docId: number
 
-    constructor(id: Number, path: string, docId: Number){
+    constructor(id: number, path: string, docId: number){
         this.id = id
         this.path = path
         this.docId = docId
