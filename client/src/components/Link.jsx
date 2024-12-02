@@ -88,20 +88,25 @@ const ListDocumentLink = (props) => {
 
         <Form.Group>
           <div className="row">
-            <div className="col-4">
-              <Form.Label className="custom-label-color">Document:</Form.Label>
-              <Form.Select className="mb-3" name="document" onChange={handleChange} isInvalid={!!errors.document}>
-                <option value="">Select a doc</option>
-                {items.filter((item) => item.title !== props.title.title).filter((doc) => !searchQuery || doc.title.toLowerCase().includes(searchQuery.toLowerCase())).map((item) => (
-                  <option key={item.title} value={item.title}>{item.title}</option>
-                ))}
-              </Form.Select>
+            <div className="col-12">
               <Form.Control
                 type="text"
                 placeholder="Search title..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
+            </div>
+          </div>
+          <div className="mb-3"></div>
+          <div className="row">
+            <div className="col-4">
+              <Form.Label className="custom-label-color">Document:</Form.Label>
+              <Form.Select name="document" onChange={handleChange} isInvalid={!!errors.document}>
+                <option value="">Select a doc</option>
+                {items.filter((item) => item.title !== props.title.title).filter((doc) => !searchQuery || doc.title.toLowerCase().includes(searchQuery.toLowerCase())).map((item) => (
+                  <option key={item.title} value={item.title}>{item.title}</option>
+                ))}
+              </Form.Select>
               <Form.Control.Feedback type="invalid">
                 {errors.document}
               </Form.Control.Feedback>
