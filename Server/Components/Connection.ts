@@ -1,9 +1,9 @@
 export class Connection {
-    SourceDocId: Number
-    TargetDocId: Number
-    Type: String
+    SourceDocId: number
+    TargetDocId: number
+    Type: string
 
-    constructor(SourceDocId: Number, TargetDocId: Number, Type: String){
+    constructor(SourceDocId: number, TargetDocId: number, Type: string){
         this.SourceDocId = SourceDocId
         this.TargetDocId = TargetDocId
         this.Type = Type

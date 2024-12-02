@@ -1,5 +1,5 @@
 import { db } from "../DB/db.ts";
-import { User, UserRole } from "../Components/User.ts";
+import { User } from "../Components/User.ts";
 import crypto from "crypto";
 
 export default class UserDao {
@@ -17,7 +17,7 @@ export default class UserDao {
                     return reject(err);
                 }
 
-                if (!row || !row.Salt) {
+                if (!row?.Salt) {
                     return resolve(false);
                 }
 
