@@ -201,6 +201,7 @@ function MapViewer(props) {
                         setSelectedDoc={setSelectedDoc}
                         setShowAddLink={props.setShowAddLink}
                         user={props.user}
+                        mode='map'
                         excludeTitle={props.setTitle}
                     />
                 </div>

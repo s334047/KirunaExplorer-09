@@ -100,7 +100,7 @@ function App() {
         <Route path='/addArea' element={<AddArea />} />
         <Route path='/addDoc' element={<AddDocument />} />
         <Route path='/modifyGeoreference' element={<ModifyGeoreference doc={excludeDoc} />} />
-        {user.role === "Urban Planner" && <Route path='/diagram' element={<DiagrammaNuovo documents={documents} connections={connections} />} />}
+        {user.role === "Urban Planner" && <Route path='/diagram' element={<DiagrammaNuovo setTitle={setExcludeDoc} documents={documents} user={user} connections={connections} />} />}
 
         {user.role === 'Urban Planner' && <Route path='/documents' element={<>
           <DocumentTable user={user} setTitle={setExcludeDoc} showAddLink={showAddLink} setShowAddLink={setShowAddLink} />

@@ -1,12 +1,14 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
+import DocumentCard from "./DocCard";
 
-const TimelineDiagram = ({ documents, connections }) => {
+const TimelineDiagram = ({ documents, user, setTitle, connections }) => {
     const svgRef = useRef(null);
     const height = document.documentElement.clientHeight * 0.9;
     const width = document.documentElement.clientWidth;
+    const [selectedDoc, setSelectedDoc] = useState(null);
 
     useEffect(() => {
         const margin = { top: 20, right: 50, bottom: 50, left: 70 };
@@ -14,7 +16,7 @@ const TimelineDiagram = ({ documents, connections }) => {
         const circleRadius = 10;
         const linePadding = 30; // Maggiore distanza tra le linee
         const minLineDistance = 30; // Distanza minima tra la linea e i cerchi (per evitare intersezioni)
-    
+
         // Parsing e formattazione delle date
         documents.forEach((doc) => {
             if (dayjs(doc.date, "DD-MM-YYYY", true).isValid()) {
@@ -25,12 +27,12 @@ const TimelineDiagram = ({ documents, connections }) => {
                 doc.date = dayjs(doc.date, "YYYY").toDate();
             }
         });
-    
+
         const xScale = d3
             .scaleTime()
             .domain(d3.extent(documents, (d) => d.date))
             .range([margin.left, width - margin.right]);
-    
+
         // Assegna le righe (posizioni y)
         const assignedRows = {};
         documents.forEach((doc) => {
@@ -46,40 +48,40 @@ const TimelineDiagram = ({ documents, connections }) => {
             }
             assignedRows[doc.id] = { ...doc, row };
         });
-    
+
         const maxRow = Math.max(...Object.values(assignedRows).map((d) => d.row));
         const adjustedHeight = margin.top + (maxRow + 1) * rowHeight + margin.bottom;
-    
+
         const yScale = d3
             .scaleLinear()
             .domain([0, maxRow])
             .range([margin.top, adjustedHeight - margin.bottom]);
-    
+
         const svgElement = svgRef.current;
         if (!svgElement) return;
-    
+
         const svg = d3.select(svgElement).attr("width", width).attr("height", adjustedHeight);
         svg.selectAll("*").remove();
-    
+
         // Aggiungi assi
         const xAxis = d3.axisBottom(xScale).ticks(10);
         svg.append("g")
             .attr("class", "x-axis")
             .attr("transform", `translate(0, ${adjustedHeight - margin.bottom})`)
             .call(xAxis);
-    
+
         const yAxis = d3.axisLeft(yScale).ticks(maxRow);
         svg.append("g")
             .attr("class", "y-axis")
             .attr("transform", `translate(${margin.left}, 0)`)
             .call(yAxis);
-    
+
         // Raggruppa le connessioni per coppia sorgente-destinatario
         const groupedConnections = d3.group(
             connections,
             (d) => `${d.source}-${d.target}`
         );
-    
+
         // Aggiungi curve Bézier per le connessioni
         svg.append("g")
             .attr("class", "connections")
@@ -89,17 +91,17 @@ const TimelineDiagram = ({ documents, connections }) => {
             .attr("d", (d, index, nodes) => {
                 const group = groupedConnections.get(`${d.source}-${d.target}`);
                 const offset = (index - (group.length - 1) / 2) * linePadding; // Spazio tra linee
-    
+
                 // Calcola la distanza minima tra la curva e i cerchi
                 const ySource = yScale(assignedRows[d.source].row);
                 const yTarget = yScale(assignedRows[d.target].row);
-    
+
                 // Distanza tra i cerchi per evitare che le linee intersechino i pallini
                 const distanceFromCircle = Math.abs(ySource - yTarget);
-    
+
                 // Assicurati che la curva non intersechi i cerchi, calcolando un offset
                 const adjustedControlOffset = Math.max(minLineDistance, Math.abs(offset));
-    
+
                 // Calcola il punto di controllo per la curva, che curverà verso il basso
                 return d3.line()
                     .x((d) => d[0])
@@ -109,7 +111,7 @@ const TimelineDiagram = ({ documents, connections }) => {
                         [
                             (xScale(assignedRows[d.source].date) +
                                 xScale(assignedRows[d.target].date)) /
-                                2,
+                            2,
                             (ySource + yTarget) / 2 + adjustedControlOffset, // Curvatura verso il basso
                         ],
                         [xScale(assignedRows[d.target].date), yTarget],
@@ -119,7 +121,7 @@ const TimelineDiagram = ({ documents, connections }) => {
             .attr("stroke-width", 2)
             .attr("fill", "none")
             .attr("marker-end", "url(#arrow)");
-    
+
         // Aggiungi cerchi per i documenti
         svg.append("g")
             .attr("class", "documents")
@@ -130,18 +132,25 @@ const TimelineDiagram = ({ documents, connections }) => {
             .attr("cy", (d) => yScale(d.row))
             .attr("r", circleRadius)
             .attr("fill", "blue")
-            .on("click", (_,d) => {
-                // Event handler for click on the circle
-                alert(`Document clicked: ${d.title}`);
-                // Here you can add further logic to handle the click, like opening a modal or navigating
+            .on("click", (_, d) => {
+                setSelectedDoc(d);
             });
     }, [width, height, documents, connections]);
-    
-    
-    
-    
 
-    return <svg ref={svgRef} style={{ marginTop: "50px" }}></svg>;
+    return (
+        <div>
+            <svg ref={svgRef} style={{ marginTop: "50px" }}></svg>
+            {selectedDoc && (
+                <DocumentCard
+                    selectedDoc={selectedDoc}
+                    setSelectedDoc={setSelectedDoc}
+                    user={user}
+                    excludeTitle={setTitle}
+                    mode="map"
+                />
+            )}
+        </div>
+    );
 };
 
 TimelineDiagram.propTypes = {
