@@ -14,8 +14,6 @@ import API from '../API.mjs'
 import AddDocument from './components/AddDocument';
 import DocumentTable from './components/ListDocuments';
 import ModifyGeoreference from './components/ModifyGeorefernce';
-import Diagram from './components/Diagram';
-import Diagramma from './components/Diagramma';
 import DiagrammaNuovo from './components/DiagrammaNuovo';
 
 function App() {
@@ -29,6 +27,10 @@ function App() {
   const [connections, setConnections] = useState([]);
 
   const nav = useNavigate();
+
+  const setFeedbackFromError = (error) => {
+    setMessage({ msg: `Error: ${error.message}`, type: 'alert' });
+  };
 
   useEffect(() => {
     API.getUserInfo()
@@ -51,9 +53,8 @@ function App() {
       setShowLoginModal(false);
       setMessage({ msg: `Benvenuto, ${user.username}!`, type: 'success' });
       setUser(user);
-      setAuthFailed(false);
     } catch (err) {
-      setMessage({ msg: `Incorrect username or password`, type: 'alert' });
+      setMessage({ msg: `Incorrect username or password\n` + err, type: 'alert' });
     }
   };
   const handleLogout = async () => {
@@ -70,7 +71,7 @@ function App() {
       try {
         const documents = await API.getAllDocs();
         setDocuments(documents);
-        const allConnections =  await API.GetConnections();
+        const allConnections = await API.GetConnections();
         setConnections(allConnections);
       } catch (error) {
         console.error('Error fetching documents and connections:', error);
