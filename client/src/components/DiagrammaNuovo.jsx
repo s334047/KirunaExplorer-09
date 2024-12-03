@@ -213,7 +213,7 @@ const TimelineDiagram = ({ documents, user, setTitle, connections }) => {
                     <Button
                         variant="primary"
                         onClick={() => setLegendVisible((prev) => !prev)}
-                        style={{ marginLeft: "20px" }}
+                        style={{ marginLeft: "20px", backgroundColor: "#154109", borderColor: "#154109" }}
                     >
                         {legendVisible ? "Nascondi Legenda" : "Mostra Legenda"}
                     </Button>
