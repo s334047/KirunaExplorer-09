@@ -3,6 +3,7 @@ import * as d3 from "d3";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
 import DocumentCard from "./DocCard";
+import { Container } from "react-bootstrap";
 
 const TimelineDiagram = ({ documents, user, setTitle, connections }) => {
     const svgRef = useRef(null);
@@ -151,7 +152,7 @@ const TimelineDiagram = ({ documents, user, setTitle, connections }) => {
             .attr("fill", "blue")
             .on("click", (_,d) => {
                 // Event handler for click on the circle
-                alert(`Document clicked: ${d.title}`);
+                setSelectedDoc(d);
                 // Here you can add further logic to handle the click, like opening a modal or navigating
             });
         const zoom = d3
@@ -199,7 +200,10 @@ const TimelineDiagram = ({ documents, user, setTitle, connections }) => {
     
     
 
-    return <svg ref={svgRef} style={{ marginTop: "50px" }}></svg>;
+    return (<Container style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {selectedDoc && <DocumentCard selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} user={user} excludeTitle={setTitle}/>}
+    <svg ref={svgRef} style={{ marginTop: "50px" }}></svg>
+    </Container>);
 };
 
 TimelineDiagram.propTypes = {

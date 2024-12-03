@@ -34,7 +34,13 @@ function DocumentCard({ selectedDoc, setSelectedDoc, user, excludeTitle }) {
                             <li><strong>Title:</strong> {selectedDoc.title}</li>
                             <li><strong>Stakeholder:</strong> {selectedDoc.stakeholder}</li>
                             <li><strong>Scale:</strong> {selectedDoc.scale}</li>
-                            <li><strong>Date:</strong> {selectedDoc.date}</li>
+                            <strong>Date:</strong> {
+                                typeof selectedDoc.date === 'string'
+                                    ? selectedDoc.date
+                                    : selectedDoc.date instanceof Date
+                                        ? selectedDoc.date.toLocaleDateString()
+                                        : 'Invalid Date'
+                            }
                             <li><strong>Type:</strong> {selectedDoc.type}</li>
                             <li>
                                 <strong>Connections:</strong> {n}
