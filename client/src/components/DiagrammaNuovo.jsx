@@ -129,7 +129,12 @@ const TimelineDiagram = ({ documents, connections }) => {
             .attr("cx", (d) => xScale(d.date))
             .attr("cy", (d) => yScale(d.row))
             .attr("r", circleRadius)
-            .attr("fill", "blue");
+            .attr("fill", "blue")
+            .on("click", (_,d) => {
+                // Event handler for click on the circle
+                alert(`Document clicked: ${d.title}`);
+                // Here you can add further logic to handle the click, like opening a modal or navigating
+            });
     }, [width, height, documents, connections]);
     
     
