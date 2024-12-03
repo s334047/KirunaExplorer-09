@@ -1,7 +1,7 @@
 class Area{
    id: number
    name: string
-   vertex: Number[][];
+   vertex: number[][];
 
     constructor(id: number, name: string, vertex: number[][]){
         this.id = id
@@ -10,4 +10,4 @@ class Area{
     }
 }
 
-export {Area};
+export { Area };
