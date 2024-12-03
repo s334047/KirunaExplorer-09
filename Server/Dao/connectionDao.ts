@@ -102,7 +102,7 @@ export default class DaoConnection {
      */
     GetConnections() {
         return new Promise<{ SourceDocId: number, TargetDocId: number, Type: string }[]>((resolve, reject) => {
-            db.all(`SELECT SourceDocId, TargetDocId, Type FROM Connection`, (err, rows: { SourceDocId: number, TargetDocId: number, Type: string }[]) => {
+            db.all(`SELECT SourceDocId as source, TargetDocId as target, Type as type FROM Connection`, (err, rows: { SourceDocId: number, TargetDocId: number, Type: string }[]) => {
                 if (err) {
                     reject(new Error('Database error'));
                 }
