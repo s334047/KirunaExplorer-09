@@ -10,6 +10,21 @@ interface RequestMock {
     isAuthenticated: () => boolean;
 }
 
+const userMock = { id: 1, username: "testuser" };
+
+const spyAuthFailed200 = jest.spyOn(passport, "authenticate").mockImplementation(
+    () => (req, res, next) => {
+        const callback = (err, user, info) => {
+            if (err || !user) return next(err || new Error("Authentication failed"));
+            req.login(user, (loginErr) => {
+                if (loginErr) return next(loginErr);
+                res.status(200).json(user);
+            });
+        };
+        callback(null, userMock, null);
+    }
+);
+
 describe("Authenticator Tests", () => {
     let mockApp: any;
     let auth: Authenticator;
@@ -57,22 +72,8 @@ describe("Authenticator Tests", () => {
             json: jest.fn(),
         } as any;
         const nextMock = jest.fn();
-
-        const userMock = { id: 1, username: "testuser" };
-
-        jest.spyOn(passport, "authenticate").mockImplementation(
-            () => (req, res, next) => {
-                const callback = (err, user, info) => {
-                    if (err || !user) return next(err || new Error("Authentication failed"));
-                    req.login(user, (loginErr) => {
-                        if (loginErr) return next(loginErr);
-                        res.status(200).json(user);
-                    });
-                };
-                callback(null, userMock, null);
-            }
-        );
-
+        spyAuthFailed200;
+        
         await auth.login(reqMock, resMock, nextMock);
 
         expect(reqMock.login).toHaveBeenCalledWith(userMock, expect.any(Function));
@@ -90,20 +91,7 @@ describe("Authenticator Tests", () => {
         } as any;
         const nextMock = jest.fn();
 
-        const userMock = { id: 1, username: "testuser" };
-
-        jest.spyOn(passport, "authenticate").mockImplementation(
-            () => (req, res, next) => {
-                const callback = (err, user, info) => {
-                    if (err || !user) return next(err || new Error("Authentication failed"));
-                    req.login(user, (loginErr) => {
-                        if (loginErr) return next(loginErr);
-                        res.status(200).json(user);
-                    });
-                };
-                callback(null, userMock, null);
-            }
-        );
+        spyAuthFailed200;
 
         await auth.login(reqMock, resMock, nextMock);
 

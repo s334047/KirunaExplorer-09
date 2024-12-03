@@ -91,23 +91,6 @@ const areaValidation = [
 
 app.post('/api/sessions', (req: any, res: any, next: any) => {
     auth.login(req, res, next);
-    /*
-    passport.authenticate('local', (err: any, user: any, info: any) => {
-        if (err) {
-            return next(err);
-        }
-        if (!user) {
-            return res.status(401).send(info);
-        }
-
-        req.login(user, (err: any) => {
-            if (err) {
-                return next(err);
-            }
-            return res.status(201).json(req.user);
-        });
-    })(req, res, next);
-    */
 });
 
 app.get('/api/sessions/current', (req: any, res: any, next: any) => {
@@ -122,14 +105,6 @@ app.get('/api/sessions/current', (req: any, res: any, next: any) => {
 app.delete('/api/sessions/current', (req: any, res: any, next: any) => {
     auth.isLoggedIn(req, res, next)
     auth.logout(req, res, next)
-    /*
-    req.logout((err: any) => {
-        if (err) {
-            return res.status(500).send({ error: 'Logout failed' });
-        }
-        return res.end();
-    });
-    */
 });
 app.delete('/api/sessions/current', (req: any, res: any, next: any) =>
     auth.isLoggedIn(req, res, next),
@@ -194,9 +169,7 @@ app.post('/api/connections', auth.isLoggedIn, connectionValidation, async (req: 
         console.log(Type, SourceDocId, TargetDocId);
         if(SourceDocId && TargetDocId){
             if(await daoConnection.FindDuplicatedDocument(SourceDocId, TargetDocId, Type)){
-                console.log("ciao1")
                 await daoConnection.SetDocumentsConnection(SourceDocId, TargetDocId, Type);
-                console.log("ciao2")
                 res.status(200).json({ message: 'Connection add successfully' });
             }
             else
