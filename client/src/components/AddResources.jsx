@@ -70,8 +70,7 @@ const FileUploader = ({ show, onClose, triggerFileInput, documentId }) => {
                             style={{ color: "#154109", borderColor: "#154109", width: '100%' }}
                             onClick={() => document.getElementById('file-input').click()}
                         >
-                            <i className="bi bi-plus-circle-fill me-2"></i>
-                            Add files
+                            <i className="bi bi-plus-circle-fill me-2"></i>Add files
                         </Button>
                     </div>
                     <input
