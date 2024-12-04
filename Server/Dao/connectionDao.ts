@@ -86,13 +86,28 @@ export default class DaoConnection {
      */
     FindDuplicatedDocument(SourceDocId: number, TargetDocId: number, Type: string) {
         return new Promise<boolean>((resolve, reject) => {
-            db.all(`SELECT Id FROM Connection WHERE SourceDocId = ? AND TargetDocId = ? AND Type = ?`, [TargetDocId, SourceDocId, Type], (err, rows) => {
+            db.get(`SELECT Id FROM Connection WHERE SourceDocId = ? AND TargetDocId = ? AND Type = ?`, [TargetDocId, SourceDocId, Type], (err, rows:any) => {
                 if (err) {
                     reject(new Error('Database error'));
-                } else if (rows.length > 0)
-                    resolve(false);
-                else
-                    resolve(true);
+                }
+                else{
+                    if (rows)
+                        resolve(false);
+                    else{
+                        db.get(`SELECT Id FROM Connection WHERE SourceDocId = ? AND TargetDocId = ? AND Type = ?`, [SourceDocId, TargetDocId, Type], (err, rows:any) => {
+                            if (err) {
+                                reject(new Error('Database error'));
+                            }
+                            else{
+                                if (rows)
+                                    resolve(false);
+                                else{
+                                    resolve(true);
+                                }   
+                            }
+                        });
+                    }   
+                }
             });
         });
     };

@@ -119,19 +119,19 @@ function ModifyGeoreference(props) {
     const handleClose = () => {
         navigate("/")
     }
-    const handleSave = () => {
+    const handleSave = async() => {
         try {
             if (mode === 'PointOld') {
-                API.modifyGeoreference(props.doc.title, selectedPoint, props.doc.coordinate, null, null)
+                await API.modifyGeoreference(props.doc.title, selectedPoint, props.doc.coordinate, null, null)
             }
             if (mode === 'PointNew') {
-                API.modifyGeoreference(props.doc.title, selectedPoint, null, null, null)
+                await API.modifyGeoreference(props.doc.title, selectedPoint, null, null, null)
             }
             if (mode === 'AreaNew') {
-                API.modifyGeoreference(props.doc.title, null, null, selectedArea.vertex, null)
+                await API.modifyGeoreference(props.doc.title, null, null, selectedArea.vertex, null)
             }
             if (mode === 'AreaOld') {
-                API.modifyGeoreference(props.doc.title, null, null, selectedArea, props.doc.area)
+                await API.modifyGeoreference(props.doc.title, null, null, selectedArea, props.doc.area)
             }
         } catch (error) {
             console.log(error)
