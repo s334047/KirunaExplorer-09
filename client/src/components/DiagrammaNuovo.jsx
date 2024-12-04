@@ -3,14 +3,13 @@ import * as d3 from "d3";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
 import DocumentCard from "./DocCard";
-import { Container, Row, Col, Button, Collapse } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 
 const TimelineDiagram = ({ documents, user, setTitle, connections }) => {
     const svgRef = useRef(null);
-    const height = document.documentElement.clientHeight * 0.9;
+    const height = document.documentElement.clientHeight * 0.85;
     const width = document.documentElement.clientWidth;
     const [selectedDoc, setSelectedDoc] = useState(null);
-    const [legendVisible, setLegendVisible] = useState(false); // State to show/hide the legend
     useEffect(() => {
         const margin = { top: 30, right: 50, bottom: 50, left: 50 };
         const maxHeight = height * 0.9; // Maximum height available (90% of the viewport height)
@@ -64,7 +63,7 @@ const TimelineDiagram = ({ documents, user, setTitle, connections }) => {
             .attr("class", "x-axis")
             .attr("transform", `translate(0, ${adjustedHeight - margin.bottom})`)
             .call(xAxis);
-        const yAxis = d3.axisLeft(yScale).ticks(maxRow);
+        const yAxis = d3.axisLeft(yScale).ticks(maxRow).tickFormat("").tickSize(0);
         svg.append("g")
             .attr("class", "y-axis")
             .attr("transform", `translate(${margin.left}, 0)`)
@@ -109,7 +108,10 @@ const TimelineDiagram = ({ documents, user, setTitle, connections }) => {
                     strokeColor = "red";
                 } else if (d.type === "Update") {
                     strokeColor = "blue";
-                } else {
+                } else if (d.type === "Collateral Consequence") {
+                    strokeColor = "green";
+                }
+                else if (d.type === "Direct Consequence") {
                     strokeColor = "black";
                 }
                 return strokeColor;
@@ -118,8 +120,10 @@ const TimelineDiagram = ({ documents, user, setTitle, connections }) => {
             .attr("fill", "none")
             .attr("stroke-dasharray", (d) => {
                 // Define the line style based on the type of connection
-                if (d.type === "Projection") return "5,5"; // Dashed line
-                if (d.type === "Update") return "10,4";
+                if (d.type === "Projection") return "5,5";
+                if (d.type === "Update") return "4,10,2";
+                if (d.type === "Direct Consequence") return "2,2";
+                if (d.type === "Collateral Consequence") return "4,10";
                 return "0"; // Solid line
             })
             .attr("marker-end", "url(#arrow)");
@@ -162,7 +166,7 @@ const TimelineDiagram = ({ documents, user, setTitle, connections }) => {
 
                 // Aggiorna assi
                 svg.select(".x-axis").call(d3.axisBottom(newXScale));
-                svg.select(".y-axis").call(d3.axisLeft(newYScale));
+                svg.select(".y-axis").call(d3.axisLeft(newYScale).tickFormat("").tickSize(0));
 
                 // Aggiorna griglia
                 svg.select(".grid-x")
@@ -209,33 +213,26 @@ const TimelineDiagram = ({ documents, user, setTitle, connections }) => {
         {selectedDoc && <DocumentCard selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} user={user} excludeTitle={setTitle} />}
         <div style={{ marginTop: "20px" }}>
             <Row className="align-items-center">
-                <Col xs="auto">
-                    <Button
-                        variant="primary"
-                        onClick={() => setLegendVisible((prev) => !prev)}
-                        style={{ marginLeft: "20px", backgroundColor: "#154109", borderColor: "#154109" }}
-                    >
-                        {legendVisible ? "Nascondi Legenda" : "Mostra Legenda"}
-                    </Button>
-                </Col>
                 <Col>
-                    <Collapse in={legendVisible}>
-                        <div>
-                            <Row className="align-items-center text-center">
-                                <Col xs="4">
-                                    <span style={{ color: "red" }}><b>Projection</b></span>  (Dashed line)
-                                </Col>
-                                <Col xs="4">
-                                    <span style={{ color: "blue" }}><b>Update </b></span> (long dashed line)
-                                </Col>
-                                <Col xs="4">
-                                    <span style={{ color: "black" }}><b>Other </b></span> (solid line)
-                                </Col>
-                            </Row>
-                        </div>
-                    </Collapse>
+                    <div>
+                        <Row className="align-items-center text-center">
+                            <Col xs="3">
+                                <span style={{ color: "red" }}><b>Projection (Dashed line)</b></span>
+                            </Col>
+                            <Col xs="3">
+                                <span style={{ color: "blue" }}><b>Update (long dashed line)</b></span>
+                            </Col>
+                            <Col xs="3">
+                                <span style={{ color: "green" }}><b>Collateral Consequence (long dotted line)</b></span>
+                            </Col>
+                            <Col xs="3">
+                                <span style={{ color: "black" }}><b>Direct Consequence (solid line)</b></span>
+                            </Col>
+                        </Row>
+                    </div>
                 </Col>
             </Row>
+
             <Row>
                 <Col>
                     <svg ref={svgRef} style={{ marginTop: "5px" }}></svg>
@@ -265,4 +262,3 @@ TimelineDiagram.propTypes = {
 };
 
 export default TimelineDiagram;
-
