@@ -8,14 +8,16 @@ function NavHeader(props) {
                 <Navbar.Brand href="#home" style={{ color: "#ffffff" }}>
                     Kiruna Explorer
                 </Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav className="me-auto">
-                        <Nav.Link href="/">Map</Nav.Link>
-                        {props.loggedIn &&<Nav.Link href="/documents">Documents</Nav.Link>}
-                        <Nav.Link href="/diagram">Diagram</Nav.Link>
-                    </Nav>
-                </Navbar.Collapse>
+                {props.loggedIn && <>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    <Navbar.Collapse id="basic-navbar-nav">
+                        <Nav className="me-auto">
+                            <Nav.Link href="/">Map</Nav.Link>
+                            <Nav.Link href="/documents">Documents</Nav.Link>
+                            <Nav.Link href="/diagram">Diagram</Nav.Link>
+                        </Nav>
+                    </Navbar.Collapse>
+                </>}
                 {!props.loggedIn ? (
                     <Button variant="outline-light" onClick={props.setShow}>
                         Login
