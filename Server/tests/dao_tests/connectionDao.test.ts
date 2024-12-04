@@ -114,13 +114,13 @@ describe("DaoConnection Tests", () => {
 
   describe("FindDuplicatedDocument", () => {
     test("should return false if a duplicate connection is found", async () => {
-      jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
-        return callback(null, [{ Id: 1 }]); // Simulate duplicate found
+      jest.spyOn(db, "get").mockImplementationOnce((sql, params, callback) => {
+        return callback(null, { Id: 1 }); // Simulate duplicate found for reversed Source-Target
       });
 
       const result = await daoConnection.FindDuplicatedDocument(1, 2, "relation");
       expect(result).toBe(false);
-      expect(db.all).toHaveBeenCalledWith(
+      expect(db.get).toHaveBeenCalledWith(
         "SELECT Id FROM Connection WHERE SourceDocId = ? AND TargetDocId = ? AND Type = ?",
         [2, 1, "relation"],
         expect.any(Function)
@@ -128,16 +128,17 @@ describe("DaoConnection Tests", () => {
     });
 
     test("should return true if no duplicate connection is found", async () => {
-      jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
-        return callback(null, []); // Simulate no duplicates
-      });
+      jest
+        .spyOn(db, "get")
+        .mockImplementationOnce((sql, params, callback) => callback(null, null)) // No reverse duplicate
+        .mockImplementationOnce((sql, params, callback) => callback(null, null)); // No direct duplicate
 
       const result = await daoConnection.FindDuplicatedDocument(1, 2, "relation");
       expect(result).toBe(true);
     });
 
     test("should throw an error if the database query fails", async () => {
-      jest.spyOn(db, "all").mockImplementation((sql, params, callback) => {
+      jest.spyOn(db, "get").mockImplementation((sql, params, callback) => {
         return callback(new Error("Database error"), null); // Simulate failure
       });
 
