@@ -150,7 +150,7 @@ function MapViewer(props) {
                 </LayersControl>
 
                 {/* Marker Cluster Group */}
-                <MarkerClusterGroup showCoverageOnHover={false} disableClusteringAtZoom={16} iconCreateFunction={createClusterCustomIcon}>
+                <MarkerClusterGroup showCoverageOnHover={false} disableClusteringAtZoom={20} iconCreateFunction={createClusterCustomIcon}>
                     {docs.filter(doc => doc.coordinate != null).map(doc => (
                         <Marker key={doc.title} position={doc.coordinate} icon={getIconByType(doc.type)} eventHandlers={{
                             click: () => {
