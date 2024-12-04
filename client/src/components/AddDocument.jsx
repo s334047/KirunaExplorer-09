@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, LayersControl, Popup, FeatureGroup,GeoJSON,useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, GeoJSON, useMapEvents } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
-import { Card, Button, Row, Col, Form } from 'react-bootstrap';
+import {  Button, Form } from 'react-bootstrap';
 import API from '../../API.mjs';
 import { useNavigate } from 'react-router-dom';
 import DescriptionComponent from './AddDescription';
