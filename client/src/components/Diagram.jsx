@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
-import DocumentCard from "./DocCard";
+import {DocumentModal} from "./DocumentShowInfo";
 import { Container, Row, Col } from "react-bootstrap";
 
 const TimelineDiagram = ({ documents, user, setTitle, connections }) => {
@@ -209,37 +209,38 @@ const TimelineDiagram = ({ documents, user, setTitle, connections }) => {
         svg.call(zoom);
     }, [width, height, documents, connections]);
 
-    return (<Container style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        {selectedDoc && <DocumentCard selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} user={user} excludeTitle={setTitle} />}
-        <div style={{ marginTop: "20px" }}>
-            <Row className="align-items-center">
-                <Col>
-                    <div>
-                        <Row className="align-items-center text-center">
-                            <Col xs="3">
-                                <span style={{ color: "red" }}><b>Projection (Dashed line)</b></span>
-                            </Col>
-                            <Col xs="3">
-                                <span style={{ color: "blue" }}><b>Update (long dashed line)</b></span>
-                            </Col>
-                            <Col xs="3">
-                                <span style={{ color: "green" }}><b>Collateral Consequence (long dotted line)</b></span>
-                            </Col>
-                            <Col xs="3">
-                                <span style={{ color: "black" }}><b>Direct Consequence (solid line)</b></span>
-                            </Col>
-                        </Row>
-                    </div>
-                </Col>
-            </Row>
+    return (
+        <Container style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {selectedDoc && <DocumentModal selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} />}
+            <div style={{ marginTop: "20px" }}>
+                <Row className="align-items-center">
+                    <Col>
+                        <div>
+                            <Row className="align-items-center text-center">
+                                <Col xs="3">
+                                    <span style={{ color: "red" }}><b>Projection (Dashed line)</b></span>
+                                </Col>
+                                <Col xs="3">
+                                    <span style={{ color: "blue" }}><b>Update (long dashed line)</b></span>
+                                </Col>
+                                <Col xs="3">
+                                    <span style={{ color: "green" }}><b>Collateral Consequence (long dotted line)</b></span>
+                                </Col>
+                                <Col xs="3">
+                                    <span style={{ color: "black" }}><b>Direct Consequence (solid line)</b></span>
+                                </Col>
+                            </Row>
+                        </div>
+                    </Col>
+                </Row>
 
-            <Row>
-                <Col>
-                    <svg ref={svgRef} style={{ marginTop: "5px" }}></svg>
-                </Col>
-            </Row>
-        </div>
-    </Container>);
+                <Row>
+                    <Col>
+                        <svg ref={svgRef} style={{ marginTop: "5px" }}></svg>
+                    </Col>
+                </Row>
+            </div>
+        </Container>);
 };
 
 TimelineDiagram.propTypes = {

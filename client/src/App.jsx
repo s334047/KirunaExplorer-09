@@ -14,7 +14,7 @@ import API from '../API.mjs'
 import AddDocument from './components/AddDocument';
 import DocumentTable from './components/ListDocuments';
 import ModifyGeoreference from './components/ModifyGeorefernce';
-import DiagrammaNuovo from './components/DiagrammaNuovo';
+import TimelineDiagram from './components/Diagram';
 
 function App() {
   const [showAddLink, setShowAddLink] = useState(false) //state for showing the modal for linking documents
@@ -101,7 +101,7 @@ function App() {
         <Route path='/addArea' element={<AddArea />} />
         <Route path='/addDoc' element={<AddDocument />} />
         <Route path='/modifyGeoreference' element={<ModifyGeoreference doc={excludeDoc} />} />
-        {user.role === 'Urban Planner' && <Route path='/diagram' element={<DiagrammaNuovo setTitle={setExcludeDoc} documents={documents} user={user} connections={connections}/>}/>}
+        {user.role === 'Urban Planner' && <Route path='/diagram' element={<TimelineDiagram setTitle={setExcludeDoc} documents={documents} user={user} connections={connections}/>}/>}
 
         {user.role === 'Urban Planner' && <Route path='/documents' element={<>
           <DocumentTable user={user} setTitle={setExcludeDoc} showAddLink={showAddLink} setShowAddLink={setShowAddLink} />

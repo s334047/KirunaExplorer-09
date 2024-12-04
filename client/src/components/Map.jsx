@@ -7,7 +7,7 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import 'react-leaflet-markercluster/dist/styles.min.css';
 import { Button, Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import DocumentCard from './DocCard';
+import {DocumentCard} from './DocumentShowInfo';
 import API from '../../API.mjs';
 import propTypes from "prop-types";
 
