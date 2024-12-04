@@ -126,6 +126,27 @@ app.post('/api/documents', auth.isLoggedIn, docValidation, async (req: any, res:
             number = await daoArea.getAreaIdFromName(req.body.area)
         }
         await daoDocument.newDescription(req.body.title, req.body.stakeholder, req.body.scale, req.body.date, req.body.type, req.body.language, req.body.page, req.body.coordinate, number, req.body.description);
+        if(req.body.formLink){
+            for(let link of req.body.formLink){
+                console.log("link: "+link);
+                const Type = link.type;
+                const SourceDocId = await daoConnection.GetDocumentsId(req.body.title);
+                const TargetDocId = await daoConnection.GetDocumentsId(link.document);
+                console.log(Type, SourceDocId, TargetDocId);
+                if(SourceDocId && TargetDocId){
+                    if(await daoConnection.FindDuplicatedDocument(SourceDocId, TargetDocId, Type)){
+                        await daoConnection.SetDocumentsConnection(SourceDocId, TargetDocId, Type);
+                        //res.status(200).json({ message: 'Connection and Document add successfully' });
+                    }
+                    /*
+                    else
+                        res.status(409).json({ message: "Duplicate connection on FindDuplicatedDocument" });*/
+                }/*else{
+                    res.status(404).json({ message: "SourceDocId or TargetDocId not found" });
+                }*/
+                
+            }
+        }
         res.status(200).json({ message: 'Document add successfully' });
     } catch (error) {
         res.status(503).json({ error: Error });

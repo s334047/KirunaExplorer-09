@@ -74,17 +74,14 @@ function AddDocument() {
     const handleClose = () => {
         navigate("/")
     }
-    const handleSave = () => {
+    const handleSave = async() => {
         try {
             if (mode === 'Point') {
-                API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, selectedPoint, null, formData.description);
+                await API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, selectedPoint, null, formData.description, formLink);
             } else if (mode === 'Area') {
-                API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, null, selectedArea.name, formData.description);
+                 await API.addDocument(formData.title, formData.stakeholders, formData.scale, formData.issuanceDate, formData.type, formData.language, formData.pages, null, selectedArea.name, formData.description, formLink);
             }
-            for (let link of formLink){
-                API.SetDocumentsConnection(formData.title,link.document,link.type)
-            }
-
+            
             // Reset degli stati
             setFormData(null);
             setFormLink(null);
