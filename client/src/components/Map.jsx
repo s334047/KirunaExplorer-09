@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, LayersControl,GeoJSON } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, LayersControl, GeoJSON } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import L from 'leaflet';
 import 'leaflet-draw';
@@ -24,7 +24,7 @@ function MapViewer(props) {
             const documents = await API.getAllDocs();
             setDocs(documents);
             const areaMap = new Map();
-    
+
             documents.filter(doc => doc.area).forEach((doc) => {
                 const areaKey = JSON.stringify(doc.area);
                 if (!areaMap.has(areaKey)) {
@@ -32,7 +32,7 @@ function MapViewer(props) {
                 }
                 areaMap.get(areaKey)?.push(doc);
             });
-    
+
             setDocumentsByArea(areaMap);
         };
         getDocs();
@@ -83,31 +83,31 @@ function MapViewer(props) {
         } else {
             vertices = extractVertices(geojson);
         }
-    
+
         if (vertices.length === 0) {
             throw new Error("Il GeoJSON non contiene vertici validi.");
         }
-    
+
         const bounds = L.latLngBounds(vertices.map(([lng, lat]) => L.latLng(lat, lng)));
         const positions = [];
         const padding = 0.0001; // Distanza minima tra i marker
-    
+
         for (let i = 0; i < count; i++) {
             const angle = (i / count) * 2 * Math.PI;
             const offsetX = padding * Math.cos(angle);
             const offsetY = padding * Math.sin(angle);
             const center = bounds.getCenter();
-    
+
             positions.push([center.lat + offsetX, center.lng + offsetY]);
         }
-    
+
         return positions;
     }
-    
+
     // Funzione di supporto per estrarre i vertici dalla geometria GeoJSON
     function extractVertices(geometry) {
         let vertices = [];
-    
+
         switch (geometry.type) {
             case "Polygon":
                 vertices = geometry.coordinates[0]; // Prendi il primo anello del poligono
@@ -120,10 +120,10 @@ function MapViewer(props) {
             default:
                 throw new Error(`Tipo di geometria ${geometry.type} non supportato.`);
         }
-    
+
         return vertices;
     }
-    
+
     const { BaseLayer } = LayersControl;
 
     return (
@@ -182,7 +182,7 @@ function MapViewer(props) {
 
                 {/* Selected Area Polygon */}
                 {selectedDoc && selectedDoc.area && (
-                    <GeoJSON key={selectedDoc.id} data={selectedDoc.area} color="red"/>
+                    <GeoJSON key={selectedDoc.id} data={selectedDoc.area} color="red" />
                 )}
                 <Legend icons={icons} />
             </MapContainer>
@@ -218,13 +218,13 @@ function MapViewer(props) {
                             </Tooltip>
                         }
                     >
-                    <Button
-                        variant="light"
-                        onClick={() => navigate("/addDoc")}
-                        style={{ borderRadius: '50%'}}
-                    >
-                        <i className="bi bi-file-earmark-plus fs-3"></i>
-                    </Button>
+                        <Button
+                            variant="light"
+                            onClick={() => navigate("/addDoc")}
+                            style={{ borderRadius: '50%' }}
+                        >
+                            <i className="bi bi-file-earmark-plus fs-3"></i>
+                        </Button>
                     </OverlayTrigger>
                 </div>
             )}
@@ -240,14 +240,14 @@ function MapViewer(props) {
                             </Tooltip>
                         }
                     >
-                    <Button
-                        variant="light"
-                        onClick={() => navigate("/addArea")}
-                        style={{ borderRadius: '50%' }}
-                        title="Draw Area"
-                    >
-                        <i className="bi bi-bounding-box-circles fs-3"></i>
-                    </Button>
+                        <Button
+                            variant="light"
+                            onClick={() => navigate("/addArea")}
+                            style={{ borderRadius: '50%' }}
+                            title="Draw Area"
+                        >
+                            <i className="bi bi-bounding-box-circles fs-3"></i>
+                        </Button>
                     </OverlayTrigger>
                 </div>
             )}
@@ -255,22 +255,43 @@ function MapViewer(props) {
     );
 }
 
-function Legend({icons}) {
+function Legend({ icons }) {
+    const [isVisible, setIsVisible] = useState(false);
+    const toggleVisibility = () => {
+        setIsVisible(!isVisible);
+    };
     return (
-
-        <Card style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 1000 }}>
-            <Card.Body>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    {Object.entries(icons).map(([type, icon]) => (
-                        <div key={type} style={{ display: 'flex', alignItems: 'center', marginTop: '1px', marginBottom: '1px'}}>
-                            <img src={icon.options.iconUrl} alt={type} style={{ width: '20px', height: '20px', marginRight: '10px' }} />
-                            <span>{type}</span>
+        <>
+            {!isVisible && (
+                <Button variant="light" onClick={toggleVisibility} style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 1000 }}>
+                    Show Legend
+                </Button>
+            )}
+            {isVisible && (
+                <Card style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 1000 }}>
+                    <Card.Header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span>Legend</span>
+                        <Button
+                            variant="link"
+                            onClick={toggleVisibility}
+                            style={{ padding: 0, border: 'none', background: 'none', color:'black' }}
+                        >
+                            <i className="bi bi-x-lg"></i>
+                        </Button>
+                    </Card.Header>
+                    <Card.Body>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            {Object.entries(icons).map(([type, icon]) => (
+                                <div key={type} style={{ display: 'flex', alignItems: 'center', marginTop: '1px', marginBottom: '1px' }}>
+                                    <img src={icon.options.iconUrl} alt={type} style={{ width: '20px', height: '20px', marginRight: '10px' }} />
+                                    <span>{type}</span>
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
-            </Card.Body>
-        </Card>
-
+                    </Card.Body>
+                </Card>
+            )}
+        </>
     );
 }
 
