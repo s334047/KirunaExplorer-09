@@ -59,7 +59,7 @@ sections:
 - What caused your errors in estimation (if any)?
 
 1. We overestimated TD managmenet because we based our estimation on the our written on SonarCloud
-2. We underestimated a little E2E testing because we thought we would spend more time on TD management
+2. We slightly underestimated E2E testing because we thought we would spend more time on TD management.
 
 - What lessons did you learn (both positive and negative) in this sprint?
 
@@ -78,11 +78,12 @@ sections:
 - Improvement goals for the next sprint and how to achieve them (technical tasks, team coordination, etc.)
 
 1. Checking everything before proceeding, so we don't have to come back to previous things
-2. Pay attention to work in progress modifications, especially on telegram, to avoid last minute changes.
-3. Pay attention on coordinations' crucial points, just to be prepared and avoid problems before they will appear.
+2. Pay close attention to work-in-progress modifications, especially on Telegram, to avoid last-minute changes.
+3. Focus on coordination's crucial points to be prepared and prevent problems before they arise.
+
 
 - One thing you are proud of as a Team!!
 
-1. We are proud of how many stories we are doing even if we are only a group of 5 people
-2. Despite some difficulties that we had in the first two sprints of this course, we managed to overcome them.  
-Right now we are almost in a stressless environment, comunicating really well and performing good activity workflow.
+1. We are proud of how many stories we have completed, even though we are only a group of five people.
+2. Despite the difficulties we faced in the first two sprints of this course, we managed to overcome them.
+Now, we are working in an almost stress-free environment, communicating effectively, and maintaining a smooth workflow.
