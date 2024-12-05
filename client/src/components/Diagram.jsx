@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
-import {DocumentModal} from "./DocumentShowInfo";
+import { DocumentModal } from "./DocumentShowInfo";
 import { Container, Row, Col } from "react-bootstrap";
 
-const TimelineDiagram = ({ documents, user, setTitle, connections }) => {
+const TimelineDiagram = ({ documents, connections }) => {
     const svgRef = useRef(null);
     const height = document.documentElement.clientHeight * 0.85;
     const width = document.documentElement.clientWidth;
@@ -121,7 +121,7 @@ const TimelineDiagram = ({ documents, user, setTitle, connections }) => {
             .attr("stroke-dasharray", (d) => {
                 // Define the line style based on the type of connection
                 if (d.type === "Projection") return "5,5";
-                if (d.type === "Update") return "4,10,2";
+                if (d.type === "Update") return "4,10,4";
                 if (d.type === "Direct Consequence") return "2,2";
                 if (d.type === "Collateral Consequence") return "4,10";
                 return "0"; // Solid line
@@ -221,13 +221,13 @@ const TimelineDiagram = ({ documents, user, setTitle, connections }) => {
                                     <span style={{ color: "red" }}><b>Projection (Dashed line)</b></span>
                                 </Col>
                                 <Col xs="3">
-                                    <span style={{ color: "blue" }}><b>Update (long dashed line)</b></span>
+                                    <span style={{ color: "blue" }}><b>Update (mixed line)</b></span>
                                 </Col>
                                 <Col xs="3">
-                                    <span style={{ color: "green" }}><b>Collateral Consequence (long dotted line)</b></span>
+                                    <span style={{ color: "green" }}><b>Collateral Consequence (spaced line)</b></span>
                                 </Col>
                                 <Col xs="3">
-                                    <span style={{ color: "black" }}><b>Direct Consequence (solid line)</b></span>
+                                    <span style={{ color: "black" }}><b>Direct Consequence (dotted line)</b></span>
                                 </Col>
                             </Row>
                         </div>
@@ -251,8 +251,6 @@ TimelineDiagram.propTypes = {
             date: PropTypes.string.isRequired,
         })
     ).isRequired,
-    user: PropTypes.object.isRequired,
-    setTitle: PropTypes.func.isRequired,
     connections: PropTypes.arrayOf(
         PropTypes.shape({
             source: PropTypes.number.isRequired,
