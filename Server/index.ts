@@ -136,14 +136,8 @@ app.post('/api/documents', auth.isLoggedIn, docValidation, async (req: any, res:
                 if(SourceDocId && TargetDocId){
                     if(await daoConnection.FindDuplicatedDocument(SourceDocId, TargetDocId, Type)){
                         await daoConnection.SetDocumentsConnection(SourceDocId, TargetDocId, Type);
-                        //res.status(200).json({ message: 'Connection and Document add successfully' });
                     }
-                    /*
-                    else
-                        res.status(409).json({ message: "Duplicate connection on FindDuplicatedDocument" });*/
-                }/*else{
-                    res.status(404).json({ message: "SourceDocId or TargetDocId not found" });
-                }*/
+                }
                 
             }
         }
@@ -309,12 +303,9 @@ app.get('/api/originalResources/:docId', auth.isLoggedIn, async (req: any, res: 
             const normalizedPath = resource.path.replace(/\\/g, '/');
             const filePath = path.resolve(__dirname, normalizedPath); //praticamente concatena il path assoluto con quello relativo
             if (fs.existsSync(filePath)) {
-                //const fileContent = fs.readFileSync(filePath); //è un buffer
                 return {
                     id: resource.id,
                     name: path.basename(filePath),
-                    //type : mime.lookup(filePath) || 'application/octet-stream',
-                    //content: fileContent.toString('base64') //converte in stringa in Base64 per poterlo trasmettere in JSON
                 }
             } else {
                 return null;
