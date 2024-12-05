@@ -5,8 +5,7 @@ import API from '../../API.mjs';
 import ListDocumentLink from './Link';
 import FileUploader from './AddResources';
 
-
-function DocumentTable() {
+function DocumentTable(props) {
 
     const [selectedDoc, setSelectedDoc] = useState(null);
     const [showAddLinkModal, setShowAddLinkModal] = useState(false);
@@ -144,7 +143,6 @@ function DocumentTable() {
                 }
             </Card>
 
-
             <Card className="p-4 shadow-sm">
                 <h5 className="mb-3" style={{ color: '#154109' }}>Document List</h5>
                 <Table bordered hover responsive className="custom-table" style={{ height: '100%' }}>
@@ -188,7 +186,7 @@ function DocumentTable() {
                                         <td>{doc.type}</td>
                                     </tr>
                                     {selectedDoc?.id === doc.id && (
-                                        <AdditionalInfo selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} documents={documents} setShowAddLinkModal={setShowAddLinkModal} />
+                                        <AdditionalInfo selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} documents={documents} setShowAddLinkModal={setShowAddLinkModal} user={props.user} />
                                     )}
                                 </React.Fragment>
                             ))}
@@ -205,7 +203,7 @@ function DocumentTable() {
     );
 };
 
-function AdditionalInfo({ selectedDoc, setSelectedDoc, documents, setShowAddLinkModal }) {
+function AdditionalInfo({ selectedDoc, setSelectedDoc, documents, setShowAddLinkModal,user }) {
     const [showFileUploader, setShowFileUploader] = useState(false);
     const [triggerFileInput, setTriggerFileInput] = useState(false);
     const [resources, setResources] = useState([]);
@@ -277,7 +275,6 @@ function AdditionalInfo({ selectedDoc, setSelectedDoc, documents, setShowAddLink
                             </li>
                         }
 
-
                         {resources.length > 0 &&
                             <li><strong>Resources:</strong>
                                 <ul>
@@ -297,9 +294,7 @@ function AdditionalInfo({ selectedDoc, setSelectedDoc, documents, setShowAddLink
                         }
 
                     </ul>
-
-
-
+                    {user.role=="Urban Planner" &&
                     <div style={{ textAlign: 'right' }}>
                         <Button
                             variant="light"
@@ -315,7 +310,7 @@ function AdditionalInfo({ selectedDoc, setSelectedDoc, documents, setShowAddLink
                         >
                             <i className="bi bi-paperclip me-2"></i>Add original resources
                         </Button>
-                    </div>
+                    </div>}
                 </td>
             </tr>
 
@@ -336,5 +331,6 @@ AdditionalInfo.propTypes = {
     setShowAddLinkModal: PropTypes.func.isRequired,
     setSelectedDoc: PropTypes.func.isRequired,
     documents: PropTypes.array.isRequired,
+    user: PropTypes.object.isRequired
 };
 export default DocumentTable;
