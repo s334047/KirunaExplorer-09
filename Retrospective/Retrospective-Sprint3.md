@@ -1,4 +1,4 @@
-TEMPLATE FOR RETROSPECTIVE (Team ##)
+TEMPLATE FOR RETROSPECTIVE (Team 09)
 =====================================
 
 The retrospective should include _at least_ the following
@@ -42,7 +42,7 @@ sections:
 - Standard deviation: 4.72 (estimate), 4.59 (actual)
 - Total task estimation error ratio: 0.017
 
- 
+
 ## QUALITY MEASURES 
 
 - Unit Testing:
