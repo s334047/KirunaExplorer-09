@@ -66,15 +66,24 @@ sections:
 ## ASSESSMENT
 
 - What caused your errors in estimation (if any)?
+1. We overestimated TD managmenet because we based our estimation on the our written on SonarCloud
+2. We underestimated a little E2E testing because we thought we would spend more time on TD management
 
 - What lessons did you learn (both positive and negative) in this sprint?
+1. We learn that by doing a lot of E2E testing we could recognise lots of errors 
+2. We learned that we have to check every little thing properly before proceeding with the next things
 
 - Which improvement goals set in the previous retrospective were you able to achieve? 
+1. We permorfed more E2E testing than the previous sprint
+2. We made a homogeneous database
   
 - Which ones you were not able to achieve? Why?
+1. We achieved all our previous goals
 
 - Improvement goals for the next sprint and how to achieve them (technical tasks, team coordination, etc.)
+1. Checking everything before proceeding, so we don't have to come back to previous things
 
 > Propose one or two
 
 - One thing you are proud of as a Team!!
+1. We are proud of how many stories we are doing even if we are only a group of 5 people
