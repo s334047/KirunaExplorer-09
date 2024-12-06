@@ -30,6 +30,7 @@ describe("Testing index.ts Routes", () => {
       type: "Type1",
       description: "Description1",
     };
+    
 
     test("should create a document successfully", async () => {
       jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => next());
@@ -178,5 +179,83 @@ describe("Testing index.ts Routes", () => {
 
       expect(response.status).toBe(503);
     });
+
+    describe("Error Handling Tests for Connections", () => {
+      describe("GET /api/connections/:SourceDoc", () => {
+        test("should return 404 when SourceDocId is not found", async () => {
+          jest.spyOn(DaoConnection.prototype, "GetDocumentsId").mockResolvedValue(null);
+    
+          const response = await request(app).get("/api/connections/UnknownDoc");
+    
+          expect(response.status).toBe(404);
+          expect(response.body.message).toBe("SourceDocId not found");
+        });
+    
+        test("should return 503 on database error", async () => {
+          jest.spyOn(DaoConnection.prototype, "GetDocumentsId").mockRejectedValue(new Error("Database error"));
+    
+          const response = await request(app).get("/api/connections/Doc1");
+    
+          expect(response.status).toBe(503);
+        });
+      });
+    
+      describe("GET /api/connections/info/:SourceDocId", () => {
+        test("should return connection details successfully", async () => {
+          const mockConnections = [{ id: 2, title: "Doc2", type: "Reference" }];
+          jest.spyOn(DaoConnection.prototype, "GetDocumentInfoConnections").mockResolvedValue(mockConnections);
+    
+          const response = await request(app).get("/api/connections/info/1");
+    
+          expect(response.status).toBe(200);
+          expect(response.body).toEqual(mockConnections);
+        });
+    
+        test("should return 503 on database error", async () => {
+          jest.spyOn(DaoConnection.prototype, "GetDocumentInfoConnections").mockRejectedValue(new Error("Database error"));
+    
+          const response = await request(app).get("/api/connections/info/1");
+    
+          expect(response.status).toBe(503);
+        });
+      });
+    });
+
+    describe("PUT /api/documents/area", () => {
+      test("should return 503 on database error", async () => {
+        jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => next());
+        jest.spyOn(DaoArea.prototype, "getAreaIdFromName").mockRejectedValue(new Error("Database error"));
+    
+        const response = await request(app).put("/api/documents/area").send({ area: "Area1", title: "Doc1" });
+    
+        expect(response.status).toBe(503);
+      });
+    });
+    
+    describe("PUT /api/modifyGeoreference", () => {
+      test("should modify georeference successfully", async () => {
+        jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => next());
+        jest.spyOn(DaoArea.prototype, "modifyGeoreference").mockResolvedValue(undefined);
+    
+        const response = await request(app)
+          .put("/api/modifyGeoreference")
+          .send({ coord: [10, 20], name: "Doc1" });
+    
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe("Georeference modified successfully");
+      });
+    
+      test("should return 503 on database error", async () => {
+        jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => next());
+        jest.spyOn(DaoArea.prototype, "modifyGeoreference").mockRejectedValue(new Error("Database error"));
+    
+        const response = await request(app)
+          .put("/api/modifyGeoreference")
+          .send({ coord: [10, 20], name: "Doc1" });
+    
+        expect(response.status).toBe(503);
+      });
+    });
+    
   });
 });
