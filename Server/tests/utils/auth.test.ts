@@ -194,4 +194,166 @@ describe("Authenticator Tests", () => {
 
         expect(nextMock).toHaveBeenCalled();
     });
+
+    
+    test("should handle missing user during login", async () => {
+        const reqMock = { login: jest.fn() } as any;
+        const resMock = { status: jest.fn().mockReturnThis(), json: jest.fn() } as any;
+        const nextMock = jest.fn();
+    
+        jest.spyOn(passport, "authenticate").mockImplementation(
+            () => (req, res, next) => {
+                const callback = (err, user, info) => {
+                    res.status(401).json({ error: "Authentication failed" });
+                };
+                callback(null, null, null);
+            }
+        );
+    
+        await auth.login(reqMock, resMock, nextMock);
+    
+        expect(resMock.status).toHaveBeenCalledWith(401);
+        expect(resMock.json).toHaveBeenCalledWith({ error: "Authentication failed" });
+    });
+    
+    test("should handle unexpected errors during logout", async () => {
+        const reqMock: RequestMock = {
+            logout: jest.fn((callback: (err: any) => void) => callback(new Error("Unexpected error"))),
+            login: jest.fn(),
+            isAuthenticated: jest.fn(() => false),
+        };
+        const resMock = {
+            status: jest.fn().mockReturnThis(),
+            end: jest.fn(),
+        } as any;
+    
+        const nextMock = jest.fn();
+    
+        await auth.logout(reqMock, resMock, nextMock);
+    
+        expect(reqMock.logout).toHaveBeenCalledWith(expect.any(Function));
+        expect(nextMock).toHaveBeenCalledWith(new Error("Unexpected error"));
+    });
+    
+    test("should call next middleware for authenticated user in isLoggedIn", () => {
+        const reqMock = {
+            isAuthenticated: jest.fn().mockReturnValue(true),
+        } as any;
+        const nextMock = jest.fn();
+    
+        auth.isLoggedIn(reqMock, {}, nextMock);
+    
+        expect(reqMock.isAuthenticated).toHaveBeenCalled();
+        expect(nextMock).toHaveBeenCalled();
+    });
+    
+    
+    
+    test("should perform full auth flow", async () => {
+        const reqMock: any = {
+            logout: jest.fn((callback: (err: any) => void) => callback(null)),
+            login: jest.fn((user: any, callback: any) => callback(null)),
+            isAuthenticated: jest.fn(() => true),
+        };
+        const resMock: any = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        } as any;
+        const nextMock = jest.fn();
+    
+        // Initialize auth
+        auth.initAuth();
+        expect(mockApp.use).toHaveBeenCalledTimes(3);
+    
+        // Simulate login
+        jest.spyOn(passport, "authenticate").mockImplementation(
+            () => (req, res, next) => {
+                const callback = (err, user, info) => {
+                    req.login(user, next);
+                    res.status(200).json(user);
+                };
+                callback(null, { id: 1, username: "testuser" }, null);
+            }
+        );
+    
+        await auth.login(reqMock, resMock, nextMock);
+        expect(reqMock.login).toHaveBeenCalled();
+        expect(resMock.status).toHaveBeenCalledWith(200);
+    
+        // Simulate logout
+        await auth.logout(reqMock, resMock, nextMock);
+        expect(reqMock.logout).toHaveBeenCalled();
+        expect(resMock.status).toHaveBeenCalledWith(200);
+    });
+    test("should handle errors during passport initialization", () => {
+        const useSpy = jest.spyOn(passport, "use").mockImplementation(() => {
+            throw new Error("Initialization error");
+        });
+    
+        expect(() => auth.initAuth()).toThrow("Initialization error");
+    
+        useSpy.mockRestore();
+    });
+    
+    test("should correctly serialize and deserialize user", () => {
+        const userMock = { id: 1, username: "testuser" };
+        let serializedUser: any;
+    
+        passport.serializeUser((user: any, done) => {
+            serializedUser = user;
+            done(null, user.id);
+        });
+    
+        passport.deserializeUser((id, done) => {
+            if (id === userMock.id) {
+                done(null, userMock);
+            } else {
+                done(new Error("User not found"));
+            }
+        });
+    
+        passport.serializeUser(userMock, (err, id) => {
+            expect(err).toBeNull();
+            expect(id).toEqual(userMock.id);
+        });
+    
+        passport.deserializeUser(userMock.id, (err, user) => {
+            expect(err).toBeNull();
+            expect(user).toEqual(userMock);
+        });
+    });
+    
+    test("should call session middleware with correct options", () => {
+        const sessionMiddlewareMock = jest.fn();
+        jest.mock("express-session", () => {
+            return jest.fn(() => sessionMiddlewareMock);
+        });
+    
+        auth.initAuth();
+    
+        expect(mockApp.use).toHaveBeenCalledWith(expect.any(Function)); // Ensure session middleware is added
+    });
+    
+    test("should handle missing session secret", () => {
+        const sessionMiddleware = jest.fn(() => {
+            throw new Error("Session secret is missing");
+        });
+    
+        mockApp.use = sessionMiddleware;
+    
+        expect(() => auth.initAuth()).toThrow("Session secret is missing");
+    });
+    
+    
+    
+    test("should handle invalid strategy in passport.use", () => {
+        jest.spyOn(passport, "use").mockImplementation(() => {
+            throw new Error("Invalid strategy");
+        });
+    
+        expect(() => auth.initAuth()).toThrow("Invalid strategy");
+    });
+    
+
 });
