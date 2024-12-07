@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from "@jest/globals";
 import passport from "passport";
 import Authenticator from "../../auth.ts";
-
 jest.mock("passport");
 
 interface RequestMock {
@@ -567,6 +566,54 @@ test("should handle missing passport strategy configuration gracefully", () => {
 
     expect(() => auth.initAuth()).toThrow("Strategy not configured");
 });
+test("should throw an error if passport initialize fails", () => {
+    jest.spyOn(passport, "initialize").mockImplementation(() => {
+        throw new Error("Initialization error");
+    });
+
+    expect(() => auth.initAuth()).toThrow("Initialization error");
+});
+
+
+
+test("should handle unexpected error during logout", async () => {
+    const reqMock = { logout: jest.fn((callback: any) => callback(new Error("Unexpected error"))) } as any;
+    const resMock = { status: jest.fn().mockReturnThis(), end: jest.fn() } as any;
+    const nextMock = jest.fn();
+
+    await auth.logout(reqMock, resMock, nextMock);
+
+    expect(nextMock).toHaveBeenCalledWith(new Error("Unexpected error"));
+});
+
+test("should handle missing user in req during login gracefully", async () => {
+    const reqMock = { login: jest.fn() } as any; // `login` is mocked but won't be called
+    const resMock = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+    } as any;
+    const nextMock = jest.fn();
+
+    // Simulate passport.authenticate returning no user
+    jest.spyOn(passport, "authenticate").mockImplementation(
+        () => (req, res, next) => {
+            const callback = (err, user, info) => {
+                if (!user) {
+                    res.status(401).json({ error: "Authentication failed" });
+                }
+            };
+            callback(null, null, null); // No user
+        }
+    );
+
+    await auth.login(reqMock, resMock, nextMock);
+
+    expect(resMock.status).toHaveBeenCalledWith(401);
+    expect(resMock.json).toHaveBeenCalledWith({ error: "Authentication failed" });
+});
+
+
+
 
 
 
