@@ -149,5 +149,31 @@ describe("DaoArea Tests", () => {
         "Database error"
       );
     });
+    describe('getAreaIdFromName', () => {
+      test('should return the correct area ID for a valid name', async () => {
+        jest.spyOn(db, 'get').mockImplementation((sql, params, callback) => {
+          return callback(null, { Id: 1 });
+        });
+        const areaId = await daoArea.getAreaIdFromName('TestArea');
+        expect(areaId).toBe(1);
+      });
+    
+      test('should return null if the area does not exist', async () => {
+        jest.spyOn(db, 'get').mockImplementation((sql, params, callback) => {
+          return callback(null, null);
+        });
+        const areaId = await daoArea.getAreaIdFromName('UnknownArea');
+        expect(areaId).toBeNull();
+      });
+    
+      test('should throw an error if the database query fails', async () => {
+        jest.spyOn(db, 'get').mockImplementation((sql, params, callback) => {
+          return callback(new Error('Database error'));
+        });
+        await expect(daoArea.getAreaIdFromName('TestArea')).rejects.toThrow('Database error');
+      });
+    });
+    
+
   });
 });
