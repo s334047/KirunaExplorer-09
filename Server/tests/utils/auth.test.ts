@@ -639,6 +639,36 @@ test("should throw an error if passport strategy fails", () => {
 });
 
 
+test("should throw an error for invalid user during login", async () => {
+    const reqMock = { user: undefined, login: jest.fn() } as any;
+    const resMock = { status: jest.fn().mockReturnThis(), json: jest.fn() } as any;
+    const nextMock = jest.fn();
+
+    await auth.login(reqMock, resMock, nextMock);
+
+    expect(resMock.status).toHaveBeenCalledWith(401);
+    expect(resMock.json).toHaveBeenCalledWith({ error: "Authentication failed" });
+});
+test("should handle deserialization failure correctly", () => {
+    passport.deserializeUser((id, done) => {
+        done(new Error("Deserialization error"), null);
+    });
+
+    passport.deserializeUser(1, (err, user) => {
+        expect(err.message).toBe("Deserialization error");
+        expect(user).toBeNull();
+    });
+});
+test("should throw an error if middleware initialization fails", () => {
+    const sessionMiddleware = jest.fn(() => {
+        throw new Error("Middleware initialization error");
+    });
+
+    mockApp.use = sessionMiddleware;
+
+    expect(() => auth.initAuth()).toThrow("Middleware initialization error");
+});
+
 
 
 
