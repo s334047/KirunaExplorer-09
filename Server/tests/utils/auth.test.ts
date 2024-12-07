@@ -552,6 +552,22 @@ test("should handle invalid isAuthenticated value in req", () => {
     expect(resMock.json).toHaveBeenCalledWith({ error: "Not authorized" });
 });
 
+test("should handle errors during passport initialization gracefully", () => {
+    jest.spyOn(passport, "initialize").mockImplementation(() => {
+        throw new Error("Initialization error");
+    });
+
+    expect(() => auth.initAuth()).toThrow("Initialization error");
+});
+
+test("should handle missing passport strategy configuration gracefully", () => {
+    jest.spyOn(passport, "use").mockImplementation(() => {
+        throw new Error("Strategy not configured");
+    });
+
+    expect(() => auth.initAuth()).toThrow("Strategy not configured");
+});
+
 
 
 

@@ -7,7 +7,8 @@ import DaoResource from "../../Dao/resourceDao.ts";
 import Authenticator from "../../auth.ts";
 import { app } from "../../index.ts";
 
-jest.mock("../../Dao/documentDao");
+
+jest.mock("../../Dao/documentDao.ts");
 jest.mock("../../Dao/connectionDao");
 jest.mock("../../Dao/areaDao");
 jest.mock("../../Dao/resourceDao");
@@ -244,6 +245,10 @@ describe("Testing index.ts Routes", () => {
         expect(response.status).toBe(200);
         expect(response.body.message).toBe("Georeference modified successfully");
       });
+
+
+      
+    
     
       test("should return 503 on database error", async () => {
         jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((req, res, next) => next());
@@ -259,3 +264,12 @@ describe("Testing index.ts Routes", () => {
     
   });
 });
+
+function connectionRouteHandler(reqMock: any, resMock: any) {
+  throw new Error("Function not implemented.");
+}
+
+
+function documentRouteHandler(reqMock: {}, resMock: any) {
+  throw new Error("Function not implemented.");
+}
