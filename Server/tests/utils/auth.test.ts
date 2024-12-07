@@ -669,6 +669,23 @@ test("should throw an error if middleware initialization fails", () => {
     expect(() => auth.initAuth()).toThrow("Middleware initialization error");
 });
 
+test("should throw an error if passport middleware fails", () => {
+    jest.spyOn(passport, "initialize").mockImplementation(() => {
+        throw new Error("Passport initialization failed");
+    });
+
+    expect(() => auth.initAuth()).toThrow("Passport initialization failed");
+
+    jest.restoreAllMocks();
+});
+
+test("should throw an error if deserialization logic is missing", () => {
+    passport.deserializeUser(undefined, (err, user) => {
+        expect(err).toBeInstanceOf(Error);
+        expect(err.message).toBe("Deserialization logic not found");
+        expect(user).toBeUndefined();
+    });
+});
 
 
 
