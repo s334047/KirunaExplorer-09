@@ -612,6 +612,31 @@ test("should handle missing user in req during login gracefully", async () => {
     expect(resMock.json).toHaveBeenCalledWith({ error: "Authentication failed" });
 });
 
+test("should throw an error if session secret is missing", () => {
+    const sessionMiddleware = jest.fn(() => {
+        throw new Error("Session secret is missing");
+    });
+
+    mockApp.use = sessionMiddleware;
+
+    expect(() => auth.initAuth()).toThrow("Session secret is missing");
+});
+test("should handle unexpected errors during middleware execution", () => {
+    const middlewareError = jest.fn(() => {
+        throw new Error("Unexpected middleware error");
+    });
+
+    mockApp.use = middlewareError;
+
+    expect(() => auth.initAuth()).toThrow("Unexpected middleware error");
+});
+test("should throw an error if passport strategy fails", () => {
+    jest.spyOn(passport, "use").mockImplementation(() => {
+        throw new Error("Strategy load error");
+    });
+
+    expect(() => auth.initAuth()).toThrow("Strategy load error");
+});
 
 
 
