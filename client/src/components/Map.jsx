@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, LayersControl, GeoJSON } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, LayersControl, GeoJSON, useMap } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import L from 'leaflet';
 import 'leaflet-draw';
@@ -7,17 +7,31 @@ import 'leaflet-draw/dist/leaflet.draw.css';
 import 'react-leaflet-markercluster/dist/styles.min.css';
 import { Button, Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import {DocumentCard} from './DocumentShowInfo';
+import { DocumentCard } from './DocumentShowInfo';
 import API from '../../API.mjs';
 import propTypes from "prop-types";
 
+function MoveMapToMarker({ position, offset }) {
+    const map = useMap();
 
+    useEffect(() => {
+        if (position) {
+            const targetPoint = map.latLngToContainerPoint(position);
+            const offsetPoint = L.point(targetPoint.x + offset.x, targetPoint.y + offset.y);
+            const newCenter = map.containerPointToLatLng(offsetPoint);
+            map.setView(newCenter, map.getZoom());
+        }
+    }, [position, offset, map]);
+
+    return null;
+}
 function MapViewer(props) {
     const navigate = useNavigate();
     const position = [67.8558, 20.2253];
     const [docs, setDocs] = useState([]);
     const [selectedDoc, setSelectedDoc] = useState(null);
     const [documentsByArea, setDocumentsByArea] = useState(new Map());
+    const [activePosition, setActivePosition] = useState(null);
 
     useEffect(() => {
         const getDocs = async () => {
@@ -37,7 +51,6 @@ function MapViewer(props) {
         };
         getDocs();
     }, []);
-
     const icons = {
         'Informative document': new L.Icon({ iconUrl: 'icon_doc_blue.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
         'Prescriptive document': new L.Icon({ iconUrl: 'icon_doc_green.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
@@ -45,7 +58,24 @@ function MapViewer(props) {
         'Technical document': new L.Icon({ iconUrl: 'icon_doc_red.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
         'Material effect': new L.Icon({ iconUrl: 'icon_doc_yellow.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
     };
-    const getIconByType = (type) => icons[type];
+    const getIconByType = (type, selectedDoc,docTitle) => {
+        const baseIcon = icons[type];
+        let size = baseIcon.options.iconSize; // Dimensione maggiore se selezionato
+        let anchor =  baseIcon.options.iconAnchor; // Ancoraggio adattato alla nuova dimensione
+        if (selectedDoc){
+            if (selectedDoc.title === docTitle){
+                size = [50, 50] ;
+                anchor = [25, 50];
+            }
+        }
+    
+        return new L.Icon({
+            iconUrl: baseIcon.options.iconUrl, // URL originale
+            iconSize: size,                   // Dimensione dinamica
+            iconAnchor: anchor,               // Ancoraggio dinamico
+            popupAnchor: baseIcon.options.popupAnchor, // Rimane invariato
+        });
+    };
 
     const createClusterCustomIcon = (cluster) => {
         const count = cluster.getChildCount();
@@ -152,10 +182,11 @@ function MapViewer(props) {
                 {/* Marker Cluster Group */}
                 <MarkerClusterGroup showCoverageOnHover={false} disableClusteringAtZoom={20} iconCreateFunction={createClusterCustomIcon}>
                     {docs.filter(doc => doc.coordinate != null).map(doc => (
-                        <Marker key={doc.title} position={doc.coordinate} icon={getIconByType(doc.type)} eventHandlers={{
+                        <Marker key={doc.title} position={doc.coordinate} icon={getIconByType(doc.type,selectedDoc,doc.title)} eventHandlers={{
                             click: () => {
                                 setSelectedDoc(null)
                                 setSelectedDoc(doc);
+                                setActivePosition({lat : doc.coordinate[0], lng : doc.coordinate[1]})
                             },
                         }}>
                         </Marker>
@@ -167,10 +198,12 @@ function MapViewer(props) {
                         return (
                             <React.Fragment key={areaKey}>
                                 {areaDocuments.map((document, index) => (
-                                    <Marker key={document.id} position={positions[index]} icon={getIconByType(document.type)} eventHandlers={{
+                                    <Marker key={document.id} position={positions[index]} icon={getIconByType(document.type,selectedDoc,document.title)} eventHandlers={{
                                         click: () => {
                                             setSelectedDoc(null)
                                             setSelectedDoc(document);
+                                            setActivePosition({lat : positions[index][0], lng : positions[index][1]})
+                                            
                                         },
                                     }}>
                                     </Marker>
@@ -185,6 +218,13 @@ function MapViewer(props) {
                     <GeoJSON key={selectedDoc.id} data={selectedDoc.area} color="red" />
                 )}
                 <Legend icons={icons} />
+                {/* Sposta la mappa quando viene selezionato un marker */}
+                {activePosition && (
+                    <MoveMapToMarker
+                        position={activePosition}
+                        offset={{ x: 0, y: 100 }} // Offset per spostare il marker sopra la Document Card
+                    />
+                )}
             </MapContainer>
 
             {/* Document Card */}
@@ -274,7 +314,7 @@ function Legend({ icons }) {
                         <Button
                             variant="link"
                             onClick={toggleVisibility}
-                            style={{ padding: 0, border: 'none', background: 'none', color:'black' }}
+                            style={{ padding: 0, border: 'none', background: 'none', color: 'black' }}
                         >
                             <i className="bi bi-x-lg"></i>
                         </Button>
