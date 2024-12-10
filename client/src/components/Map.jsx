@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, LayersControl, GeoJSON, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, LayersControl, GeoJSON, useMap, Tooltip as LeafletTooltip } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import L from 'leaflet';
 import 'leaflet-draw';
@@ -189,6 +189,9 @@ function MapViewer(props) {
                                 setActivePosition({lat : doc.coordinate[0], lng : doc.coordinate[1]})
                             },
                         }}>
+                            <LeafletTooltip direction="top" offset={[5, -30]} opacity={1}>
+                                <span>{doc.title}</span>
+                            </LeafletTooltip>
                         </Marker>
                     ))}
                     {Array.from(documentsByArea.entries()).map(([areaKey, areaDocuments]) => {
@@ -206,6 +209,9 @@ function MapViewer(props) {
                                             
                                         },
                                     }}>
+                                        <LeafletTooltip direction="top" offset={[5,-30]} opacity={1}>
+                                            <span>{document.title}</span>
+                                        </LeafletTooltip>
                                     </Marker>
                                 ))}
                             </React.Fragment>
