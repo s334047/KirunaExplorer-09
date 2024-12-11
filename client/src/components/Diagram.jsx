@@ -3,13 +3,14 @@ import * as d3 from "d3";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
 import { DocumentModal } from "./DocumentShowInfo";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Button } from "react-bootstrap";
 
 const TimelineDiagram = ({ documents, connections }) => {
     const svgRef = useRef(null);
     const height = document.documentElement.clientHeight * 0.85;
     const width = document.documentElement.clientWidth;
     const [selectedDoc, setSelectedDoc] = useState(null);
+    const [legendVisible, setLegendVisible] = useState(false);
     useEffect(() => {
         const margin = { top: 30, right: 50, bottom: 50, left: 50 };
         const maxHeight = height * 0.9; // Maximum height available (90% of the viewport height)
@@ -62,7 +63,9 @@ const TimelineDiagram = ({ documents, connections }) => {
         svg.append("g")
             .attr("class", "x-axis")
             .attr("transform", `translate(0, ${adjustedHeight - margin.bottom})`)
-            .call(xAxis);
+            .call(xAxis)
+            .selectAll("text") // Seleziona tutti i testi dell'asse x
+            .style("font-size", "16px"); // Imposta la dimensione del font
         const yAxis = d3.axisLeft(yScale).ticks(maxRow).tickFormat("").tickSize(0);
         svg.append("g")
             .attr("class", "y-axis")
@@ -165,7 +168,7 @@ const TimelineDiagram = ({ documents, connections }) => {
                 const newYScale = transform.rescaleY(yScale);
 
                 // Aggiorna assi
-                svg.select(".x-axis").call(d3.axisBottom(newXScale));
+                svg.select(".x-axis").call(d3.axisBottom(newXScale)).selectAll("text").style("font-size", "16px");
                 svg.select(".y-axis").call(d3.axisLeft(newYScale).tickFormat("").tickSize(0));
 
                 // Aggiorna griglia
@@ -212,28 +215,33 @@ const TimelineDiagram = ({ documents, connections }) => {
     return (
         <Container style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             {selectedDoc && <DocumentModal selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} />}
-            <div style={{ marginTop: "20px" }}>
+            <div style={{ marginTop: "1px" }}>
                 <Row className="align-items-center">
                     <Col>
-                        <div>
-                            <Row className="align-items-center text-center">
-                                <Col xs="3">
+                        <Row className="align-items-center text-center">
+                            <Col xs="2">
+                                <Button onClick={() => setLegendVisible(!legendVisible)}
+                                    style={{ backgroundColor: '#154109', color: 'white' }}>
+                                    {legendVisible ? "Hide Legend" : "Show Legend"}
+                                </Button>
+                            </Col>
+                            {legendVisible && (<>
+                                <Col xs="2">
                                     <span style={{ color: "red" }}><b>Projection (Dashed line)</b></span>
                                 </Col>
-                                <Col xs="3">
+                                <Col xs="2">
                                     <span style={{ color: "blue" }}><b>Update (mixed line)</b></span>
                                 </Col>
                                 <Col xs="3">
                                     <span style={{ color: "green" }}><b>Collateral Consequence (spaced line)</b></span>
                                 </Col>
-                                <Col xs="3">
+                                <Col xs="2">
                                     <span style={{ color: "black" }}><b>Direct Consequence (dotted line)</b></span>
-                                </Col>
-                            </Row>
-                        </div>
+                                </Col></>
+                            )}
+                        </Row>
                     </Col>
                 </Row>
-
                 <Row>
                     <Col>
                         <svg ref={svgRef} style={{ marginTop: "5px" }}></svg>
