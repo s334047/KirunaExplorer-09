@@ -275,11 +275,11 @@ function MapViewer(props) {
                     zIndex: 1000,
                 }}>
                     <DocumentCard
+                        documents={docs}
                         selectedDoc={selectedDoc}
                         setSelectedDoc={setSelectedDoc}
                         setShowAddLink={props.setShowAddLink}
                         user={props.user}
-                        mode='map'
                         excludeTitle={props.setTitle}
                         mapRef={mapRef}
                     />

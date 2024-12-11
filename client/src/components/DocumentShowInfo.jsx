@@ -6,15 +6,15 @@ import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 
-function DocumentCard({ selectedDoc, setSelectedDoc, user, excludeTitle,mapRef }) {
-    const [n, setN] = useState(0);
+function DocumentCard({ documents, selectedDoc, setSelectedDoc, user, excludeTitle, mapRef }) {
+    const [connections, setConnections] = useState([]);
     const navigate = useNavigate();
     useEffect(() => {
-        const getNConnection = async () => {
-            const n = await API.GetDocumentConnections(selectedDoc.title);
-            setN(n);
+        const getConnections = async () => {
+            const connectionsInfo = await API.GetDocumentInfoConnections(selectedDoc.id);
+            setConnections(connectionsInfo);
         }
-        getNConnection();
+        getConnections();
     }, [selectedDoc])
     return (
         <Card className="document-card">
@@ -31,25 +31,41 @@ function DocumentCard({ selectedDoc, setSelectedDoc, user, excludeTitle,mapRef }
                     />
                 </div>
                 <Row >
-                    <Col md={6} >
+                    <Col md={connections.length>0 ? 4: 6} >
                         <ul style={{ listStyleType: 'none', paddingLeft: '30px' }}>
                             <li><strong>Title:</strong> {selectedDoc.title}</li>
                             <li><strong>Stakeholder:</strong> {selectedDoc.stakeholder}</li>
                             <li><strong>Scale:</strong> {selectedDoc.scale}</li>
                             <li><strong>Date:</strong> {selectedDoc.date}</li>
                             <li><strong>Type:</strong> {selectedDoc.type}</li>
-                            <li>
-                                <strong>Connections:</strong> {n}
-                            </li>
                             {selectedDoc.language && <li><strong>Language:</strong> {selectedDoc.language}</li>}
                             {selectedDoc.page && <li><strong>Pages:</strong> {selectedDoc.page}</li>}
                         </ul>
                     </Col>
-                    <Col md={6}>
+                    {connections.length > 0 &&
+                        <Col md={4}>
+                            <strong>Connections:</strong>
+                            <ul>
+                                {connections.map(connection => (
+                                    <li key={`${connection.id}-${connection.type}`}>
+                                        <Button
+                                            variant="link"
+                                            style={{ color: "#154109" , textAlign: "left"}}
+                                            onClick={() => setSelectedDoc(documents.find((d) => d.id === connection.id))}
+                                        >
+                                            {connection.title} - {connection.type}
+                                        </Button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </Col>
+                    }
+                    <Col md={connections.length>0 ? 4: 6}>
                         <ul style={{ listStyleType: 'none', paddingRight: '30px' }}>
                             <li><strong>Description:</strong><br />{selectedDoc.description}</li>
                         </ul>
                     </Col>
+
                 </Row>
                 {user.role === 'Urban Planner' &&
                     <div className="d-flex justify-content-end">
@@ -68,11 +84,12 @@ function DocumentCard({ selectedDoc, setSelectedDoc, user, excludeTitle,mapRef }
 }
 
 DocumentCard.propTypes = {
+    documents: PropTypes.array.isRequired,
     selectedDoc: PropTypes.object.isRequired,
     setSelectedDoc: PropTypes.func.isRequired,
     user: PropTypes.object.isRequired,
     excludeTitle: PropTypes.func.isRequired,
-    mapRef:PropTypes.object,
+    mapRef: PropTypes.object,
 }
 
 function DocumentModal({ selectedDoc, setSelectedDoc }) {
@@ -155,9 +172,9 @@ function DocumentModal({ selectedDoc, setSelectedDoc }) {
                                 </ul>
                             </li>
                         }
-                </ul>
-            </div>
-        </Modal.Body>
+                    </ul>
+                </div>
+            </Modal.Body>
         </Modal >
     );
 }
