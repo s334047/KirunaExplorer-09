@@ -350,5 +350,9 @@ MapViewer.propTypes = {
 Legend.propTypes = {
     icons: propTypes.object.isRequired,
 };
+MoveMapToMarker.propTypes ={
+    position:propTypes.object.isRequired,
+    offset:propTypes.object.isRequired,
+}
 
 export default MapViewer;

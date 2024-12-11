@@ -29,7 +29,7 @@ function App() {
   const nav = useNavigate();
 
   const setFeedbackFromError = (error) => {
-    setMessage({ msg: `Error: ${error.message}`, type: 'alert' });
+    setMessage( `Error: ${error.message}`);
   };
 
   useEffect(() => {
@@ -41,7 +41,7 @@ function App() {
         if (loggedIn)
           setFeedbackFromError(e);
         setLoggedIn(false);
-        setUser('');
+        setUser({});
       });
   }, [loggedIn]);
 
@@ -51,16 +51,16 @@ function App() {
       const user = await API.logIn(credentials);
       setLoggedIn(true);
       setShowLoginModal(false);
-      setMessage({ msg: `Benvenuto, ${user.username}!`, type: 'success' });
+      setMessage(`Benvenuto, ${user.username}!`);
       setUser(user);
     } catch (err) {
-      setMessage({ msg: `Incorrect username or password\n` + err, type: 'alert' });
+      setMessage(`Incorrect username or password\n`);
     }
   };
   const handleLogout = async () => {
     await API.logOut();
     setShowAddLink(false)
-    setUser('');
+    setUser({});
     setLoggedIn(false);
     setMessage('');
     nav('/');
