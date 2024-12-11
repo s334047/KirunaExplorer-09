@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 
-function DocumentCard({ selectedDoc, setSelectedDoc, user, excludeTitle }) {
+function DocumentCard({ selectedDoc, setSelectedDoc, user, excludeTitle,mapRef }) {
     const [n, setN] = useState(0);
     const navigate = useNavigate();
     useEffect(() => {
@@ -25,6 +25,7 @@ function DocumentCard({ selectedDoc, setSelectedDoc, user, excludeTitle }) {
                         className="btn btn-close"
                         onClick={() => {
                             setSelectedDoc(null);
+                            mapRef.current.setZoom(13)
                         }}
                         aria-label="Close"
                     />
