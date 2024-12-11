@@ -11,6 +11,7 @@ const TimelineDiagram = ({ documents, connections }) => {
     const width = document.documentElement.clientWidth;
     const [selectedDoc, setSelectedDoc] = useState(null);
     const [legendVisible, setLegendVisible] = useState(false);
+    const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, name: "" });
     useEffect(() => {
         const margin = { top: 30, right: 50, bottom: 50, left: 50 };
         const maxHeight = height * 0.9; // Maximum height available (90% of the viewport height)
@@ -64,7 +65,7 @@ const TimelineDiagram = ({ documents, connections }) => {
             .attr("class", "x-axis")
             .attr("transform", `translate(0, ${adjustedHeight - margin.bottom})`)
             .call(xAxis)
-            .selectAll("text") // Seleziona tutti i testi dell'asse x
+            .selectAll("text") // Seleziona tutti i testi dell"asse x
             .style("font-size", "16px"); // Imposta la dimensione del font
         const yAxis = d3.axisLeft(yScale).ticks(maxRow).tickFormat("").tickSize(0);
         svg.append("g")
@@ -185,7 +186,13 @@ const TimelineDiagram = ({ documents, connections }) => {
                 // Aggiorna cerchi
                 svg.selectAll(".documents circle")
                     .attr("cx", (d) => newXScale(d.date))
-                    .attr("cy", (d) => newYScale(d.row));
+                    .attr("cy", (d) => newYScale(d.row))
+                    .on("mouseover", (event, d) => {
+                        setTooltip({ visible: true, x: event.pageX, y: event.pageY, name: d.title });
+                    })
+                    .on("mouseout", () => {
+                        setTooltip({ visible: false, x: 0, y: 0, name: "" });
+                    });
 
                 // Aggiorna curve di Bézier
                 svg.selectAll(".connections path")
@@ -213,7 +220,7 @@ const TimelineDiagram = ({ documents, connections }) => {
     }, [width, height, documents, connections]);
 
     return (
-        <Container style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Container style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             {selectedDoc && <DocumentModal selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} />}
             <div style={{ marginTop: "1px" }}>
                 <Row className="align-items-center">
@@ -221,7 +228,7 @@ const TimelineDiagram = ({ documents, connections }) => {
                         <Row className="align-items-center text-center">
                             <Col xs="2">
                                 <Button onClick={() => setLegendVisible(!legendVisible)}
-                                    style={{ backgroundColor: '#154109', color: 'white' }}>
+                                    style={{ backgroundColor: "#154109", color: "white" }}>
                                     {legendVisible ? "Hide Legend" : "Show Legend"}
                                 </Button>
                             </Col>
@@ -247,6 +254,11 @@ const TimelineDiagram = ({ documents, connections }) => {
                         <svg ref={svgRef} style={{ marginTop: "5px" }}></svg>
                     </Col>
                 </Row>
+                {tooltip.visible && (
+                    <div style={{ position: 'absolute', left: tooltip.x + 10, top: tooltip.y + 10, backgroundColor: 'white', border: '1px solid black', padding: '5px', pointerEvents: 'none', zIndex: 1000 }}>
+                        {tooltip.name}
+                    </div>
+                )}
             </div>
         </Container>);
 };
