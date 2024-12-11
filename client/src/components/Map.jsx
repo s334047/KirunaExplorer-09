@@ -12,14 +12,14 @@ import API from '../../API.mjs';
 import propTypes from "prop-types";
 
 
-function MoveMapToMarker({ position, offset,MarkerClusterGroup }) {
+function MoveMapToMarker({ position }) {
     const map = useMap();
 
     useEffect(() => {
         if (position) {
                 map.setView(position, 17);
         }
-    }, [position, offset, map]);
+    }, [position, map]);
 
     return null;
 }
@@ -260,8 +260,7 @@ function MapViewer(props) {
                 {activePosition && (
                     <MoveMapToMarker
                         position={activePosition}
-                        offset={{ x: 0, y: 100 }} // Offset per spostare il marker sopra la Document Card
-                        MarkerClusterGroup={markerClusterRef}
+
                     />
                 )}
             </MapContainer>
@@ -386,7 +385,6 @@ Legend.propTypes = {
 };
 MoveMapToMarker.propTypes = {
     position: propTypes.object.isRequired,
-    offset: propTypes.object.isRequired,
 }
 
 export default MapViewer;

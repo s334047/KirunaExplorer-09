@@ -72,6 +72,7 @@ DocumentCard.propTypes = {
     setSelectedDoc: PropTypes.func.isRequired,
     user: PropTypes.object.isRequired,
     excludeTitle: PropTypes.func.isRequired,
+    mapRef:PropTypes.object,
 }
 
 function DocumentModal({ selectedDoc, setSelectedDoc }) {
