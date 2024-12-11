@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import API from '../../API.mjs';
 import ListDocumentLink from './Link';
 import FileUploader from './AddResources';
+import { useNavigate } from 'react-router-dom';
 
 function DocumentTable(props) {
 
@@ -207,6 +208,7 @@ function AdditionalInfo({ selectedDoc, setSelectedDoc, documents, setShowAddLink
     const [showFileUploader, setShowFileUploader] = useState(false);
     const [triggerFileInput, setTriggerFileInput] = useState(false);
     const [resources, setResources] = useState([]);
+    const navigate = useNavigate();
 
     const handleDownload = async (id) => {
         try {
@@ -294,9 +296,9 @@ function AdditionalInfo({ selectedDoc, setSelectedDoc, documents, setShowAddLink
                         }
 
                     </ul>
-                    {user.role=="Urban Planner" &&
+                    
                     <div style={{ textAlign: 'right' }}>
-                        <Button
+                        {user.role=="Urban Planner" && <><Button
                             variant="light"
                             style={{ color: "#154109", borderColor: "#154109", marginRight: "10px" }}
                             onClick={() => { setShowAddLinkModal(true); }}
@@ -309,8 +311,15 @@ function AdditionalInfo({ selectedDoc, setSelectedDoc, documents, setShowAddLink
                             onClick={handleAddResourcesClick}
                         >
                             <i className="bi bi-paperclip me-2"></i>Add original resources
+                        </Button></>}
+                        <Button
+                            variant="light"
+                            style={{ color: "#154109", borderColor: "#154109", marginRight: "10px" }}
+                            onClick={()=>{navigate("/", { state: { documentId: selectedDoc.id } })}}
+                        >
+                            <i className="bi bi-eye me-2"></i>See on map
                         </Button>
-                    </div>}
+                    </div>
                 </td>
             </tr>
 

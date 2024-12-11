@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, LayersControl, GeoJSON, useMap, Tooltip as LeafletTooltip } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import L from 'leaflet';
@@ -6,25 +6,24 @@ import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import 'react-leaflet-markercluster/dist/styles.min.css';
 import { Button, Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { DocumentCard } from './DocumentShowInfo';
 import API from '../../API.mjs';
 import propTypes from "prop-types";
 
-function MoveMapToMarker({ position, offset }) {
+
+function MoveMapToMarker({ position }) {
     const map = useMap();
 
     useEffect(() => {
         if (position) {
-            const targetPoint = map.latLngToContainerPoint(position);
-            const offsetPoint = L.point(targetPoint.x + offset.x, targetPoint.y + offset.y);
-            const newCenter = map.containerPointToLatLng(offsetPoint);
-            map.setView(newCenter, map.getZoom());
+                map.setView(position, 17);
         }
-    }, [position, offset, map]);
+    }, [position, map]);
 
     return null;
 }
+
 function MapViewer(props) {
     const navigate = useNavigate();
     const position = [67.8558, 20.2253];
@@ -32,6 +31,10 @@ function MapViewer(props) {
     const [selectedDoc, setSelectedDoc] = useState(null);
     const [documentsByArea, setDocumentsByArea] = useState(new Map());
     const [activePosition, setActivePosition] = useState(null);
+    const location = useLocation();
+    const documentId = location.state?.documentId;
+    const markerClusterRef = useRef();
+    const mapRef = useRef();
 
     useEffect(() => {
         const getDocs = async () => {
@@ -48,8 +51,36 @@ function MapViewer(props) {
             });
 
             setDocumentsByArea(areaMap);
+            if (documentId && documents.length > 0) {
+  
+                const doc = documents.find(d => d.id === documentId);
+
+                if (doc) {
+                    setSelectedDoc(doc);
+                    if (doc.coordinate) {
+                        setActivePosition({ lat: doc.coordinate[0], lng: doc.coordinate[1] });
+                    }
+                    else if (doc.area) {
+                        const areaKey = JSON.stringify(doc.area);
+                        const areaDocuments = areaMap.get(areaKey);
+                        if (areaDocuments) {
+                            const positions = generateNonOverlappingPositions(doc.area, areaDocuments.length);
+                            const docIndex = areaDocuments.findIndex(d => d.id === doc.id);
+                            if (docIndex !== -1) {
+                                setActivePosition({
+                                    lat: positions[docIndex][0],
+                                    lng: positions[docIndex][1],
+                                });
+                            }
+                        }
+                    }
+                }
+
+            }
         };
+
         getDocs();
+        navigate(location.pathname, { replace: true, state: null });
     }, []);
     const icons = {
         'Informative document': new L.Icon({ iconUrl: 'icon_doc_blue.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
@@ -58,17 +89,17 @@ function MapViewer(props) {
         'Technical document': new L.Icon({ iconUrl: 'icon_doc_red.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
         'Material effect': new L.Icon({ iconUrl: 'icon_doc_yellow.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
     };
-    const getIconByType = (type, selectedDoc,docTitle) => {
+    const getIconByType = (type, selectedDoc, docTitle) => {
         const baseIcon = icons[type];
         let size = baseIcon.options.iconSize; // Dimensione maggiore se selezionato
-        let anchor =  baseIcon.options.iconAnchor; // Ancoraggio adattato alla nuova dimensione
-        if (selectedDoc){
-            if (selectedDoc.title === docTitle){
-                size = [50, 50] ;
+        let anchor = baseIcon.options.iconAnchor; // Ancoraggio adattato alla nuova dimensione
+        if (selectedDoc) {
+            if (selectedDoc.title === docTitle) {
+                size = [50, 50];
                 anchor = [25, 50];
             }
         }
-    
+
         return new L.Icon({
             iconUrl: baseIcon.options.iconUrl, // URL originale
             iconSize: size,                   // Dimensione dinamica
@@ -159,6 +190,7 @@ function MapViewer(props) {
     return (
         <div style={{ display: 'flex', flex: 1, position: 'relative', height: '90vh' }}>
             <MapContainer
+                ref={mapRef}
                 center={position}
                 zoom={13}
                 style={{ flex: 1, height: "100%", width: "100%", borderRadius: '10px' }}
@@ -180,13 +212,13 @@ function MapViewer(props) {
                 </LayersControl>
 
                 {/* Marker Cluster Group */}
-                <MarkerClusterGroup showCoverageOnHover={false} disableClusteringAtZoom={20} iconCreateFunction={createClusterCustomIcon}>
+                <MarkerClusterGroup ref={markerClusterRef} showCoverageOnHover={false} disableClusteringAtZoom={20} iconCreateFunction={createClusterCustomIcon}>
                     {docs.filter(doc => doc.coordinate != null).map(doc => (
-                        <Marker key={doc.title} position={doc.coordinate} icon={getIconByType(doc.type,selectedDoc,doc.title)} eventHandlers={{
+                        <Marker key={doc.title} position={doc.coordinate} icon={getIconByType(doc.type, selectedDoc, doc.title)} eventHandlers={{
                             click: () => {
                                 setSelectedDoc(null)
                                 setSelectedDoc(doc);
-                                setActivePosition({lat : doc.coordinate[0], lng : doc.coordinate[1]})
+                                setActivePosition({ lat: doc.coordinate[0], lng: doc.coordinate[1] })
                             },
                         }}>
                             <LeafletTooltip direction="top" offset={[5, -30]} opacity={1}>
@@ -201,15 +233,15 @@ function MapViewer(props) {
                         return (
                             <React.Fragment key={areaKey}>
                                 {areaDocuments.map((document, index) => (
-                                    <Marker key={document.id} position={positions[index]} icon={getIconByType(document.type,selectedDoc,document.title)} eventHandlers={{
+                                    <Marker key={document.id} position={positions[index]} icon={getIconByType(document.type, selectedDoc, document.title)} eventHandlers={{
                                         click: () => {
                                             setSelectedDoc(null)
                                             setSelectedDoc(document);
-                                            setActivePosition({lat : positions[index][0], lng : positions[index][1]})
-                                            
+                                            setActivePosition({ lat: positions[index][0], lng: positions[index][1] })
+
                                         },
                                     }}>
-                                        <LeafletTooltip direction="top" offset={[5,-30]} opacity={1}>
+                                        <LeafletTooltip direction="top" offset={[5, -30]} opacity={1}>
                                             <span>{document.title}</span>
                                         </LeafletTooltip>
                                     </Marker>
@@ -228,7 +260,7 @@ function MapViewer(props) {
                 {activePosition && (
                     <MoveMapToMarker
                         position={activePosition}
-                        offset={{ x: 0, y: 100 }} // Offset per spostare il marker sopra la Document Card
+
                     />
                 )}
             </MapContainer>
@@ -249,6 +281,7 @@ function MapViewer(props) {
                         user={props.user}
                         mode='map'
                         excludeTitle={props.setTitle}
+                        mapRef={mapRef}
                     />
                 </div>
             )}
@@ -350,9 +383,8 @@ MapViewer.propTypes = {
 Legend.propTypes = {
     icons: propTypes.object.isRequired,
 };
-MoveMapToMarker.propTypes ={
-    position:propTypes.object.isRequired,
-    offset:propTypes.object.isRequired,
+MoveMapToMarker.propTypes = {
+    position: propTypes.object.isRequired,
 }
 
 export default MapViewer;
