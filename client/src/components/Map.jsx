@@ -12,12 +12,18 @@ import API from '../../API.mjs';
 import propTypes from "prop-types";
 
 
-function MoveMapToMarker({ position }) {
+function MoveMapToMarker({ position,view,setView }) {
     const map = useMap();
 
     useEffect(() => {
         if (position) {
+            if (view == "normal"){
+                map.setView(position, map.getZoom());
+            }
+            else{
                 map.setView(position, 17);
+                setView("normal")
+            }
         }
     }, [position, map]);
 
@@ -31,6 +37,7 @@ function MapViewer(props) {
     const [selectedDoc, setSelectedDoc] = useState(null);
     const [documentsByArea, setDocumentsByArea] = useState(new Map());
     const [activePosition, setActivePosition] = useState(null);
+    const [view,setView]=useState("normal");
     const location = useLocation();
     const documentId = location.state?.documentId;
     const markerClusterRef = useRef();
@@ -48,13 +55,14 @@ function MapViewer(props) {
                     areaMap.set(areaKey, []);
                 }
                 areaMap.get(areaKey)?.push(doc);
+                setPositions(documentId,documents)
             });
 
             setDocumentsByArea(areaMap);
             if (documentId && documents.length > 0) {
-  
+                setView("advanced")
                 const doc = documents.find(d => d.id === documentId);
-
+    
                 if (doc) {
                     setSelectedDoc(doc);
                     if (doc.coordinate) {
@@ -75,13 +83,41 @@ function MapViewer(props) {
                         }
                     }
                 }
-
+    
             }
         };
 
         getDocs();
         navigate(location.pathname, { replace: true, state: null });
     }, []);
+    const setPositions=(documentId,documents)=>{
+        if (documentId && documents.length > 0) {
+            setView("advanced")
+            const doc = documents.find(d => d.id === documentId);
+
+            if (doc) {
+                setSelectedDoc(doc);
+                if (doc.coordinate) {
+                    setActivePosition({ lat: doc.coordinate[0], lng: doc.coordinate[1] });
+                }
+                else if (doc.area) {
+                    const areaKey = JSON.stringify(doc.area);
+                    const areaDocuments = documentsByArea.get(areaKey);
+                    if (areaDocuments) {
+                        const positions = generateNonOverlappingPositions(doc.area, areaDocuments.length);
+                        const docIndex = areaDocuments.findIndex(d => d.id === doc.id);
+                        if (docIndex !== -1) {
+                            setActivePosition({
+                                lat: positions[docIndex][0],
+                                lng: positions[docIndex][1],
+                            });
+                        }
+                    }
+                }
+            }
+
+        }
+    }
     const icons = {
         'Informative document': new L.Icon({ iconUrl: 'icon_doc_blue.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
         'Prescriptive document': new L.Icon({ iconUrl: 'icon_doc_green.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
@@ -260,6 +296,8 @@ function MapViewer(props) {
                 {activePosition && (
                     <MoveMapToMarker
                         position={activePosition}
+                        view={view}
+                        setView={setView}
 
                     />
                 )}
@@ -282,6 +320,7 @@ function MapViewer(props) {
                         user={props.user}
                         excludeTitle={props.setTitle}
                         mapRef={mapRef}
+                        setPosition={setPositions}
                     />
                 </div>
             )}
@@ -385,6 +424,8 @@ Legend.propTypes = {
 };
 MoveMapToMarker.propTypes = {
     position: propTypes.object.isRequired,
+    view: propTypes.string.isRequired,
+    setView: propTypes.func.isRequired
 }
 
 export default MapViewer;

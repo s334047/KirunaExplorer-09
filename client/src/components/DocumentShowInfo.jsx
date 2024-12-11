@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 
-function DocumentCard({ documents, selectedDoc, setSelectedDoc, user, excludeTitle, mapRef }) {
+function DocumentCard({ documents, selectedDoc, setSelectedDoc, user, excludeTitle, mapRef,setPosition }) {
     const [connections, setConnections] = useState([]);
     const navigate = useNavigate();
     useEffect(() => {
@@ -51,7 +51,9 @@ function DocumentCard({ documents, selectedDoc, setSelectedDoc, user, excludeTit
                                         <Button
                                             variant="link"
                                             style={{ color: "#154109" , textAlign: "left"}}
-                                            onClick={() => setSelectedDoc(documents.find((d) => d.id === connection.id))}
+                                            onClick={() => {setSelectedDoc(documents.find((d) => d.id === connection.id));
+                                                console.log("Passo di qui");
+                                                setPosition(connection.id,documents)}}
                                         >
                                             {connection.title} - {connection.type}
                                         </Button>
@@ -90,6 +92,7 @@ DocumentCard.propTypes = {
     user: PropTypes.object.isRequired,
     excludeTitle: PropTypes.func.isRequired,
     mapRef: PropTypes.object,
+    setPosition: PropTypes.func
 }
 
 function DocumentModal({ selectedDoc, setSelectedDoc }) {
