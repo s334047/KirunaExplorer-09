@@ -72,7 +72,7 @@ function LoginComponent(props) {
                                         textAlign: 'center'
                                     }}
                                 >
-                                    {props.message.msg}
+                                    {props.message}
                                 </div>
 
                                 <Button
