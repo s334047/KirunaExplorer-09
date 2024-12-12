@@ -102,27 +102,38 @@ describe("Authenticator Tests", () => {
             json: jest.fn(),
         } as any;
         const nextMock = jest.fn();
-
         const userMock = { id: 1, username: "testuser" };
-
-        jest.spyOn(passport, "authenticate").mockImplementation(
-            () => (req, res, next) => {
-                const callback = (err, user, _info) => {
-                    if (err || !user) return next(err || new Error("Authentication failed"));
-                    req.login(user, (loginErr) => {
-                        if (loginErr) return next(loginErr);
-                        res.status(200).json(user);
-                    });
-                };
-                callback(null, userMock, null);
-            }
-        );
-
+    
+        // Extracted callback for better readability
+        const authenticateCallback = (req, res, next) => {
+            const callback = (err, user, _info) => {
+                if (err || !user) {
+                    next(err || new Error("Authentication failed"));
+                    return;
+                }
+                handleUserLogin(req, res, next, user);
+            };
+            callback(null, userMock, null);
+        };
+    
+        // Extracted user login handling
+        const handleUserLogin = (req, res, next, user) => {
+            req.login(user, (loginErr) => {
+                if (loginErr) {
+                    next(loginErr);
+                    return;
+                }
+                res.status(200).json(user);
+            });
+        };
+    
+        jest.spyOn(passport, "authenticate").mockImplementation(() => authenticateCallback);
+    
         await auth.login(reqMock, resMock, nextMock);
-
+    
         expect(nextMock).toHaveBeenCalledWith(new Error("Login error"));
     });
-
+    
     test("should return 401 if authentication fails", async () => {
         const reqMock = { login: jest.fn() } as any;
         const resMock = { status: jest.fn().mockReturnThis(), json: jest.fn() } as any;
@@ -211,25 +222,27 @@ describe("Authenticator Tests", () => {
     });
 
     
+    function handleAuthenticationError(res: any) {
+        res.status(401).json({ error: "Authentication failed" });
+    }
+    
     test("should handle missing user during login", async () => {
         const reqMock = { login: jest.fn() } as any;
         const resMock = { status: jest.fn().mockReturnThis(), json: jest.fn() } as any;
         const nextMock = jest.fn();
     
-        jest.spyOn(passport, "authenticate").mockImplementation(
-            () => (_req, res, _next) => {
-                const callback = (_err, _user, _info) => {
-                    res.status(401).json({ error: "Authentication failed" });
-                };
-                callback(null, null, null);
-            }
-        );
+        const mockAuthenticate = () => (_req: any, res: any, _next: any) => {
+            handleAuthenticationError(res);
+        };
+    
+        jest.spyOn(passport, "authenticate").mockImplementation(mockAuthenticate);
     
         await auth.login(reqMock, resMock, nextMock);
     
         expect(resMock.status).toHaveBeenCalledWith(401);
         expect(resMock.json).toHaveBeenCalledWith({ error: "Authentication failed" });
     });
+    
     
     test("should handle unexpected errors during logout", async () => {
         const reqMock: RequestMock = {
@@ -267,40 +280,51 @@ describe("Authenticator Tests", () => {
     test("should perform full auth flow", async () => {
         const reqMock: any = {
             logout: jest.fn((callback: (err: any) => void) => callback(null)),
-            login: jest.fn((_user: any, callback: any) => callback(null)),
+            login: jest.fn((_user: any, callback: (err: any) => void) => callback(null)),
             isAuthenticated: jest.fn(() => true),
         };
+    
         const resMock: any = {
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
             end: jest.fn(),
-        } as any;
+        };
+    
         const nextMock = jest.fn();
+    
+        const handleLogin = (req: any, res: any, next: any, user: any) => {
+            req.login(user, (loginErr: any) => {
+                if (loginErr) return next(loginErr);
+                res.status(200).json(user);
+            });
+        };
+    
+        const authenticateCallback = (req: any, res: any, next: any) => {
+            const userMock = { id: 1, username: "testuser" };
+            handleLogin(req, res, next, userMock);
+        };
+    
+        jest.spyOn(passport, "authenticate").mockImplementation(
+            () => (req, res, next) => authenticateCallback(req, res, next)
+        );
     
         // Initialize auth
         auth.initAuth();
         expect(mockApp.use).toHaveBeenCalledTimes(3);
     
         // Simulate login
-        jest.spyOn(passport, "authenticate").mockImplementation(
-            () => (req, res, next) => {
-                const callback = (_err, user, _info) => {
-                    req.login(user, next);
-                    res.status(200).json(user);
-                };
-                callback(null, { id: 1, username: "testuser" }, null);
-            }
-        );
-    
         await auth.login(reqMock, resMock, nextMock);
+    
         expect(reqMock.login).toHaveBeenCalled();
         expect(resMock.status).toHaveBeenCalledWith(200);
     
         // Simulate logout
         await auth.logout(reqMock, resMock, nextMock);
+    
         expect(reqMock.logout).toHaveBeenCalled();
         expect(resMock.status).toHaveBeenCalledWith(200);
     });
+    
     test("should handle errors during passport initialization", () => {
         const useSpy = jest.spyOn(passport, "use").mockImplementation(() => {
             throw new Error("Initialization error");
@@ -599,31 +623,31 @@ test("should handle unexpected error during logout", async () => {
     expect(nextMock).toHaveBeenCalledWith(new Error("Unexpected error"));
 });
 
-test("should handle missing user in req during login gracefully", async () => {
-    const reqMock = { login: jest.fn() } as any; // `login` is mocked but won't be called
-    const resMock = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-    } as any;
-    const nextMock = jest.fn();
-
-    // Simulate passport.authenticate returning no user
+// Helper function to simulate passport authentication behavior
+const simulatePassportAuthenticate = (callback) => {
     jest.spyOn(passport, "authenticate").mockImplementation(
         () => (_req, res, _next) => {
-            const callback = (_err, user, _info) => {
-                if (!user) {
-                    res.status(401).json({ error: "Authentication failed" });
-                }
-            };
-            callback(null, null, null); // No user
+            callback(res);
         }
     );
+};
+
+test("should handle missing user during login gracefully", async () => {
+    const reqMock = { login: jest.fn() } as any;
+    const resMock = { status: jest.fn().mockReturnThis(), json: jest.fn() } as any;
+    const nextMock = jest.fn();
+
+    // Use the helper function to simplify passport behavior
+    simulatePassportAuthenticate((res) => {
+        res.status(401).json({ error: "Authentication failed" });
+    });
 
     await auth.login(reqMock, resMock, nextMock);
 
     expect(resMock.status).toHaveBeenCalledWith(401);
     expect(resMock.json).toHaveBeenCalledWith({ error: "Authentication failed" });
 });
+
 
 test("should throw an error if session secret is missing", () => {
     const sessionMiddleware = jest.fn(() => {
