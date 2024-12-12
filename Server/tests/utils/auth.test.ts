@@ -694,12 +694,16 @@ test("should throw an error if deserialization logic is missing", () => {
 test("should initialize passport and session middleware", () => {
     const appMock = { use: jest.fn() } as any;
 
-    new Authenticator(appMock);
+    const authenticator = new Authenticator(appMock); // Instantiate and assign the object
+
+    // Optionally check if the authenticator instance is not null or undefined
+    expect(authenticator).toBeDefined();
 
     expect(appMock.use).toHaveBeenCalledWith(expect.any(Function)); // For session
     expect(appMock.use).toHaveBeenCalledWith(passport.initialize());
     expect(appMock.use).toHaveBeenCalledWith(passport.session());
 });
+
 
 
 test("should correctly initialize passport middleware with session", () => {
