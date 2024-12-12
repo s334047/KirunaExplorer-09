@@ -145,6 +145,11 @@ const TimelineDiagram = ({ documents, connections }) => {
                 // Event handler for click on the circle
                 setSelectedDoc(d);
                 // Here you can add further logic to handle the click, like opening a modal or navigating
+            }).on("mouseover", (event, d) => {
+                setTooltip({ visible: true, x: event.pageX, y: event.pageY, name: d.title });
+            })
+            .on("mouseout", () => {
+                setTooltip({ visible: false, x: 0, y: 0, name: "" });
             });
         // Add vertical gridlines
         const makeXGridlines = () => d3.axisBottom(xScale);
@@ -186,13 +191,7 @@ const TimelineDiagram = ({ documents, connections }) => {
                 // Aggiorna cerchi
                 svg.selectAll(".documents circle")
                     .attr("cx", (d) => newXScale(d.date))
-                    .attr("cy", (d) => newYScale(d.row))
-                    .on("mouseover", (event, d) => {
-                        setTooltip({ visible: true, x: event.pageX, y: event.pageY, name: d.title });
-                    })
-                    .on("mouseout", () => {
-                        setTooltip({ visible: false, x: 0, y: 0, name: "" });
-                    });
+                    .attr("cy", (d) => newYScale(d.row));
 
                 // Aggiorna curve di Bézier
                 svg.selectAll(".connections path")
