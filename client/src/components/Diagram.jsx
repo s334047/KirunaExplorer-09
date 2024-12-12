@@ -7,11 +7,22 @@ import { Container, Row, Col, Button } from "react-bootstrap";
 
 const TimelineDiagram = ({ documents, connections }) => {
     const svgRef = useRef(null);
-    const height = document.documentElement.clientHeight * 0.85;
-    const width = document.documentElement.clientWidth;
+    const height = document.documentElement.clientHeight * 0.80;
+    const [width, setWidth] = useState(document.documentElement.clientWidth);
     const [selectedDoc, setSelectedDoc] = useState(null);
     const [legendVisible, setLegendVisible] = useState(false);
     const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, name: "" });
+
+    // Handle resizing when the card is visible
+    useEffect(() => {
+        const handleResize = () => {
+            const containerWidth = document.documentElement.clientWidth * (selectedDoc ? 0.58 : 0.8); // Adjust width
+            setWidth(containerWidth);
+        };
+
+        handleResize();
+    }, [selectedDoc]);
+
     useEffect(() => {
         const margin = { top: 30, right: 50, bottom: 50, left: 50 };
         const maxHeight = height * 0.9; // Maximum height available (90% of the viewport height)
@@ -47,6 +58,8 @@ const TimelineDiagram = ({ documents, connections }) => {
             }
             assignedRows[doc.id] = { ...doc, row };
         });
+
+
         const maxRow = Math.max(...Object.values(assignedRows).map((d) => d.row));
         const rowHeight = Math.max(40, maxHeight / (maxRow + 1)); // Dynamic height with a minimum of 40px
         const adjustedHeight = margin.top + (maxRow + 1) * rowHeight + margin.bottom;
@@ -220,47 +233,68 @@ const TimelineDiagram = ({ documents, connections }) => {
     }, [width, height, documents, connections]);
 
     return (
-        <Container style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            {selectedDoc && <DocumentModal selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} />}
-            <div style={{ marginTop: "1px" }}>
-                <Row className="align-items-center">
-                    <Col>
-                        <Row className="align-items-center text-center">
-                            <Col xs="2">
-                                <Button onClick={() => setLegendVisible(!legendVisible)}
-                                    style={{ backgroundColor: "#154109", color: "white" }}>
-                                    {legendVisible ? "Hide Legend" : "Show Legend"}
-                                </Button>
-                            </Col>
-                            {legendVisible && (<>
-                                <Col xs="2">
-                                    <span style={{ color: "red" }}><b>Projection (Dashed line)</b></span>
-                                </Col>
-                                <Col xs="2">
-                                    <span style={{ color: "blue" }}><b>Update (mixed line)</b></span>
-                                </Col>
-                                <Col xs="3">
-                                    <span style={{ color: "green" }}><b>Collateral Consequence (spaced line)</b></span>
-                                </Col>
-                                <Col xs="2">
-                                    <span style={{ color: "black" }}><b>Direct Consequence (dotted line)</b></span>
-                                </Col></>
-                            )}
-                        </Row>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <svg ref={svgRef} style={{ marginTop: "5px" }}></svg>
-                    </Col>
-                </Row>
-                {tooltip.visible && (
-                    <div style={{ position: 'absolute', left: tooltip.x + 10, top: tooltip.y + 10, backgroundColor: 'white', border: '1px solid black', padding: '5px', pointerEvents: 'none', zIndex: 1000 }}>
-                        {tooltip.name}
-                    </div>
+        <Container>
+            <Row className="align-items-center text-center">
+                <Col xs="2">
+                    <Button
+                        onClick={() => setLegendVisible(!legendVisible)}
+                        style={{ backgroundColor: "#154109", color: "white" }}
+                    >
+                        {legendVisible ? "Hide Legend" : "Show Legend"}
+                    </Button>
+                </Col>
+                {legendVisible && (
+                    <>
+                        <Col xs="2">
+                            <span style={{ color: "red" }}><b>Projection (Dashed line)</b></span>
+                        </Col>
+                        <Col xs="2">
+                            <span style={{ color: "blue" }}><b>Update (Mixed line)</b></span>
+                        </Col>
+                        <Col xs="3">
+                            <span style={{ color: "green" }}><b>Collateral Consequence (Spaced line)</b></span>
+                        </Col>
+                        <Col xs="2">
+                            <span style={{ color: "black" }}><b>Direct Consequence (Dotted line)</b></span>
+                        </Col>
+                    </>
                 )}
-            </div>
-        </Container>);
+            </Row>
+
+            <Row>
+                <Col
+                    xs={selectedDoc ? 8 : 12}
+                    style={{
+                        transition: "all 0.3s ease-in-out",
+                        overflow: "hidden",
+                    }}
+                >
+                    <svg ref={svgRef}></svg>
+                    {tooltip.visible && (
+                        <div
+                            style={{
+                                position: "absolute",
+                                left: tooltip.x + 10,
+                                top: tooltip.y + 10,
+                                backgroundColor: "white",
+                                border: "1px solid black",
+                                padding: "5px",
+                                pointerEvents: "none",
+                                zIndex: 1000,
+                            }}
+                        >
+                            {tooltip.name}
+                        </div>
+                    )}
+                </Col>
+                {selectedDoc && (
+                    <Col xs={4} style={{ padding: "20px" }}>
+                        <DocumentModal selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} maxHeight={height-50}/>
+                    </Col>
+                )}
+            </Row>
+        </Container>
+    );
 };
 
 TimelineDiagram.propTypes = {
