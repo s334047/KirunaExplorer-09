@@ -142,7 +142,7 @@ const TimelineDiagram = ({ documents, connections }) => {
                 }
                 return strokeColor;
             })
-            .attr("stroke-width", 2)
+            .attr("stroke-width", 4)
             .attr("fill", "none")
             .attr("stroke-dasharray", (d) => {
                 // Define the line style based on the type of connection
@@ -152,7 +152,13 @@ const TimelineDiagram = ({ documents, connections }) => {
                 if (d.type === "Collateral Consequence") return "4,10";
                 return "0"; // Solid line
             })
-            .attr("marker-end", "url(#arrow)");
+            .attr("marker-end", "url(#arrow)")
+            .on("mouseover", (event, d) => {
+                setTooltip({ visible: true, x: event.pageX, y: event.pageY, name: d.type });
+            })
+            .on("mouseout", () => {
+                setTooltip({ visible: false, x: 0, y: 0, name: "" });
+            });
         // Add images for the documents
         svg.append("g")
             .attr("class", "documents")
@@ -163,8 +169,32 @@ const TimelineDiagram = ({ documents, connections }) => {
             .attr("xlink:href", (d) => icons[d.type])
             .attr("x", (d) => xScale(d.date) - 17.5)
             .attr("y", (d) => yScale(d.row) - 17.5)
-            .attr("width", 35)
-            .attr("height", 35)
+            .attr("width", (d) => {
+                if (selectedDoc){
+                    if(selectedDoc.title == d.title){
+                        return 50
+                    }
+                    else{
+                        return 35
+                    }
+                }
+                else{
+                    return 35
+                }
+            }) // Condizione per la larghezza
+            .attr("height", (d) =>  {
+                if (selectedDoc){
+                    if(selectedDoc.title == d.title){
+                        return 50
+                    }
+                    else{
+                        return 35
+                    }
+                }
+                else{
+                    return 35
+                }
+            })
             .style("z-index", "10")
             .on("click", (_, d) => {
                 // Event handler for click on the circle
@@ -242,7 +272,7 @@ const TimelineDiagram = ({ documents, connections }) => {
                     });
             });
         svg.call(zoom);
-    }, [width, height, documents, connections]);
+    }, [width, height, documents, connections,selectedDoc]);
 
     return (
         <>
