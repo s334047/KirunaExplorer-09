@@ -127,21 +127,23 @@ describe("Authenticator Tests", () => {
         const reqMock = { login: jest.fn() } as any;
         const resMock = { status: jest.fn().mockReturnThis(), json: jest.fn() } as any;
         const nextMock = jest.fn();
-
-        jest.spyOn(passport, "authenticate").mockImplementation(
-            () => (_req, res, _next) => {
-                const callback = (_err, _user, _info) => {
-                    res.status(401).json({ error: "Authentication failed" });
-                };
-                callback(null, null, new Error("Authentication failed"));
-            }
-        );
-
+    
+        jest.spyOn(passport, "authenticate").mockImplementation(() => {
+            return (_req, res, _next) => {
+                handleFailedAuthentication(res);
+            };
+        });
+    
+        function handleFailedAuthentication(res: any) {
+            res.status(401).json({ error: "Authentication failed" });
+        }
+    
         await auth.login(reqMock, resMock, nextMock);
-
+    
         expect(resMock.status).toHaveBeenCalledWith(401);
         expect(resMock.json).toHaveBeenCalledWith({ error: "Authentication failed" });
     });
+    
 
     test("should log out user successfully", async () => {
         const reqMock: RequestMock = {
@@ -314,9 +316,9 @@ describe("Authenticator Tests", () => {
         let serializedUser: any;
     
         passport.serializeUser((user: any, done) => {
-            serializedUser = user;
-            done(null, user.id);
+            done(null, user.id); 
         });
+        
     
         passport.deserializeUser((id, done) => {
             if (id === userMock.id) {
