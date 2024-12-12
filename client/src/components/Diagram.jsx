@@ -13,6 +13,14 @@ const TimelineDiagram = ({ documents, connections }) => {
     const [legendVisible, setLegendVisible] = useState(false);
     const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, name: "" });
 
+    const icons = {
+        'Informative document': 'icon_doc_blue.png',
+        'Prescriptive document': 'icon_doc_green.png',
+        'Design document': 'icon_doc_orange.png',
+        'Technical document': 'icon_doc_red.png',
+        'Material effect': 'icon_doc_yellow.png',
+    };
+
     // Handle resizing when the card is visible
     useEffect(() => {
         const handleResize = () => {
@@ -51,7 +59,7 @@ const TimelineDiagram = ({ documents, connections }) => {
                 Object.values(assignedRows).some(
                     (assigned) =>
                         assigned.row === row &&
-                        Math.abs(xScale(assigned.date) - xScale(doc.date)) < circleRadius * 2
+                        Math.abs(xScale(assigned.date) - xScale(doc.date)) < 35
                 )
             ) {
                 row += 1;
@@ -144,16 +152,19 @@ const TimelineDiagram = ({ documents, connections }) => {
                 return "0"; // Solid line
             })
             .attr("marker-end", "url(#arrow)");
-        // Add circles for the documents
+        // Add images for the documents
         svg.append("g")
             .attr("class", "documents")
+            .raise()
             .selectAll("circle")
             .data(Object.values(assignedRows))
-            .join("circle")
-            .attr("cx", (d) => xScale(d.date))
-            .attr("cy", (d) => yScale(d.row))
-            .attr("r", circleRadius)
-            .attr("fill", "blue")
+            .join("image")
+            .attr("xlink:href", (d) => icons[d.type])
+            .attr("x", (d) => xScale(d.date) - 17.5)
+            .attr("y", (d) => yScale(d.row) - 17.5)
+            .attr("width", 35)
+            .attr("height", 35)
+            .style("z-index", "10")
             .on("click", (_, d) => {
                 // Event handler for click on the circle
                 setSelectedDoc(d);
@@ -202,9 +213,9 @@ const TimelineDiagram = ({ documents, connections }) => {
                     .attr("stroke-dasharray", "3,3"); // Mantieni tratteggio
 
                 // Aggiorna cerchi
-                svg.selectAll(".documents circle")
-                    .attr("cx", (d) => newXScale(d.date))
-                    .attr("cy", (d) => newYScale(d.row));
+                svg.selectAll(".documents image")
+                    .attr("x", (d) => newXScale(d.date) - 17.5)
+                    .attr("y", (d) => newYScale(d.row) - 17.5);
 
                 // Aggiorna curve di Bézier
                 svg.selectAll(".connections path")
