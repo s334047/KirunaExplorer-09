@@ -95,7 +95,7 @@ DocumentCard.propTypes = {
     setPosition: PropTypes.func
 }
 
-function DocumentModal({ selectedDoc, setSelectedDoc }) {
+function DocumentModal({ selectedDoc, setSelectedDoc, maxHeight}) {
     const [connections, setConnections] = useState([]);
     const [resources, setResources] = useState([]);
 
@@ -125,8 +125,8 @@ function DocumentModal({ selectedDoc, setSelectedDoc }) {
     };
 
     return (
-        <Modal show='true' onHide={() => setSelectedDoc(null)} centered>
-            <Modal.Body>
+        <Card style={{ height: maxHeight, overflowY: "auto"}}>
+            <Card.Body>
                 <div className="d-flex justify-content-between align-items-center mb-3">
                     <div style={{ flex: 1 }} />
                     <button
@@ -177,8 +177,8 @@ function DocumentModal({ selectedDoc, setSelectedDoc }) {
                         }
                     </ul>
                 </div>
-            </Modal.Body>
-        </Modal >
+            </Card.Body>
+        </Card >
     );
 }
 
