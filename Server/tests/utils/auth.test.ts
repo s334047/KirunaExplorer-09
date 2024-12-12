@@ -62,28 +62,36 @@ describe("Authenticator Tests", () => {
             json: jest.fn(),
         } as any;
         const nextMock = jest.fn();
-
+    
         const userMock = { id: 1, username: "testuser" };
-
-        jest.spyOn(passport, "authenticate").mockImplementation(
-            () => (req, res, next) => {
-                const callback = (err, user, _info) => {
-                    if (err || !user) return next(err || new Error("Authentication failed"));
-                    req.login(user, (loginErr) => {
-                        if (loginErr) return next(loginErr);
-                        res.status(200).json(user);
-                    });
-                };
-                callback(null, userMock, null);
+    
+        jest.spyOn(passport, "authenticate").mockImplementation(() => {
+            return (req, res, next) => {
+                handleAuthentication(null, userMock, req, res, next);
+            };
+        });
+    
+        function handleAuthentication(err: any, user: any, req: any, res: any, next: any) {
+            if (err || !user) {
+                return next(err || new Error("Authentication failed"));
             }
-        );
-
+            req.login(user, (loginErr) => {
+                if (loginErr) {
+                    return next(loginErr);
+                }
+                res.status(200).json(user);
+            });
+        }
+    
         await auth.login(reqMock, resMock, nextMock);
-
+    
         expect(reqMock.login).toHaveBeenCalledWith(userMock, expect.any(Function));
         expect(resMock.status).toHaveBeenCalledWith(200);
         expect(resMock.json).toHaveBeenCalledWith(userMock);
     });
+    
+
+    
 
     test("should handle login failure due to req.login error", async () => {
         const reqMock: { login: jest.Mock } = {
