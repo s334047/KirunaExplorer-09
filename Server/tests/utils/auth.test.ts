@@ -809,7 +809,10 @@ test('should serialize user correctly', async () => {
 
     const serializedUser = await new Promise((resolve, reject) => {
         passport.serializeUser(user, (err, result) => {
-            if (err) reject(err);
+            if (err) {
+                reject(err instanceof Error ? err : new Error(String(err))); // Ensure rejection reason is an Error
+                return;
+            }
             resolve(result);
         });
     });
