@@ -11,8 +11,7 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-describe("DaoArea Tests", () => {
-  describe("getAllAreas", () => {
+  describe("DaoArea Tests - getAllAreas", () => {
     test("should return all areas", async () => {
       const mockRows = [
         { Id: 1, Name: "Area1", Vertex: JSON.stringify([[10, 20], [30, 40]]) },
@@ -39,7 +38,7 @@ describe("DaoArea Tests", () => {
     });
   });
 
-  describe("addAreaToDoc", () => {
+  describe("DaoArea Tests - addAreaToDoc", () => {
     test("should successfully add an area to a document", async () => {
       jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
         return callback(null); // Simulate success
@@ -62,7 +61,7 @@ describe("DaoArea Tests", () => {
     });
   });
 
-  describe("addArea", () => {
+  describe("DaoArea Tests - addArea", () => {
     test("should successfully add a new area", async () => {
       jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
         return callback(null); // Simulate success
@@ -85,7 +84,7 @@ describe("DaoArea Tests", () => {
     });
   });
 
-  describe("modifyGeoreference", () => {
+  describe("DaoArea Tests - modifyGeoreference", () => {
     test("should modify coordinates for a document without an old coordinate", async () => {
       jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
         return callback(null); // Simulate success
@@ -149,7 +148,7 @@ describe("DaoArea Tests", () => {
         "Database error"
       );
     });
-    
+
     describe('getAreaIdFromName', () => {
       test('should return the correct area ID for a valid name', async () => {
         jest.spyOn(db, 'get').mockImplementation((sql, params, callback) => {
@@ -210,7 +209,6 @@ describe("DaoArea Tests", () => {
       });
     });
   });
-});
 
 describe("DaoArea Tests - Additional Coverage", () => {
   describe("modifyGeoreference", () => {
