@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Card, Row, Col, Button, Modal } from 'react-bootstrap';
+import { Card, Row, Col, Button } from 'react-bootstrap';
 import API from '../../API.mjs';
 import dayjs from "dayjs";
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+
 
 
 function DocumentCard({ documents, selectedDoc, setSelectedDoc, user, excludeTitle, mapRef, setPosition }) {
@@ -18,18 +19,25 @@ function DocumentCard({ documents, selectedDoc, setSelectedDoc, user, excludeTit
     }, [selectedDoc])
     return (
         <Card className="document-card">
+            <Card.Header className="d-flex justify-content-between align-items-center" style={{ borderBottom: "none"}}>
+                <button className="btn btn-dark"
+                    onClick={()=>{navigate("/diagram", { state: { documentId: selectedDoc.id } })}}
+                    style={{
+                        backgroundColor: "#154109",
+                        borderRadius: "50%"
+                    }}>
+                    <i class="bi bi-graph-up"></i>
+                </button>
+                <button
+                    className="btn btn-close"
+                    onClick={() => {
+                        setSelectedDoc(null);
+                        mapRef.current.setZoom(13)
+                    }}
+                    aria-label="Close"
+                />
+            </Card.Header>
             <Card.Body>
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                    <div style={{ flex: 1 }} />
-                    <button
-                        className="btn btn-close"
-                        onClick={() => {
-                            setSelectedDoc(null);
-                            mapRef.current.setZoom(13)
-                        }}
-                        aria-label="Close"
-                    />
-                </div>
                 <Row >
                     <Col md={connections.length > 0 ? 4 : 6} >
                         <ul style={{ listStyleType: 'none', paddingLeft: '30px' }}>
@@ -100,6 +108,7 @@ DocumentCard.propTypes = {
 function DocumentModal({ documents, selectedDoc, setSelectedDoc, maxHeight }) {
     const [connections, setConnections] = useState([]);
     const [resources, setResources] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const getConnections = async () => {
@@ -128,66 +137,73 @@ function DocumentModal({ documents, selectedDoc, setSelectedDoc, maxHeight }) {
 
     return (
         <Card style={{ height: maxHeight, overflowY: "auto" }}>
+            <Card.Header className="d-flex justify-content-between align-items-center" style={{ borderBottom: "none", backgroundColor: "inherit"}}>
+                <button className="btn btn-dark"
+                    onClick={()=>{navigate("/", { state: { documentId: selectedDoc.id } })}}
+                    style={{
+                        backgroundColor: "#154109",
+                        borderRadius: "50%"
+                    }}>
+                    <i class="bi bi-geo-alt"></i>
+                </button>
+                <button
+                    className="btn btn-close"
+                    onClick={() => {
+                        setSelectedDoc(null);
+                    }}
+                    aria-label="Close"
+                />
+            </Card.Header>
             <Card.Body>
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                    <div style={{ flex: 1 }} />
-                    <button
-                        className="btn btn-close"
-                        onClick={() => {
-                            setSelectedDoc(null);
-                        }}
-                        aria-label="Close"
-                    />
-                </div>
-                    <ul style={{ listStyleType: 'none', padding: "20px"}}>
-                        <li><strong>Title:</strong> {selectedDoc.title}</li>
-                        <li><strong>Stakeholder:</strong> {selectedDoc.stakeholder}</li>
-                        <li><strong>Scale:</strong> {selectedDoc.scale}</li>
-                        <li><strong>Date:</strong> {selectedDoc.date ? dayjs(selectedDoc.date).format('DD-MM-YYYY') : "N/A"}</li>
-                        <li><strong>Type:</strong> {selectedDoc.type}</li>
-                        <li><strong>Description:</strong><br/>{selectedDoc.description}</li>
-                        {selectedDoc.language && <li><strong>Language:</strong> {selectedDoc.language}</li>}
-                        {selectedDoc.page && <li><strong>Pages:</strong> {selectedDoc.page}</li>}
-                        {connections.length > 0 && (
-                            <>
-                                <li><strong>Connections:</strong></li>
-                                <ul>
-                                    {connections.map(connection => (
-                                        <li key={`${connection.id}-${connection.type}`}>
-                                            <Button
-                                                variant="link"
-                                                style={{ color: "#154109", textAlign: "left" }}
-                                                onClick={() => {
-                                                    setSelectedDoc(documents.find((d) => d.id === connection.id));
-                                                    console.log("Passo di qui 1");
-                                                    //setPosition(connection.id, documents);
-                                                }}
-                                            >
-                                                {connection.title} - {connection.type}
-                                            </Button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </>
-                        )}
-                        {resources.length > 0 &&
-                            <li><strong>Resources:</strong>
-                                <ul>
-                                    {resources.map((resource) => (
-                                        <li key={resource.id}>
-                                            <Button
-                                                variant="link"
-                                                style={{ color: "#154109" }}
-                                                onClick={() => handleDownload(resource.id)}
-                                            >
-                                                {resource.name}
-                                            </Button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </li>
-                        }
-                    </ul>
+                <ul style={{ listStyleType: 'none', padding: "20px" }}>
+                    <li><strong>Title:</strong> {selectedDoc.title}</li>
+                    <li><strong>Stakeholder:</strong> {selectedDoc.stakeholder}</li>
+                    <li><strong>Scale:</strong> {selectedDoc.scale}</li>
+                    <li><strong>Date:</strong> {selectedDoc.date ? dayjs(selectedDoc.date).format('DD-MM-YYYY') : "N/A"}</li>
+                    <li><strong>Type:</strong> {selectedDoc.type}</li>
+                    <li><strong>Description:</strong><br />{selectedDoc.description}</li>
+                    {selectedDoc.language && <li><strong>Language:</strong> {selectedDoc.language}</li>}
+                    {selectedDoc.page && <li><strong>Pages:</strong> {selectedDoc.page}</li>}
+                    {connections.length > 0 && (
+                        <>
+                            <li><strong>Connections:</strong></li>
+                            <ul>
+                                {connections.map(connection => (
+                                    <li key={`${connection.id}-${connection.type}`}>
+                                        <Button
+                                            variant="link"
+                                            style={{ color: "#154109", textAlign: "left" }}
+                                            onClick={() => {
+                                                setSelectedDoc(documents.find((d) => d.id === connection.id));
+                                                console.log("Passo di qui 1");
+                                                //setPosition(connection.id, documents);
+                                            }}
+                                        >
+                                            {connection.title} - {connection.type}
+                                        </Button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </>
+                    )}
+                    {resources.length > 0 &&
+                        <li><strong>Resources:</strong>
+                            <ul>
+                                {resources.map((resource) => (
+                                    <li key={resource.id}>
+                                        <Button
+                                            variant="link"
+                                            style={{ color: "#154109" }}
+                                            onClick={() => handleDownload(resource.id)}
+                                        >
+                                            {resource.name}
+                                        </Button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </li>
+                    }
+                </ul>
             </Card.Body>
         </Card >
     );

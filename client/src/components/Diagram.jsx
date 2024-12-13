@@ -10,7 +10,10 @@ const TimelineDiagram = ({ documents, connections }) => {
     const svgRef = useRef(null);
     const height = document.documentElement.clientHeight * 0.80;
     const [width, setWidth] = useState(document.documentElement.clientWidth);
-    const [selectedDoc, setSelectedDoc] = useState(null);
+    const documentId = location.state?.documentId;
+    const [selectedDoc, setSelectedDoc] = useState(
+        documentId ? documents.find(doc => doc.id === documentId) : null
+    );
     const [legendVisible, setLegendVisible] = useState(false);
     const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, name: "" });
 
