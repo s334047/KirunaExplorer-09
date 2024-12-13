@@ -2,17 +2,20 @@ import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
+import { useLocation } from 'react-router-dom';
 import { DocumentModal } from "./DocumentShowInfo";
 import LegendCard from "./Legend";
+
 import { Container, Row, Col, Button } from "react-bootstrap";
 
 const TimelineDiagram = ({ documents, connections }) => {
     const svgRef = useRef(null);
     const height = document.documentElement.clientHeight * 0.80;
     const [width, setWidth] = useState(document.documentElement.clientWidth);
-    const documentId = location.state?.documentId;
+    const location = useLocation();
+    const docFromMap = location.state?.docFromMap;
     const [selectedDoc, setSelectedDoc] = useState(
-        documentId ? documents.find(doc => doc.id === documentId) : null
+        docFromMap ? docFromMap : null
     );
     const [legendVisible, setLegendVisible] = useState(false);
     const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, name: "" });
@@ -278,8 +281,6 @@ const TimelineDiagram = ({ documents, connections }) => {
     }, [width, height, documents, connections,selectedDoc]);
 
     return (
-        <>
-
             <Container fluid center >
                 <Row className="align-left">
                     <Col xs="2">
@@ -338,7 +339,6 @@ const TimelineDiagram = ({ documents, connections }) => {
                     )}
                 </Row>
             </Container>
-        </>
     );
 };
 
