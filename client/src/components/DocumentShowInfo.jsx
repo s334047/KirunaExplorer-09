@@ -17,11 +17,12 @@ function DocumentCard({ documents, selectedDoc, setSelectedDoc, user, excludeTit
         }
         getConnections();
     }, [selectedDoc])
-    return (
+    return (<>
+        {console.log(selectedDoc)}
         <Card className="document-card">
             <Card.Header className="d-flex justify-content-between align-items-center" style={{ borderBottom: "none"}}>
                 <button className="btn btn-dark"
-                    onClick={()=>{navigate("/diagram", { state: { documentId: selectedDoc.id } })}}
+                    onClick={()=>{navigate("/diagram", { state: { docFromMap: selectedDoc } })}}
                     style={{
                         backgroundColor: "#154109",
                         borderRadius: "50%"
@@ -92,7 +93,7 @@ function DocumentCard({ documents, selectedDoc, setSelectedDoc, user, excludeTit
                 }
             </Card.Body>
         </Card>
-    );
+        </>);
 }
 
 DocumentCard.propTypes = {
