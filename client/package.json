@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@turf/turf": "^7.1.0",
     "bootstrap": "^5.3.3",
     "bootstrap-css": "3.3.7",
     "bootstrap-icons": "^1.11.3",

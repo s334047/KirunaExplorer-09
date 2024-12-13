@@ -10,17 +10,19 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { DocumentCard } from './DocumentShowInfo';
 import API from '../../API.mjs';
 import propTypes from "prop-types";
+import * as turf from '@turf/turf';
 
 
-function MoveMapToMarker({ position,view,setView }) {
+
+function MoveMapToMarker({ position, view, setView }) {
     const map = useMap();
 
     useEffect(() => {
         if (position) {
-            if (view == "normal"){
+            if (view == "normal") {
                 map.setView(position, map.getZoom());
             }
-            else{
+            else {
                 map.setView(position, 17);
                 setView("normal")
             }
@@ -37,11 +39,16 @@ function MapViewer(props) {
     const [selectedDoc, setSelectedDoc] = useState(null);
     const [documentsByArea, setDocumentsByArea] = useState(new Map());
     const [activePosition, setActivePosition] = useState(null);
-    const [view,setView]=useState("normal");
+    const [view, setView] = useState("normal");
+    const [mode, setMode] = useState("normal")
+    const [listDocumentsArea,setListDocumentsArea]=useState([]);
+    const [totalArea,setTotalArea]=useState(null)
+    const [documentsArea, setDocumentsArea] = useState([]);
     const location = useLocation();
     const documentId = location.state?.documentId;
     const markerClusterRef = useRef();
     const mapRef = useRef();
+      
 
     useEffect(() => {
         const getDocs = async () => {
@@ -55,14 +62,14 @@ function MapViewer(props) {
                     areaMap.set(areaKey, []);
                 }
                 areaMap.get(areaKey)?.push(doc);
-                setPositions(documentId,documents)
+                setPositions(documentId, documents)
             });
 
             setDocumentsByArea(areaMap);
             if (documentId && documents.length > 0) {
                 setView("advanced")
                 const doc = documents.find(d => d.id === documentId);
-    
+
                 if (doc) {
                     setSelectedDoc(doc);
                     if (doc.coordinate) {
@@ -83,14 +90,14 @@ function MapViewer(props) {
                         }
                     }
                 }
-    
+
             }
         };
 
         getDocs();
         navigate(location.pathname, { replace: true, state: null });
     }, []);
-    const setPositions=(documentId,documents)=>{
+    const setPositions = (documentId, documents) => {
         if (documentId && documents.length > 0) {
             setView("advanced")
             const doc = documents.find(d => d.id === documentId);
@@ -134,6 +141,15 @@ function MapViewer(props) {
                 size = [50, 50];
                 anchor = [25, 50];
             }
+        }
+        else if (listDocumentsArea.length>0){
+            const alreadyExists = listDocumentsArea.some(
+                (doc) => doc.title === docTitle // Confronta gli ID
+              );
+              if(alreadyExists){
+                size = [50, 50];
+                anchor = [25, 50];
+              }
         }
 
         return new L.Icon({
@@ -222,7 +238,18 @@ function MapViewer(props) {
     }
 
     const { BaseLayer } = LayersControl;
-
+    useEffect(()=>{
+        if(documentsArea.length>1){
+            let union = turf.union(turf.featureCollection(documentsArea));
+            console.log(union)
+            setTotalArea(union)
+ 
+            
+        }
+        else if (documentsArea.length>0){
+            setTotalArea(turf.featureCollection([documentsArea[0]]))
+        }
+    },[documentsArea])
     return (
         <div style={{ display: 'flex', flex: 1, position: 'relative', height: '90vh' }}>
             <MapContainer
@@ -252,9 +279,11 @@ function MapViewer(props) {
                     {docs.filter(doc => doc.coordinate != null).map(doc => (
                         <Marker key={doc.title} position={doc.coordinate} icon={getIconByType(doc.type, selectedDoc, doc.title)} eventHandlers={{
                             click: () => {
-                                setSelectedDoc(null)
-                                setSelectedDoc(doc);
-                                setActivePosition({ lat: doc.coordinate[0], lng: doc.coordinate[1] })
+                                if (mode == "normal") {
+                                    setSelectedDoc(null)
+                                    setSelectedDoc(doc);
+                                    setActivePosition({ lat: doc.coordinate[0], lng: doc.coordinate[1] })
+                                }
                             },
                         }}>
                             <LeafletTooltip direction="top" offset={[5, -30]} opacity={1}>
@@ -271,9 +300,20 @@ function MapViewer(props) {
                                 {areaDocuments.map((document, index) => (
                                     <Marker key={document.id} position={positions[index]} icon={getIconByType(document.type, selectedDoc, document.title)} eventHandlers={{
                                         click: () => {
-                                            setSelectedDoc(null)
-                                            setSelectedDoc(document);
-                                            setActivePosition({ lat: positions[index][0], lng: positions[index][1] })
+                                            if (mode == "normal") {
+                                                setSelectedDoc(null)
+                                                setSelectedDoc(document);
+                                                setActivePosition({ lat: positions[index][0], lng: positions[index][1] })
+                                            }
+                                            else{
+                                                const alreadyExists = listDocumentsArea.some(
+                                                    (doc) => doc.id === document.id // Confronta gli ID
+                                                  );
+                                                if(!alreadyExists){
+                                                    setListDocumentsArea((prevDocuments) =>[...prevDocuments,document])
+                                                    setDocumentsArea((prevDocuments) => [...prevDocuments, turf.polygon(document.area.geometry.coordinates)])
+                                                }
+                                            }
 
                                         },
                                     }}>
@@ -301,6 +341,7 @@ function MapViewer(props) {
 
                     />
                 )}
+                {totalArea && <GeoJSON key={JSON.stringify(totalArea)} data={totalArea} color="red" ></GeoJSON>}
             </MapContainer>
 
             {/* Document Card */}
@@ -326,6 +367,38 @@ function MapViewer(props) {
             )}
 
             {/* Add Document Button */}
+            {!selectedDoc && (
+                <div style={{ position: 'absolute', bottom: '140px', left: '10px', zIndex: 1000 }}>
+                    <OverlayTrigger
+                        placement="right"
+                        overlay={
+                            <Tooltip id="tooltip-draw-area">
+                                {mode==="normal" ? "Open multiple area visualization" : "Close multiple area visualization"}
+                            </Tooltip>
+                            
+                        }
+                    >
+                        <Button
+                            variant="light"
+                            onClick={() => {
+                                if (mode == "normal") {
+                                    setMode("area");
+                                }
+                                else {
+                                    setMode("normal")
+                                    setListDocumentsArea([]);
+                                    setDocumentsArea([]);
+                                    setTotalArea(null);
+                                }
+                            }
+                            }
+                            style={{ borderRadius: '50%' }}
+                        >
+                            <i className="bi bi-eye fs-3"></i>
+                        </Button>
+                    </OverlayTrigger>
+                </div>
+            )}
             {!selectedDoc && props.user.role === 'Urban Planner' && (
                 <div style={{ position: 'absolute', bottom: '20px', left: '10px', zIndex: 1000 }}>
                     <OverlayTrigger
