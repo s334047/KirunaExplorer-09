@@ -330,7 +330,7 @@ const TimelineDiagram = ({ documents, connections }) => {
                     </Col>
                     {selectedDoc && (
                         <Col xs={4} style={{ padding: "20px" }}>
-                            <DocumentModal selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} maxHeight={height - 50} />
+                            <DocumentModal documents={documents} selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} maxHeight={height - 50} />
                         </Col>
                     )}
                 </Row>

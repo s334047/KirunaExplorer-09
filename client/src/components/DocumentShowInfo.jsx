@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 
-function DocumentCard({ documents, selectedDoc, setSelectedDoc, user, excludeTitle, mapRef,setPosition }) {
+function DocumentCard({ documents, selectedDoc, setSelectedDoc, user, excludeTitle, mapRef, setPosition }) {
     const [connections, setConnections] = useState([]);
     const navigate = useNavigate();
     useEffect(() => {
@@ -31,7 +31,7 @@ function DocumentCard({ documents, selectedDoc, setSelectedDoc, user, excludeTit
                     />
                 </div>
                 <Row >
-                    <Col md={connections.length>0 ? 4: 6} >
+                    <Col md={connections.length > 0 ? 4 : 6} >
                         <ul style={{ listStyleType: 'none', paddingLeft: '30px' }}>
                             <li><strong>Title:</strong> {selectedDoc.title}</li>
                             <li><strong>Stakeholder:</strong> {selectedDoc.stakeholder}</li>
@@ -50,10 +50,12 @@ function DocumentCard({ documents, selectedDoc, setSelectedDoc, user, excludeTit
                                     <li key={`${connection.id}-${connection.type}`}>
                                         <Button
                                             variant="link"
-                                            style={{ color: "#154109" , textAlign: "left"}}
-                                            onClick={() => {setSelectedDoc(documents.find((d) => d.id === connection.id));
+                                            style={{ color: "#154109", textAlign: "left" }}
+                                            onClick={() => {
+                                                setSelectedDoc(documents.find((d) => d.id === connection.id));
                                                 console.log("Passo di qui");
-                                                setPosition(connection.id,documents)}}
+                                                setPosition(connection.id, documents)
+                                            }}
                                         >
                                             {connection.title} - {connection.type}
                                         </Button>
@@ -62,7 +64,7 @@ function DocumentCard({ documents, selectedDoc, setSelectedDoc, user, excludeTit
                             </ul>
                         </Col>
                     }
-                    <Col md={connections.length>0 ? 4: 6}>
+                    <Col md={connections.length > 0 ? 4 : 6}>
                         <ul style={{ listStyleType: 'none', paddingRight: '30px' }}>
                             <li><strong>Description:</strong><br />{selectedDoc.description}</li>
                         </ul>
@@ -95,7 +97,7 @@ DocumentCard.propTypes = {
     setPosition: PropTypes.func
 }
 
-function DocumentModal({ selectedDoc, setSelectedDoc, maxHeight}) {
+function DocumentModal({ documents, selectedDoc, setSelectedDoc, maxHeight }) {
     const [connections, setConnections] = useState([]);
     const [resources, setResources] = useState([]);
 
@@ -125,7 +127,7 @@ function DocumentModal({ selectedDoc, setSelectedDoc, maxHeight}) {
     };
 
     return (
-        <Card style={{ height: maxHeight, overflowY: "auto"}}>
+        <Card style={{ height: maxHeight, overflowY: "auto" }}>
             <Card.Body>
                 <div className="d-flex justify-content-between align-items-center mb-3">
                     <div style={{ flex: 1 }} />
@@ -137,27 +139,37 @@ function DocumentModal({ selectedDoc, setSelectedDoc, maxHeight}) {
                         aria-label="Close"
                     />
                 </div>
-                <div>
-                    <ul style={{ listStyleType: 'none', paddingLeft: '30px' }}>
+                    <ul style={{ listStyleType: 'none', padding: "20px"}}>
                         <li><strong>Title:</strong> {selectedDoc.title}</li>
                         <li><strong>Stakeholder:</strong> {selectedDoc.stakeholder}</li>
                         <li><strong>Scale:</strong> {selectedDoc.scale}</li>
                         <li><strong>Date:</strong> {selectedDoc.date ? dayjs(selectedDoc.date).format('DD-MM-YYYY') : "N/A"}</li>
                         <li><strong>Type:</strong> {selectedDoc.type}</li>
-                        <li><strong>Description:</strong><br />{selectedDoc.description}</li>
+                        <li><strong>Description:</strong><br/>{selectedDoc.description}</li>
                         {selectedDoc.language && <li><strong>Language:</strong> {selectedDoc.language}</li>}
                         {selectedDoc.page && <li><strong>Pages:</strong> {selectedDoc.page}</li>}
-                        {connections.length > 0 &&
-                            <li><strong>Connections:</strong>
+                        {connections.length > 0 && (
+                            <>
+                                <li><strong>Connections:</strong></li>
                                 <ul>
                                     {connections.map(connection => (
                                         <li key={`${connection.id}-${connection.type}`}>
-                                            {connection.title} - {connection.type}
+                                            <Button
+                                                variant="link"
+                                                style={{ color: "#154109", textAlign: "left" }}
+                                                onClick={() => {
+                                                    setSelectedDoc(documents.find((d) => d.id === connection.id));
+                                                    console.log("Passo di qui 1");
+                                                    //setPosition(connection.id, documents);
+                                                }}
+                                            >
+                                                {connection.title} - {connection.type}
+                                            </Button>
                                         </li>
                                     ))}
                                 </ul>
-                            </li>
-                        }
+                            </>
+                        )}
                         {resources.length > 0 &&
                             <li><strong>Resources:</strong>
                                 <ul>
@@ -176,7 +188,6 @@ function DocumentModal({ selectedDoc, setSelectedDoc, maxHeight}) {
                             </li>
                         }
                     </ul>
-                </div>
             </Card.Body>
         </Card >
     );
