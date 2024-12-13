@@ -149,6 +149,7 @@ describe("DaoArea Tests", () => {
         "Database error"
       );
     });
+    
     describe('getAreaIdFromName', () => {
       test('should return the correct area ID for a valid name', async () => {
         jest.spyOn(db, 'get').mockImplementation((sql, params, callback) => {
@@ -213,33 +214,29 @@ describe("DaoArea Tests", () => {
 
 describe("DaoArea Tests - Additional Coverage", () => {
   describe("modifyGeoreference", () => {
-    const spyError = jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
+    jest.spyOn(db, "run").mockImplementation((sql, params, callback) => {
       return callback(new Error("Database error"));
     });
 
     test("should handle error when updating coordinates without an old coordinate", async () => {
-      spyError;
       await expect(daoArea.modifyGeoreference(1, [10, 20], null, null, null, null)).rejects.toThrow(
         "Database error"
       );
     });
 
     test("should handle error when updating coordinates with an old coordinate", async () => {
-      spyError;
       await expect(daoArea.modifyGeoreference(1, [10, 20], [5, 5], null, null, null)).rejects.toThrow(
         "Database error"
       );
     });
 
     test("should handle error when updating area vertex", async () => {
-     spyError;
       await expect(
         daoArea.modifyGeoreference(1, null, null, [[10, 20]], [[5, 5]], 1)
       ).rejects.toThrow("Database error");
     });
 
     test("should handle error when updating document area to null", async () => {
-      spyError;
       await expect(
         daoArea.modifyGeoreference(1, null, null, { area: true }, null, 1)
       ).rejects.toThrow("Database error");
