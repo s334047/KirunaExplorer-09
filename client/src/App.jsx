@@ -63,7 +63,6 @@ function App() {
     setUser({});
     setLoggedIn(false);
     setMessage('');
-    nav('/');
   };
 
   useEffect(() => {
@@ -101,10 +100,14 @@ function App() {
         <Route path='/addArea' element={<AddArea />} />
         <Route path='/addDoc' element={<AddDocument />} />
         <Route path='/modifyGeoreference' element={<ModifyGeoreference doc={excludeDoc} />} />
-        <Route path='/diagram' element={<TimelineDiagram setTitle={setExcludeDoc} documents={documents} user={user} connections={connections}/>}/>
+        <Route path='/diagram' element={<>
+        <TimelineDiagram setTitle={setExcludeDoc} documents={documents} user={user} connections={connections}/>
+        <LoginComponent message={message} login={handleLogin} show={showLoginModal} setShow={setShowLoginModal} />
+        </>}/>
 
         <Route path='/documents' element={<>
           <DocumentTable user={user} setTitle={setExcludeDoc} showAddLink={showAddLink} setShowAddLink={setShowAddLink} />
+          <LoginComponent message={message} login={handleLogin} show={showLoginModal} setShow={setShowLoginModal} />
           <ListDocumentLink title={excludeDoc} show={showAddLink} setShow={setShowAddLink} />
         </>
         }></Route>
