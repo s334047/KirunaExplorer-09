@@ -15,7 +15,7 @@ const TimelineDiagram = ({ documents, connections }) => {
     const location = useLocation();
     const docFromMap = location.state?.docFromMap;
     const [selectedDoc, setSelectedDoc] = useState(
-        docFromMap ? docFromMap : null
+        docFromMap || null
     );
     const [legendVisible, setLegendVisible] = useState(false);
     const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, name: "" });
@@ -41,7 +41,6 @@ const TimelineDiagram = ({ documents, connections }) => {
     useEffect(() => {
         const margin = { top: 30, right: 50, bottom: 50, left: 50 };
         const maxHeight = height * 0.9; // Maximum height available (90% of the viewport height)
-        const circleRadius = 10;
         const linePadding = 30; // Greater line spacing
         const minLineDistance = 30; // Minimum distance between the line and the circles (to avoid intersections)
         // Parsing and formatting dates
