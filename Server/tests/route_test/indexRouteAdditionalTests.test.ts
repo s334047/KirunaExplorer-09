@@ -322,5 +322,116 @@ describe("Additional Tests for Uncovered Lines in index.ts", () => {
       expect(response.body).toEqual({ error: "Authentication failed" });
     });
 });
+
+
+describe("Modified Tests for Uncovered Lines in index.ts", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
   });
+
+  describe("Error Scenarios for Route Handlers", () => {
+    test("should return 503 if invalid data is provided to POST /api/documents", async () => {
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
+      jest.spyOn(DaoDocument.prototype, "newDescription").mockRejectedValue(new Error("Invalid data"));
+
+      const invalidDocument = { title: "" }; // Missing required fields
+
+      const response = await request(app).post("/api/documents").send(invalidDocument);
+
+      expect(response.status).toBe(503);
+      
+      
+    });
+
+    test("should return 200 for valid area in PUT /api/documents/area", async () => {
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
+      jest.spyOn(DaoArea.prototype, "getAreaIdFromName").mockResolvedValue(1);
+
+      const payload = { area: "ExistingArea", title: "Doc1" };
+
+      const response = await request(app).put("/api/documents/area").send(payload);
+
+      expect(response.status).toBe(200);
+    });
+
+    test("should return 201 for valid vertex data in POST /api/areas", async () => {
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
+      jest.spyOn(DaoArea.prototype, "addArea").mockResolvedValue(undefined);
+
+      const validArea = { name: "Test Area", vertex: [[10, 20], [30, 40], [50, 60]] };
+
+      const response = await request(app).post("/api/areas").send(validArea);
+
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual({ message: "Area add successfully" });
+    });
+  });
+
+  describe("Advanced Error Handling and Corner Cases", () => {
+    test("should return 503 for unexpected errors in GET /api/connections", async () => {
+      jest.spyOn(DaoConnection.prototype, "GetConnections").mockRejectedValue(new Error("Unexpected server error"));
+
+      const response = await request(app).get("/api/connections");
+
+      expect(response.status).toBe(503);
+      
+    });
+
+    test("should return 404 for invalid file paths in GET /api/originalResources/download/:id", async () => {
+      const mockResource = { id: 1, path: "../resources/invalid/../../file.pdf" };
+      jest.spyOn(DaoResource.prototype, "getResourceById").mockResolvedValue(mockResource as any);
+      jest.spyOn(fs, "existsSync").mockReturnValue(false);
+
+      const response = await request(app).get("/api/originalResources/download/1");
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({ error: "File not found" });
+    });
+  });
+
+  describe("Enhanced Validation for Input Data", () => {
+    test("should return 503 for malformed coordinates in PUT /api/modifyGeoreference", async () => {
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
+      jest.spyOn(DaoArea.prototype, "modifyGeoreference").mockRejectedValue(new Error("Malformed coordinates"));
+
+      const invalidPayload = { coord: [10], name: "Doc1" }; // Coordinates should be a pair
+
+      const response = await request(app).put("/api/modifyGeoreference").send(invalidPayload);
+
+      expect(response.status).toBe(503);
+      
+    });
+
+    test("should return 503 if document title is missing in POST /api/connections", async () => {
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
+      jest.spyOn(DaoConnection.prototype, "SetDocumentsConnection").mockRejectedValue(new Error("Invalid document title"));
+
+      const invalidConnection = {
+        SourceDocument: "",
+        TargetDocument: "Doc2",
+        ConnectionType: "Reference",
+      };
+
+      const response = await request(app).post("/api/connections").send(invalidConnection);
+
+      expect(response.status).toBe(503);
+      
+    });
+  });
+
+  describe("Handling Invalid Routes and Methods", () => {
+    test("should return 404 for unsupported methods", async () => {
+      const response = await request(app).patch("/api/areas");
+
+      expect(response.status).toBe(404); // Application does not handle 405; aligning with current behavior
+    });
+
+    test("should return 404 for unregistered routes", async () => {
+      const response = await request(app).get("/api/nonexistent-route");
+
+      expect(response.status).toBe(404);
+    });
+  });
+  });
+});
 });
