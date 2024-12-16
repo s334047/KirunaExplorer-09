@@ -39,7 +39,7 @@ const TimelineDiagram = ({ documents, connections }) => {
     }, [selectedDoc, legendVisible]);
 
     useEffect(() => {
-        const margin = { top: 30, right: 50, bottom: 50, left: 50 };
+        const margin = { top: 30, right: 20, bottom: 50, left: 100 };
         const maxHeight = height * 0.9; // Maximum height available (90% of the viewport height)
         const linePadding = 30; // Greater line spacing
         const minLineDistance = 30; // Minimum distance between the line and the circles (to avoid intersections)
@@ -57,22 +57,20 @@ const TimelineDiagram = ({ documents, connections }) => {
             .scaleTime()
             .domain(d3.extent(documents, (d) => d.date))
             .range([margin.left, width - margin.right]);
-        // Assign rows (y positions)
-        const assignedRows = {};
+        // Create a map of scales to assign unique row numbers
+        const scaleMap = {};
+        let currentRow = 0;
         documents.forEach((doc) => {
-            let row = 0;
-            while (
-                Object.values(assignedRows).some(
-                    (assigned) =>
-                        assigned.row === row &&
-                        Math.abs(xScale(assigned.date) - xScale(doc.date)) < 35
-                )
-            ) {
-                row += 1;
+            if (!scaleMap[doc.scale]) {
+                scaleMap[doc.scale] = currentRow++;
             }
-            assignedRows[doc.id] = { ...doc, row };
         });
 
+        // Assign rows (y positions) based on the scale of the document
+        const assignedRows = {};
+        documents.forEach((doc) => {
+            assignedRows[doc.id] = { ...doc, row: scaleMap[doc.scale] };
+        });
 
         const maxRow = Math.max(...Object.values(assignedRows).map((d) => d.row));
         const rowHeight = Math.max(40, maxHeight / (maxRow + 1)); // Dynamic height with a minimum of 40px
@@ -94,11 +92,16 @@ const TimelineDiagram = ({ documents, connections }) => {
             .call(xAxis)
             .selectAll("text") // Seleziona tutti i testi dell"asse x
             .style("font-size", "16px"); // Imposta la dimensione del font
-        const yAxis = d3.axisLeft(yScale).ticks(maxRow).tickFormat("").tickSize(0);
+        const yAxis = d3.axisLeft(yScale).ticks(maxRow).tickFormat((d) => {
+            const scale = Object.keys(scaleMap).find(key => scaleMap[key] === d);
+            return scale || "";
+        });
         svg.append("g")
             .attr("class", "y-axis")
             .attr("transform", `translate(${margin.left}, 0)`)
-            .call(yAxis);
+            .call(yAxis)
+            .selectAll("text") // Seleziona tutti i testi dell"asse x
+            .style("font-size", "16px"); // Imposta la dimensione del font;
         // Group connections by source-destination pair
         const groupedConnections = d3.group(
             connections,
@@ -175,28 +178,28 @@ const TimelineDiagram = ({ documents, connections }) => {
             .attr("x", (d) => xScale(d.date) - 17.5)
             .attr("y", (d) => yScale(d.row) - 17.5)
             .attr("width", (d) => {
-                if (selectedDoc){
-                    if(selectedDoc.title == d.title){
+                if (selectedDoc) {
+                    if (selectedDoc.title == d.title) {
                         return 50
                     }
-                    else{
+                    else {
                         return 35
                     }
                 }
-                else{
+                else {
                     return 35
                 }
             }) // Condizione per la larghezza
-            .attr("height", (d) =>  {
-                if (selectedDoc){
-                    if(selectedDoc.title == d.title){
+            .attr("height", (d) => {
+                if (selectedDoc) {
+                    if (selectedDoc.title == d.title) {
                         return 50
                     }
-                    else{
+                    else {
                         return 35
                     }
                 }
-                else{
+                else {
                     return 35
                 }
             })
@@ -225,6 +228,22 @@ const TimelineDiagram = ({ documents, connections }) => {
             .selectAll("line")
             .attr("stroke", "#5e5e5e")
             .attr("stroke-dasharray", "3,3");
+        // Funzione per generare le linee della griglia sull'asse y
+        const yTickValues = Object.values(scaleMap);
+        const makeYGridlines = () => d3.axisLeft(yScale).tickValues(yTickValues);
+        // Aggiungi griglia y
+        svg.append("g")
+            .attr("class", "grid grid-y")
+            .attr("transform", `translate(${margin.left}, 0)`)
+            .call(
+                makeYGridlines()
+                    .tickSize(-width + margin.left + margin.right) // Full width of the graph
+                    .tickFormat("") // No labels
+            )
+            .selectAll("line")
+            .attr("stroke", "#5e5e5e")
+            .attr("stroke-dasharray", "3,3");
+
         const zoom = d3
             .zoom()
             .scaleExtent([1, 10])
@@ -236,13 +255,27 @@ const TimelineDiagram = ({ documents, connections }) => {
 
                 // Aggiorna assi
                 svg.select(".x-axis").call(d3.axisBottom(newXScale)).selectAll("text").style("font-size", "16px");
-                svg.select(".y-axis").call(d3.axisLeft(newYScale).tickFormat("").tickSize(0));
+                svg.select(".y-axis").call(d3.axisLeft(newYScale).tickValues(yTickValues).tickFormat((d) => {
+                    const scale = Object.keys(scaleMap).find(key => scaleMap[key] === d);
+                    return scale || "";
+                })).selectAll("text").style("font-size", "16px");
 
                 // Aggiorna griglia
                 svg.select(".grid-x")
                     .call(
                         d3.axisBottom(newXScale)
                             .tickSize(-adjustedHeight + margin.top + margin.bottom)
+                            .tickFormat("")
+                    )
+                    .selectAll("line")
+                    .attr("stroke", "#5e5e5e")
+                    .attr("stroke-dasharray", "3,3"); // Mantieni tratteggio
+
+                // Aggiorna griglia y
+                svg.select(".grid-y")
+                    .call(
+                        d3.axisLeft(newYScale).tickValues(yTickValues)
+                            .tickSize(-width + margin.left + margin.right)
                             .tickFormat("")
                     )
                     .selectAll("line")
@@ -268,8 +301,7 @@ const TimelineDiagram = ({ documents, connections }) => {
                             .curve(d3.curveBundle.beta(0.8))([
                                 [newXScale(assignedRows[d.source].date), ySource],
                                 [
-                                    (newXScale(assignedRows[d.source].date) +
-                                        newXScale(assignedRows[d.target].date)) / 2,
+                                    (newXScale(assignedRows[d.source].date) + newXScale(assignedRows[d.target].date)) / 2,
                                     (ySource + yTarget) / 2 + adjustedControlOffset,
                                 ],
                                 [newXScale(assignedRows[d.target].date), yTarget],
@@ -277,67 +309,67 @@ const TimelineDiagram = ({ documents, connections }) => {
                     });
             });
         svg.call(zoom);
-    }, [width, height, documents, connections,selectedDoc]);
+    }, [width, height, documents, connections, selectedDoc]);
 
     return (
-            <Container fluid center >
-                <Row className="align-left">
-                    <Col xs="2">
+        <Container fluid center >
+            <Row className="align-left">
+                <Col xs="2">
 
-                        <Button
-                            variant="link"
-                            onClick={() => {
-                                setLegendVisible(!legendVisible);
-                                setSelectedDoc(null);
-                            }
-                            }
-                            style={{
-                                backgroundColor: "transparent",
-                              }}
-                              disabled={legendVisible}
-                        >
-                            <i className="bi bi-info-circle" style={{ fontSize: "1.5rem", color: "#154109" }}></i>
-                        </Button>
-                    </Col>
-                </Row>
-                <Row>
-                    {legendVisible && (
-                        <Col xs={4} style={{ padding: "20px" }}>
-                            <LegendCard maxHeight={height - 50} setLegendVisible={setLegendVisible}/>
-                        </Col>
-                    )}
-                    <Col
-                        xs={selectedDoc || legendVisible ? 8 : 12}
+                    <Button
+                        variant="link"
+                        onClick={() => {
+                            setLegendVisible(!legendVisible);
+                            setSelectedDoc(null);
+                        }
+                        }
                         style={{
-                            transition: "all 0.3s ease-in-out",
-                            overflow: "hidden",
+                            backgroundColor: "transparent",
                         }}
+                        disabled={legendVisible}
                     >
-                        <svg ref={svgRef}></svg>
-                        {tooltip.visible && (
-                            <div
-                                style={{
-                                    position: "absolute",
-                                    left: tooltip.x + 10,
-                                    top: tooltip.y + 10,
-                                    backgroundColor: "white",
-                                    border: "1px solid black",
-                                    padding: "5px",
-                                    pointerEvents: "none",
-                                    zIndex: 1000,
-                                }}
-                            >
-                                {tooltip.name}
-                            </div>
-                        )}
+                        <i className="bi bi-info-circle" style={{ fontSize: "1.5rem", color: "#154109" }}></i>
+                    </Button>
+                </Col>
+            </Row>
+            <Row>
+                {legendVisible && (
+                    <Col xs={4} style={{ padding: "20px" }}>
+                        <LegendCard maxHeight={height - 50} setLegendVisible={setLegendVisible} />
                     </Col>
-                    {selectedDoc && (
-                        <Col xs={4} style={{ padding: "20px" }}>
-                            <DocumentModal documents={documents} selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} maxHeight={height - 50} />
-                        </Col>
+                )}
+                <Col
+                    xs={selectedDoc || legendVisible ? 8 : 12}
+                    style={{
+                        transition: "all 0.3s ease-in-out",
+                        overflow: "hidden",
+                    }}
+                >
+                    <svg ref={svgRef}></svg>
+                    {tooltip.visible && (
+                        <div
+                            style={{
+                                position: "absolute",
+                                left: tooltip.x + 10,
+                                top: tooltip.y + 10,
+                                backgroundColor: "white",
+                                border: "1px solid black",
+                                padding: "5px",
+                                pointerEvents: "none",
+                                zIndex: 1000,
+                            }}
+                        >
+                            {tooltip.name}
+                        </div>
                     )}
-                </Row>
-            </Container>
+                </Col>
+                {selectedDoc && (
+                    <Col xs={4} style={{ padding: "20px" }}>
+                        <DocumentModal documents={documents} selectedDoc={selectedDoc} setSelectedDoc={setSelectedDoc} maxHeight={height - 50} />
+                    </Col>
+                )}
+            </Row>
+        </Container>
     );
 };
 
