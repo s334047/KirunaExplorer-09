@@ -19,6 +19,7 @@ function MoveMapToMarker({ position, view, setView }) {
 
     useEffect(() => {
         if (position) {
+            position.lat-=0.0005;
             if (view == "normal") {
                 map.setView(position, map.getZoom());
             }
@@ -81,12 +82,7 @@ function MapViewer(props) {
                         if (areaDocuments) {
                             const positions = generateNonOverlappingPositions(doc.area, areaDocuments.length);
                             const docIndex = areaDocuments.findIndex(d => d.id === doc.id);
-                            if (docIndex !== -1) {
-                                setActivePosition({
-                                    lat: positions[docIndex][0],
-                                    lng: positions[docIndex][1],
-                                });
-                            }
+                            checkSetPositions(docIndex,positions);
                         }
                     }
                 }
@@ -113,17 +109,40 @@ function MapViewer(props) {
                     if (areaDocuments) {
                         const positions = generateNonOverlappingPositions(doc.area, areaDocuments.length);
                         const docIndex = areaDocuments.findIndex(d => d.id === doc.id);
-                        if (docIndex !== -1) {
-                            setActivePosition({
-                                lat: positions[docIndex][0],
-                                lng: positions[docIndex][1],
-                            });
-                        }
+                        checkSetPositions(docIndex,positions);
                     }
                 }
             }
 
         }
+    }
+    const checkSetPositions= (docIndex, positions)=>{
+        if (docIndex !== -1) {
+            setActivePosition({
+                lat: positions[docIndex][0],
+                lng: positions[docIndex][1],
+            });
+        }
+    }
+    const handleAreaShowDocuments = (document)=>{
+        const alreadyExists = listDocumentsArea.some(
+            (doc) => doc.id === document.id 
+          );
+        if(!alreadyExists){
+            setListDocumentsArea((prevDocuments) =>[...prevDocuments,document])
+            setDocumentsArea((prevDocuments) => [...prevDocuments, turf.polygon(document.area.geometry.coordinates)])
+        }
+        else {
+            let index_remove=listDocumentsArea.findIndex((doc) => doc.id === document.id);
+            setDocumentsArea((prevDocuments) =>
+                prevDocuments.filter((_, index) => 
+                  index !== index_remove
+                )
+              );
+            setListDocumentsArea((prevDocuments) =>
+              prevDocuments.filter((doc) => doc.id !== document.id)
+            );
+          }
     }
     const icons = {
         'Informative document': new L.Icon({ iconUrl: 'icon_doc_blue.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
@@ -249,6 +268,9 @@ function MapViewer(props) {
         else if (documentsArea.length>0){
             setTotalArea(turf.featureCollection([documentsArea[0]]))
         }
+        else if(documentsArea.length==0){
+            setTotalArea(null);
+        }
     },[documentsArea])
     return (
         <div style={{ display: 'flex', flex: 1, position: 'relative', height: '90vh' }}>
@@ -306,13 +328,7 @@ function MapViewer(props) {
                                                 setActivePosition({ lat: positions[index][0], lng: positions[index][1] })
                                             }
                                             else{
-                                                const alreadyExists = listDocumentsArea.some(
-                                                    (doc) => doc.id === document.id // Confronta gli ID
-                                                  );
-                                                if(!alreadyExists){
-                                                    setListDocumentsArea((prevDocuments) =>[...prevDocuments,document])
-                                                    setDocumentsArea((prevDocuments) => [...prevDocuments, turf.polygon(document.area.geometry.coordinates)])
-                                                }
+                                                handleAreaShowDocuments(document);
                                             }
 
                                         },
@@ -341,7 +357,7 @@ function MapViewer(props) {
 
                     />
                 )}
-                {totalArea && <GeoJSON key={JSON.stringify(totalArea)} data={totalArea} color="red" ></GeoJSON>}
+                {totalArea  && <GeoJSON key={JSON.stringify(totalArea)} data={totalArea} color="red" ></GeoJSON>}
             </MapContainer>
 
             {/* Document Card */}
