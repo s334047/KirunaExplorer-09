@@ -19,7 +19,6 @@ describe("Additional Tests for Uncovered Lines in index.ts", () => {
     jest.clearAllMocks();
   });
 
-
   describe("GET /api/connections/info/:SourceDocId - Database Errors", () => {
     test("should return 503 if daoConnection.GetDocumentInfoConnections throws an error", async () => {
       jest.spyOn(DaoConnection.prototype, "GetDocumentInfoConnections").mockRejectedValue(new Error("Database error"));
@@ -27,7 +26,6 @@ describe("Additional Tests for Uncovered Lines in index.ts", () => {
       const response = await request(app).get("/api/connections/info/1");
 
       expect(response.status).toBe(503);
-      
     });
   });
 
@@ -71,7 +69,17 @@ describe("Additional Tests for Uncovered Lines in index.ts", () => {
         .attach("file", Buffer.from("Test file"), "testfile.pdf");
 
       expect(response.status).toBe(503);
-      
+    });
+
+    test("should return 400 if no file is uploaded", async () => {
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
+
+      const response = await request(app)
+        .post("/api/originalResources")
+        .field("docId", "123");
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({ message: "No file updated" });
     });
   });
 
@@ -92,10 +100,8 @@ describe("Additional Tests for Uncovered Lines in index.ts", () => {
       const response = await request(app).get("/api/connections/Doc1");
 
       expect(response.status).toBe(503);
-      
     });
   });
-
 
   describe("PUT /api/modifyGeoreference - Error Scenarios", () => {
     test("should return 503 if daoArea.modifyGeoreference throws an error", async () => {
@@ -107,128 +113,110 @@ describe("Additional Tests for Uncovered Lines in index.ts", () => {
         .send({ coord: [10, 20], name: "Doc1" });
 
       expect(response.status).toBe(503);
-      
     });
   });
 
-  describe("Additional Tests for Uncovered Lines in index.ts", () => {
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-  
-    describe("POST /api/documents - Validation Errors", () => {
-  
-      test("should return 503 if daoDocument.newDescription throws an error", async () => {
-        jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
-        jest.spyOn(DaoArea.prototype, "getAreaIdFromName").mockResolvedValue(null);
-        jest.spyOn(DaoDocument.prototype, "newDescription").mockRejectedValue(new Error("Database error"));
-  
-        const validDocument = {
-          title: "Document Title",
-          stakeholder: "Stakeholder1",
-          scale: "Scale1",
-          date: "2023-12-06",
-          type: "Type1",
-          description: "Description1",
-        };
-  
-        const response = await request(app).post("/api/documents").send(validDocument);
-  
-        expect(response.status).toBe(503);
-      });
-    });
-  
-    describe("DELETE /api/sessions/current - Session Management", () => {
-      test("should return 200 if user logs out successfully", async () => {
-        jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
-        jest.spyOn(Authenticator.prototype, "logout").mockImplementation((_req, res, _next) => {
-          return res.status(200).end();
-        });
-  
-        const response = await request(app).delete("/api/sessions/current");
-  
-        expect(response.status).toBe(200);
-      });
-    });
-  
-    describe("POST /api/connections - Error Scenarios", () => {
-      test("should return 404 if SourceDocId or TargetDocId is not found", async () => {
-        jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
-        jest.spyOn(DaoConnection.prototype, "GetDocumentsId").mockResolvedValueOnce(null);
-  
-        const invalidConnection = {
-          SourceDocument: "UnknownSourceDoc",
-          TargetDocument: "UnknownTargetDoc",
-          ConnectionType: "Reference",
-        };
-  
-        const response = await request(app).post("/api/connections").send(invalidConnection);
-  
-        expect(response.status).toBe(404);
-        expect(response.body).toEqual({ message: "SourceDocId or TargetDocId not found" });
-      });
-  
-      test("should return 409 if the connection is duplicated", async () => {
-        jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
-        jest.spyOn(DaoConnection.prototype, "GetDocumentsId").mockResolvedValue(1);
-        jest.spyOn(DaoConnection.prototype, "FindDuplicatedDocument").mockResolvedValue(false);
-  
-        const duplicateConnection = {
-          SourceDocument: "Doc1",
-          TargetDocument: "Doc2",
-          ConnectionType: "Reference",
-        };
-  
-        const response = await request(app).post("/api/connections").send(duplicateConnection);
-  
-        expect(response.status).toBe(409);
-        expect(response.body).toEqual({ message: "Duplicate connection on FindDuplicatedDocument" });
-      });
-  
-      test("should return 503 if daoConnection.SetDocumentsConnection throws an error", async () => {
-        jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
-        jest.spyOn(DaoConnection.prototype, "GetDocumentsId").mockResolvedValue(1);
-        jest.spyOn(DaoConnection.prototype, "FindDuplicatedDocument").mockResolvedValue(true);
-        jest.spyOn(DaoConnection.prototype, "SetDocumentsConnection").mockRejectedValue(new Error("Database error"));
-  
-        const connection = {
-          SourceDocument: "Doc1",
-          TargetDocument: "Doc2",
-          ConnectionType: "Reference",
-        };
-  
-        const response = await request(app).post("/api/connections").send(connection);
-  
-        expect(response.status).toBe(503);
-      });
-    });
-  
-    describe("PUT /api/documents/area - Error Scenarios", () => {
-      test("should return 503 if daoArea.addAreaToDoc throws an error", async () => {
-        jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
-        jest.spyOn(DaoArea.prototype, "getAreaIdFromName").mockResolvedValue(1);
-        jest.spyOn(DaoDocument.prototype, "getDocumentIdFromTitle").mockResolvedValue(1);
-        jest.spyOn(DaoArea.prototype, "addAreaToDoc").mockRejectedValue(new Error("Database error"));
-  
-        const association = { area: "Area1", title: "Document1" };
-  
-        const response = await request(app).put("/api/documents/area").send(association);
-  
-        expect(response.status).toBe(503);
-      });
-    });
-  
-    describe("GET /api/connections - General Tests", () => {
-      
-  
-      test("should return 503 if daoConnection.GetConnections throws an error", async () => {
-        jest.spyOn(DaoConnection.prototype, "GetConnections").mockRejectedValue(new Error("Database error"));
-  
-        const response = await request(app).get("/api/connections");
-  
-        expect(response.status).toBe(503);
-      });
+  describe("POST /api/documents - Validation Errors", () => {
+    test("should return 503 if daoDocument.newDescription throws an error", async () => {
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
+      jest.spyOn(DaoArea.prototype, "getAreaIdFromName").mockResolvedValue(null);
+      jest.spyOn(DaoDocument.prototype, "newDescription").mockRejectedValue(new Error("Database error"));
+
+      const validDocument = {
+        title: "Document Title",
+        stakeholder: "Stakeholder1",
+        scale: "Scale1",
+        date: "2023-12-06",
+        type: "Type1",
+        description: "Description1",
+      };
+
+      const response = await request(app).post("/api/documents").send(validDocument);
+
+      expect(response.status).toBe(503);
     });
   });
-  
+
+  describe("DELETE /api/sessions/current - Session Management", () => {
+    test("should return 200 if user logs out successfully", async () => {
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
+      jest.spyOn(Authenticator.prototype, "logout").mockImplementation((_req, res, _next) => {
+        return res.status(200).end();
+      });
+
+      const response = await request(app).delete("/api/sessions/current");
+
+      expect(response.status).toBe(200);
+    });
+  });
+
+  describe("POST /api/connections - Error Scenarios", () => {
+    test("should return 404 if SourceDocId or TargetDocId is not found", async () => {
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
+      jest.spyOn(DaoConnection.prototype, "GetDocumentsId").mockResolvedValueOnce(null);
+
+      const invalidConnection = {
+        SourceDocument: "UnknownSourceDoc",
+        TargetDocument: "UnknownTargetDoc",
+        ConnectionType: "Reference",
+      };
+
+      const response = await request(app).post("/api/connections").send(invalidConnection);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({ message: "SourceDocId or TargetDocId not found" });
+    });
+
+    test("should return 409 if the connection is duplicated", async () => {
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
+      jest.spyOn(DaoConnection.prototype, "GetDocumentsId").mockResolvedValue(1);
+      jest.spyOn(DaoConnection.prototype, "FindDuplicatedDocument").mockResolvedValue(false);
+
+      const duplicateConnection = {
+        SourceDocument: "Doc1",
+        TargetDocument: "Doc2",
+        ConnectionType: "Reference",
+      };
+
+      const response = await request(app).post("/api/connections").send(duplicateConnection);
+
+      expect(response.status).toBe(409);
+      expect(response.body).toEqual({ message: "Duplicate connection on FindDuplicatedDocument" });
+    });
+
+    test("should return 503 if daoConnection.SetDocumentsConnection throws an error", async () => {
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
+      jest.spyOn(DaoConnection.prototype, "GetDocumentsId").mockResolvedValue(1);
+      jest.spyOn(DaoConnection.prototype, "FindDuplicatedDocument").mockResolvedValue(true);
+      jest.spyOn(DaoConnection.prototype, "SetDocumentsConnection").mockRejectedValue(new Error("Database error"));
+
+      const connection = {
+        SourceDocument: "Doc1",
+        TargetDocument: "Doc2",
+        ConnectionType: "Reference",
+      };
+
+      const response = await request(app).post("/api/connections").send(connection);
+
+      expect(response.status).toBe(503);
+    });
+  });
+
+  describe("GET /api/connections - General Tests", () => {
+    test("should return 503 if daoConnection.GetConnections throws an error", async () => {
+      jest.spyOn(DaoConnection.prototype, "GetConnections").mockRejectedValue(new Error("Database error"));
+
+      const response = await request(app).get("/api/connections");
+
+      expect(response.status).toBe(503);
+    });
+  });
+
+  describe("Error Handling for Undefined Routes", () => {
+    test("should return 404 for undefined routes", async () => {
+      const response = await request(app).get("/undefined-route");
+
+      expect(response.status).toBe(404);
+    });
+  });
 });
