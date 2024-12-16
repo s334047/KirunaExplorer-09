@@ -53,7 +53,7 @@ function DescriptionComponent(props) {
     getDocs()
   }, [])
   const closeModal = () => {
-    navigate("/")
+    navigate("/map")
   };
   const checkDate = () => {
     const newErrors = {};

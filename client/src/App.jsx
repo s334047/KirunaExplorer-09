@@ -15,6 +15,7 @@ import AddDocument from './components/AddDocument';
 import DocumentTable from './components/ListDocuments';
 import ModifyGeoreference from './components/ModifyGeorefernce';
 import TimelineDiagram from './components/Diagram';
+import { HomePage, Slideshow } from './components/HomePage';
 
 function App() {
   const [showAddLink, setShowAddLink] = useState(false) //state for showing the modal for linking documents
@@ -53,6 +54,7 @@ function App() {
       setShowLoginModal(false);
       setMessage(`Benvenuto, ${user.username}!`);
       setUser(user);
+      nav('/map');
     } catch (err) {
       setMessage(`Incorrect username or password\n`);
     }
@@ -63,6 +65,7 @@ function App() {
     setUser({});
     setLoggedIn(false);
     setMessage('');
+    nav('/');
   };
 
   useEffect(() => {
@@ -89,7 +92,11 @@ function App() {
           </Container>
         </>
       }>
-        <Route index element={<>
+        <Route path='/' element={<>
+          <HomePage/>
+          <LoginComponent message={message} login={handleLogin} show={showLoginModal} setShow={setShowLoginModal} />
+        </>}/>
+        <Route path='/map' element={<>
           <MapViewer user={user} setTitle={setExcludeDoc} showAddLink={showAddLink} setShowAddLink={setShowAddLink} />
           <ListDocumentLink title={excludeDoc} show={showAddLink} setShow={setShowAddLink} />
           <LoginComponent message={message} login={handleLogin} show={showLoginModal} setShow={setShowLoginModal} />

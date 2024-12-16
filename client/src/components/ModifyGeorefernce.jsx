@@ -117,7 +117,7 @@ function ModifyGeoreference(props) {
         setSelectedPoint([newLatLng.lat, newLatLng.lng]); // Aggiorna lo stato con le nuove coordinate
     };
     const handleClose = () => {
-        navigate("/")
+        navigate("/map")
     }
     const handleSave = async() => {
         try {

@@ -140,7 +140,7 @@ function DocumentModal({ documents, selectedDoc, setSelectedDoc, maxHeight }) {
         <Card style={{ height: maxHeight, overflowY: "auto" }}>
             <Card.Header className="d-flex justify-content-between align-items-center" style={{ borderBottom: "none", backgroundColor: "inherit"}}>
                 <button className="btn btn-dark"
-                    onClick={()=>{navigate("/", { state: { documentId: selectedDoc.id } })}}
+                    onClick={()=>{navigate("/map", { state: { documentId: selectedDoc.id } })}}
                     style={{
                         backgroundColor: "#154109",
                         borderRadius: "50%"

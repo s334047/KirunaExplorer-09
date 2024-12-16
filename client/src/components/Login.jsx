@@ -30,7 +30,7 @@ function Login({ setUser }) {
       if (response.user) {
         setUser(response.user);
         sessionStorage.setItem('user', JSON.stringify(response.user));
-        navigate('/');
+        navigate('/map');
       } else {
         setError('Unexpected error, please try again.');
       }

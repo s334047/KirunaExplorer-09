@@ -315,7 +315,7 @@ function AdditionalInfo({ selectedDoc, setSelectedDoc, documents, setShowAddLink
                         <Button
                             variant="light"
                             style={{ color: "#154109", borderColor: "#154109", marginRight: "10px" }}
-                            onClick={()=>{navigate("/", { state: { documentId: selectedDoc.id } })}}
+                            onClick={()=>{navigate("/map", { state: { documentId: selectedDoc.id } })}}
                         >
                             <i className="bi bi-eye me-2"></i>See on map
                         </Button>

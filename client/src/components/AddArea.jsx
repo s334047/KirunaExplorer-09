@@ -24,7 +24,7 @@ function AddArea(){
         setAreaName(null)
         setResetDrawing(true);
         setTimeout(() => setResetDrawing(false), 0);
-        navigate("/")
+        navigate("/map")
     }
     const handleChangeName = (e) => {
         setAreaName(e.target.value);
@@ -34,7 +34,7 @@ function AddArea(){
         setAreaName(null)
         setResetDrawing(true);
         setTimeout(() => setResetDrawing(false), 0);
-        navigate("/");
+        navigate("/map");
     }
     const handleDrawCreated = (e) => {
         const layer = e.layer;

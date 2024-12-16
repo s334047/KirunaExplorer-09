@@ -5,14 +5,14 @@ function NavHeader(props) {
     return (
         <Navbar expand="lg" className="custom-navbar" style={{ borderBottom: '1px solid #dee2e6' }}>
             <Container fluid>
-                <Navbar.Brand href="#home" style={{ color: "#ffffff" }}>
+                <Navbar.Brand href="/" style={{ color: "#ffffff" }}>
                     Kiruna Explorer
                 </Navbar.Brand>
                 <>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="me-auto">
-                            <Nav.Link href="/">Map</Nav.Link>
+                            <Nav.Link href="/map">Map</Nav.Link>
                             <Nav.Link href="/documents">Documents</Nav.Link>
                             <Nav.Link href="/diagram">Diagram</Nav.Link>
                         </Nav>

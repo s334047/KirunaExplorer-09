@@ -72,7 +72,7 @@ function AddDocument() {
         setSelectedArea(foundArea);
     }
     const handleClose = () => {
-        navigate("/")
+        navigate("/map")
     }
     const handleSave = async() => {
         try {
@@ -91,7 +91,7 @@ function AddDocument() {
         } catch (error) {
             console.error("Errore catturato in handleSaveNew:", error);
         }
-        navigate("/")
+        navigate("/map")
     }
     useEffect(() => {
         setSelectedPoint([lat, lng])
