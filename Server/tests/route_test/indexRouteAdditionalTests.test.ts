@@ -219,4 +219,108 @@ describe("Additional Tests for Uncovered Lines in index.ts", () => {
       expect(response.status).toBe(404);
     });
   });
+
+  describe("POST /api/areas - Adding a new area", () => {
+    test("should return 201 if a new area is added successfully", async () => {
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
+      jest.spyOn(DaoArea.prototype, "addArea").mockResolvedValue(undefined);
+
+      const newArea = {
+        name: "Test Area",
+        vertex: [[10, 20], [30, 40], [50, 60]],
+      };
+
+      const response = await request(app).post("/api/areas").send(newArea);
+
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual({ message: "Area add successfully" });
+    });
+
+  
+
+  describe("GET /api/documents/areas/:name - Fetch documents by area name", () => {
+    test("should return documents successfully", async () => {
+      const mockDocs = [{ id: 1, title: "Doc1" }, { id: 2, title: "Doc2" }];
+      jest.spyOn(DaoArea.prototype, "getAreaIdFromName").mockResolvedValue(1);
+      jest.spyOn(DaoDocument.prototype, "getAllDocOfArea").mockResolvedValue(mockDocs as any);
+
+      const response = await request(app).get("/api/documents/areas/Area1");
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(mockDocs);
+    });
+
+    test("should return 503 if fetching documents fails", async () => {
+      jest.spyOn(DaoArea.prototype, "getAreaIdFromName").mockResolvedValue(1);
+      jest.spyOn(DaoDocument.prototype, "getAllDocOfArea").mockRejectedValue(new Error("Database error"));
+
+      const response = await request(app).get("/api/documents/areas/Area1");
+
+      expect(response.status).toBe(503);
+      
+    });
+  });
+
+  describe("GET /api/originalResources/download/:id - File Download", () => {
+    test("should return a file for valid resource ID", async () => {
+      const mockResource = { id: 1, path: "resources/file1.pdf" };
+      jest.spyOn(DaoResource.prototype, "getResourceById").mockResolvedValue(mockResource as any);
+      jest.spyOn(fs, "existsSync").mockReturnValue(true);
+      jest.spyOn(fs, "readFileSync").mockReturnValue(Buffer.from("file content"));
+
+      const response = await request(app).get("/api/originalResources/download/1");
+
+      expect(response.status).toBe(200);
+      expect(response.header["content-type"]).toBe("application/octet-stream");
+    });
+
+    test("should return 404 if file does not exist", async () => {
+      const mockResource = { id: 1, path: "resources/nonexistent.pdf" };
+      jest.spyOn(DaoResource.prototype, "getResourceById").mockResolvedValue(mockResource as any);
+      jest.spyOn(fs, "existsSync").mockReturnValue(false);
+
+      const response = await request(app).get("/api/originalResources/download/1");
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({ error: "File not found" });
+    });
+
+    test("should return 503 if fetching resource fails", async () => {
+      jest.spyOn(DaoResource.prototype, "getResourceById").mockRejectedValue(new Error("Database error"));
+
+      const response = await request(app).get("/api/originalResources/download/1");
+
+      expect(response.status).toBe(503);
+      
+    });
+  });
+
+  describe("POST /api/sessions - Authentication", () => {
+    test("should return 200 if login is successful", async () => {
+      jest.spyOn(Authenticator.prototype, "login").mockImplementation((_req, res, _next) => {
+        return res.status(200).json({ message: "Login successful" });
+      });
+
+      const credentials = { username: "testuser", password: "testpass" };
+
+      const response = await request(app).post("/api/sessions").send(credentials);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({ message: "Login successful" });
+    });
+
+    test("should return 401 if authentication fails", async () => {
+      jest.spyOn(Authenticator.prototype, "login").mockImplementation((_req, res, _next) => {
+        return res.status(401).json({ error: "Authentication failed" });
+      });
+
+      const invalidCredentials = { username: "invaliduser", password: "wrongpass" };
+
+      const response = await request(app).post("/api/sessions").send(invalidCredentials);
+
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({ error: "Authentication failed" });
+    });
+});
+  });
 });
