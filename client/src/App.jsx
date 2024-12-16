@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import { Routes, Route, Outlet, useNavigate } from 'react-router-dom';
-import { Container } from 'react-bootstrap';
+import { Routes, Route, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import NavHeader from './components/NavHeader';
 import MapViewer from './components/Map';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -15,7 +14,7 @@ import AddDocument from './components/AddDocument';
 import DocumentTable from './components/ListDocuments';
 import ModifyGeoreference from './components/ModifyGeorefernce';
 import TimelineDiagram from './components/Diagram';
-import { HomePage, Slideshow } from './components/HomePage';
+import HomePage from './components/HomePage';
 
 function App() {
   const [showAddLink, setShowAddLink] = useState(false) //state for showing the modal for linking documents
@@ -28,6 +27,7 @@ function App() {
   const [connections, setConnections] = useState([]);
 
   const nav = useNavigate();
+  const location = useLocation();
 
   const setFeedbackFromError = (error) => {
     setMessage( `Error: ${error.message}`);
@@ -54,7 +54,7 @@ function App() {
       setShowLoginModal(false);
       setMessage(`Benvenuto, ${user.username}!`);
       setUser(user);
-      nav('/map');
+      nav(location.pathname || '/');
     } catch (err) {
       setMessage(`Incorrect username or password\n`);
     }
@@ -65,7 +65,7 @@ function App() {
     setUser({});
     setLoggedIn(false);
     setMessage('');
-    nav('/');
+    nav(location.pathname || '/');
   };
 
   useEffect(() => {
@@ -87,13 +87,11 @@ function App() {
       <Route element={
         <>
           <NavHeader loggedIn={loggedIn} logout={handleLogout} setShow={() => setShowLoginModal(true)} />
-          <Container fluid className='mt-3 justify-content-center align-items-center'>
             <Outlet />
-          </Container>
         </>
       }>
         <Route path='/' element={<>
-          <HomePage/>
+          <HomePage user={user}/>
           <LoginComponent message={message} login={handleLogin} show={showLoginModal} setShow={setShowLoginModal} />
         </>}/>
         <Route path='/map' element={<>
