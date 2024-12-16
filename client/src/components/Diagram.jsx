@@ -334,7 +334,7 @@ const TimelineDiagram = ({ documents, connections }) => {
             </Row>
             <Row>
                 {legendVisible && (
-                    <Col xs={4} style={{ padding: "20px" }}>
+                    <Col xs={3} style={{ padding: "20px" }}>
                         <LegendCard maxHeight={height - 50} setLegendVisible={setLegendVisible} />
                     </Col>
                 )}
