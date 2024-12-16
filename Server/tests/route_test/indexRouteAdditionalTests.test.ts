@@ -432,6 +432,111 @@ describe("Modified Tests for Uncovered Lines in index.ts", () => {
       expect(response.status).toBe(404);
     });
   });
+
+
+  describe("GET /api/connections - Database Error", () => {
+    test("should handle unexpected errors when fetching connections", async () => {
+      jest.spyOn(DaoConnection.prototype, "GetConnections").mockRejectedValue(new Error("Unexpected error"));
+
+      const response = await request(app).get("/api/connections");
+
+      expect(response.status).toBe(503);
+      
+    });
   });
+
+  describe("GET /api/documents - Database Error", () => {
+    test("should handle database errors when fetching documents", async () => {
+      jest.spyOn(DaoDocument.prototype, "getAllDoc").mockRejectedValue(new Error("Database error"));
+
+      const response = await request(app).get("/api/documents");
+
+      expect(response.status).toBe(503);
+      
+    });
+  });
+
+  describe("POST /api/originalResources - File Handling", () => {
+    test("should return 503 if saving the file to the database fails", async () => {
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
+      jest.spyOn(DaoResource.prototype, "addOriginalResource").mockRejectedValue(new Error("Database error"));
+
+      const response = await request(app)
+        .post("/api/originalResources")
+        .field("docId", "1")
+        .attach("file", Buffer.from("Sample content"), "sample.txt");
+
+      expect(response.status).toBe(503);
+    });
+  });
+
+  describe("GET /api/originalResources - File Not Found", () => {
+    test("should handle cases where no files are found for a document", async () => {
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
+      jest.spyOn(DaoResource.prototype, "getResourcesByDoc").mockResolvedValue([]);
+
+      const response = await request(app).get("/api/originalResources/1");
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual([]);
+    });
+  });
+
+  describe("GET /api/originalResources/download/:id - Edge Cases", () => {
+    test("should return 404 if the resource file does not exist on disk", async () => {
+      const mockResource = { id: 1, path: "resources/missing.pdf" };
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
+      jest.spyOn(DaoResource.prototype, "getResourceById").mockResolvedValue(mockResource as any);
+      jest.spyOn(fs, "existsSync").mockReturnValue(false);
+
+      const response = await request(app).get("/api/originalResources/download/1");
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({ error: "File not found" });
+    });
+  });
+
+  describe("PUT /api/modifyGeoreference - Database Errors", () => {
+    test("should handle errors when modifying georeference", async () => {
+      jest.spyOn(Authenticator.prototype, "isLoggedIn").mockImplementation((_req, _res, next) => next());
+      jest.spyOn(DaoArea.prototype, "modifyGeoreference").mockRejectedValue(new Error("Database error"));
+
+      const payload = {
+        coord: [10, 20],
+        name: "Document Title",
+      };
+
+      const response = await request(app).put("/api/modifyGeoreference").send(payload);
+
+      expect(response.status).toBe(503);
+      
+    });
+  });
+
+  
+
+ 
+
+  describe("GET /api/areas - Error Handling", () => {
+    test("should return 503 if fetching areas fails", async () => {
+      jest.spyOn(DaoArea.prototype, "getAllAreas").mockRejectedValue(new Error("Database error"));
+
+      const response = await request(app).get("/api/areas");
+
+      expect(response.status).toBe(503);
+      
+    });
+  });
+
+  describe("Error Handling for Undefined Routes", () => {
+    test("should return 404 for unregistered routes", async () => {
+      const response = await request(app).get("/nonexistent-route");
+
+      expect(response.status).toBe(404);
+    });
+  });
+
+ 
 });
+  });
 });
