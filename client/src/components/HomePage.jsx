@@ -28,7 +28,7 @@ function HeroSection(props){
 
     const heroStyle = {
         position: "relative",
-        height: "100vh",
+        height: "93.3vh",
         width: "100%",
         backgroundImage: `url(${images[currentImageIndex]})`,
         backgroundSize: "cover",
