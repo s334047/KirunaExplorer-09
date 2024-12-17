@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState} from "react";
 import Kiruna_homepage1 from "./../assets/Kiruna_homepage1.jpg";
 import Kiruna_homepage2 from "./../assets/Kiruna_homepage2.jpg";
 import Kiruna_homepage3 from "./../assets/Kiruna_homepage3.jpg";
@@ -82,9 +82,9 @@ function HeroSection(props){
                 onMouseEnter={() => setIsHoveredLeft(true)}
                 onMouseLeave={() => setIsHoveredLeft(false)}
                 style={{ ...arrowStyle, left: "10px", 
-                    transform: isHoveredLeft ? "translateY(-50%) scale(1.2)" : "translateY(-50%)" }} // Posizionata a sinistra
+                    transform: isHoveredLeft ? "translateY(-50%) scale(1.2)" : "translateY(-50%)" }} 
             >
-                 <i class="bi bi-arrow-left-circle"></i> {/* Simbolo di freccia sinistra */}
+                 <i className="bi bi-arrow-left-circle"></i> {/* Simbolo di freccia sinistra */}
             </button>
 
             {/* Freccia Destra */}
@@ -94,9 +94,9 @@ function HeroSection(props){
                 onMouseLeave={() => setIsHoveredRight(false)}
                 style={{ ...arrowStyle, right: "10px",
                     transform: isHoveredRight ? "translateY(-50%) scale(1.2)" : "translateY(-50%)"
-                 }} // Posizionata a destra
+                 }}
             >
-                <i class="bi bi-arrow-right-circle"></i> {/* Simbolo di freccia destra */}
+                <i className="bi bi-arrow-right-circle"></i> {/* Simbolo di freccia destra */}
             </button>
         </div>
     );
@@ -104,11 +104,18 @@ function HeroSection(props){
 
 function Message(props){
     const username = props.user ? props.user.username : null;
-    const message = username ? "Take part in Kiruna's transformation" : "Log-in to see more details";
+    const message1 = username ? null : "The web application that allows you to monitor one of the biggest urban transformation projects in recent history."
+    const message2 = username ? "Take part in Kiruna's transformation" : null;
     return(
         <div style={{fontSize: "24px"}}>
-            {username ? <h1 style={{fontSize: "90px"}}>Welcome {props.user.username}!</h1> : <h1 style={{fontSize: "90px"}}>Welcome in Kiruna Explorer!</h1>}
-            <p style={{fontSize: "30px"}}>{message}</p>
+            {username ? <h1 style={{fontSize: "100px"}}>Welcome {props.user.username}!</h1> : <h1 style={{fontSize: "100px"}}>Welcome in Kiruna Explorer!</h1>}
+            {username ? <p style={{fontSize: "30px"}}>Take part in Kiruna's transformation</p> : 
+                        <>
+                            <p style={{fontSize: "25px", marginBottom: "30px"}}>{message1}</p>
+                            <p> </p>
+                            <p style={{fontSize: "22px", marginBottom: "-5px"}}>If you are just a visitor, you can navigate through different modes.</p>
+                            <p style={{fontSize: "22px"}}>Otherwise, log-in to see more features.</p>
+                        </>}
         </div>
     );
 }

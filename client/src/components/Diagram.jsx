@@ -21,11 +21,14 @@ const TimelineDiagram = ({ documents, connections }) => {
     const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, name: "" });
 
     const icons = {
-        'Informative document': 'icon_doc_blue.png',
-        'Prescriptive document': 'icon_doc_green.png',
-        'Design document': 'icon_doc_orange.png',
-        'Technical document': 'icon_doc_red.png',
-        'Material effect': 'icon_doc_yellow.png',
+        'Informative document':  'Informative Document.png',
+        'Design document': 'Design Document.png' ,
+        'Prescriptive document':  'Prescriptive Document.png' ,
+        'Technical document': 'Technical Document.png' ,
+        'Material effect':  'Material Effect.png' ,
+        'Consultation':  'Consultation.png' ,
+        'Conflict': 'Conflict.png' ,
+        'Agreement':  'Agreement.png' ,
     };
 
     // Handle resizing when the card is visible
@@ -77,7 +80,7 @@ const TimelineDiagram = ({ documents, connections }) => {
         const adjustedHeight = margin.top + (maxRow + 1) * rowHeight + margin.bottom;
         const yScale = d3
             .scaleLinear()
-            .domain([0, maxRow])
+            .domain([0, maxRow+1])
             .range([margin.top, adjustedHeight - margin.bottom]);
 
         const svgElement = svgRef.current;

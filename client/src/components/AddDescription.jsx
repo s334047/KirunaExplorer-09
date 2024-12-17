@@ -35,7 +35,7 @@ function DescriptionComponent(props) {
       case 2:
         return "Add info of the card";
       case 3:
-        return "Add link";
+        return "Add connection";
       case 4:
         return "Add georeference";
       default:
@@ -83,7 +83,7 @@ function DescriptionComponent(props) {
     return newErrors.date;
   }
   const checkStep1 = () => {
-    const allowedScales = ["blueprint/effects", "concept", "text"]; // sostituisci con le stringhe consentite
+    const allowedScales = ["blueprints/effects", "concept", "text"]; // sostituisci con le stringhe consentite
     const scaleRegex = /^1:\d+([.,]\d+)?$/;
     const newErrors = {};
     if (!formData.title) newErrors.title = "The title is mandatory.";
@@ -302,7 +302,7 @@ function DescriptionComponent(props) {
                     isInvalid={!!errors.scale}
                   >
                     <option value="">Select a scale</option>
-                    <option value="blueprint/effects">Blueprint/effects</option>
+                    <option value="blueprints/effects">Blueprints/effects</option>
                     <option value="concept">Concept</option>
                     <option value="text">Text</option>
                   </Form.Select>)}
@@ -358,9 +358,12 @@ function DescriptionComponent(props) {
                     <option value="">Select a type</option>
                     <option value="Technical document">Technical document</option>
                     <option value="Informative document">Informative document</option>
-                    <option value="Material Effect">Material effect</option>
+                    <option value="Material effect">Material effect</option>
                     <option value="Prescriptive document">Prescriptive document</option>
                     <option value="Design document">Design document</option>
+                    <option value="Conflict">Conflict</option>
+                    <option value="Agreement">Agreement</option>
+                    <option value="Consultation">Consultation</option>
                   </Form.Select>
                   <Form.Control.Feedback type="invalid">
                     {errors.type}
@@ -458,7 +461,7 @@ function DescriptionComponent(props) {
                     onClick={handleAddLink}
                     className="d-flex align-items-center"
                   >
-                    <i className="bi bi-plus-circle-fill me-2"></i> Create Link
+                    <i className="bi bi-plus-circle-fill me-2"></i> Create connection
                   </Button>
                 </div>
               </div>

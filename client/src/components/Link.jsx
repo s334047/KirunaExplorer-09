@@ -82,7 +82,7 @@ const ListDocumentLink = (props) => {
   return (
     <Modal show={props.show} onHide={closeModal} centered>
       <Modal.Header closeButton>
-        <Modal.Title style={{ color: "#154109" }}>Creating new link</Modal.Title>
+        <Modal.Title style={{ color: "#154109" }}>Creating new connection</Modal.Title>
       </Modal.Header>
       <Modal.Body>
 
@@ -133,7 +133,7 @@ const ListDocumentLink = (props) => {
                 onClick={handleAddLink}
                 className="d-flex align-items-center"
               >
-                <i className="bi bi-plus-circle-fill me-2"></i> Create Link
+                <i className="bi bi-plus-circle-fill me-2"></i> Create connection
               </Button>
             </div>
           </div>

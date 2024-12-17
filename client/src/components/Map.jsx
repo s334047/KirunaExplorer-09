@@ -145,39 +145,43 @@ function MapViewer(props) {
           }
     }
     const icons = {
-        'Informative document': new L.Icon({ iconUrl: 'icon_doc_blue.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
-        'Prescriptive document': new L.Icon({ iconUrl: 'icon_doc_green.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
-        'Design document': new L.Icon({ iconUrl: 'icon_doc_orange.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
-        'Technical document': new L.Icon({ iconUrl: 'icon_doc_red.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
-        'Material effect': new L.Icon({ iconUrl: 'icon_doc_yellow.png', iconSize: [35, 35], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
+        'Informative document': { iconUrl: 'Informative Document.png' },
+        'Design document': { iconUrl: 'Design Document.png' },
+        'Prescriptive document': { iconUrl: 'Prescriptive Document.png' },
+        'Technical document': { iconUrl: 'Technical Document.png' },
+        'Material effect': { iconUrl: 'Material Effect.png' },
+        'Consultation': { iconUrl: 'Consultation.png' },
+        'Conflict': { iconUrl: 'Conflict.png' },
+        'Agreement': { iconUrl: 'Agreement.png' },
     };
+    
     const getIconByType = (type, selectedDoc, docTitle) => {
         const baseIcon = icons[type];
-        let size = baseIcon.options.iconSize; // Dimensione maggiore se selezionato
-        let anchor = baseIcon.options.iconAnchor; // Ancoraggio adattato alla nuova dimensione
-        if (selectedDoc) {
-            if (selectedDoc.title === docTitle) {
-                size = [50, 50];
-                anchor = [25, 50];
+        let size = [35, 35]; // Dimensione predefinita
+        let anchor = [12, 41]; // Punto di ancoraggio predefinito
+    
+        // Logica per ingrandire l'icona
+        if (selectedDoc && selectedDoc.title === docTitle) {
+            size = [60, 60];
+        } else if (listDocumentsArea.length > 0) {
+            const alreadyExists = listDocumentsArea.some((doc) => doc.title === docTitle);
+            if (alreadyExists) {
+                size = [60, 60];
             }
         }
-        else if (listDocumentsArea.length>0){
-            const alreadyExists = listDocumentsArea.some(
-                (doc) => doc.title === docTitle // Confronta gli ID
-              );
-              if(alreadyExists){
-                size = [50, 50];
-                anchor = [25, 50];
-              }
-        }
-
-        return new L.Icon({
-            iconUrl: baseIcon.options.iconUrl, // URL originale
-            iconSize: size,                   // Dimensione dinamica
-            iconAnchor: anchor,               // Ancoraggio dinamico
-            popupAnchor: baseIcon.options.popupAnchor, // Rimane invariato
+    
+        // Utilizzo di L.divIcon con un div HTML per supportare il CSS
+        return L.divIcon({
+            html: `<div class="icon-with-background" style="width: ${size[0]}px; height: ${size[1]}px;">
+                       <img src="${baseIcon.iconUrl}" style="width: 100%; height: 100%;" alt="${type}" />
+                   </div>`,
+            className: '', // Nessuna classe Leaflet predefinita
+            iconSize: size,                   // Dimensioni
+            iconAnchor: anchor,               // Punto di ancoraggio
+            popupAnchor: [1, -34],
         });
     };
+    
 
     const createClusterCustomIcon = (cluster) => {
         const count = cluster.getChildCount();
@@ -297,7 +301,7 @@ function MapViewer(props) {
                 </LayersControl>
 
                 {/* Marker Cluster Group */}
-                <MarkerClusterGroup ref={markerClusterRef} showCoverageOnHover={false} disableClusteringAtZoom={20} iconCreateFunction={createClusterCustomIcon}>
+                <MarkerClusterGroup ref={markerClusterRef} showCoverageOnHover={false}  iconCreateFunction={createClusterCustomIcon}>
                     {docs.filter(doc => doc.coordinate != null).map(doc => (
                         <Marker key={doc.title} position={doc.coordinate} icon={getIconByType(doc.type, selectedDoc, doc.title)} eventHandlers={{
                             click: () => {
@@ -384,7 +388,7 @@ function MapViewer(props) {
 
             {/* Add Document Button */}
             {!selectedDoc && (
-                <div style={{ position: 'absolute', bottom: '140px', left: '10px', zIndex: 1000 }}>
+                <div style={{ position: 'absolute', bottom: '20px', left: '10px', zIndex: 1000 }}>
                     <OverlayTrigger
                         placement="right"
                         overlay={
@@ -416,7 +420,7 @@ function MapViewer(props) {
                 </div>
             )}
             {!selectedDoc && props.user.role === 'Urban Planner' && (
-                <div style={{ position: 'absolute', bottom: '20px', left: '10px', zIndex: 1000 }}>
+                <div style={{ position: 'absolute', bottom: '80px', left: '10px', zIndex: 1000 }}>
                     <OverlayTrigger
                         placement="right"
                         overlay={
@@ -438,7 +442,7 @@ function MapViewer(props) {
 
             {/* Add Area Button */}
             {!selectedDoc && props.user.role === 'Urban Planner' && (
-                <div style={{ position: 'absolute', bottom: '80px', left: '10px', zIndex: 1000 }}>
+                <div style={{ position: 'absolute', bottom: '140px', left: '10px', zIndex: 1000 }}>
                     <OverlayTrigger
                         placement="right"
                         overlay={
@@ -490,7 +494,7 @@ function Legend({ icons }) {
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                             {Object.entries(icons).map(([type, icon]) => (
                                 <div key={type} style={{ display: 'flex', alignItems: 'center', marginTop: '1px', marginBottom: '1px' }}>
-                                    <img src={icon.options.iconUrl} alt={type} style={{ width: '20px', height: '20px', marginRight: '10px' }} />
+                                    <img src={icon.iconUrl} alt={type} style={{ width: '20px', height: '20px', marginRight: '10px' }} />
                                     <span>{type}</span>
                                 </div>
                             ))}
