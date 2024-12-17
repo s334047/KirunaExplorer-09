@@ -303,7 +303,7 @@ function AdditionalInfo({ selectedDoc, setSelectedDoc, documents, setShowAddLink
                             style={{ color: "#154109", borderColor: "#154109", marginRight: "10px" }}
                             onClick={() => { setShowAddLinkModal(true); }}
                         >
-                            <i className="bi bi-plus-circle-fill me-2"></i>Add link
+                            <i className="bi bi-plus-circle-fill me-2"></i>Add connection
                         </Button>
                         <Button
                             variant="light"

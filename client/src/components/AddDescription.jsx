@@ -35,7 +35,7 @@ function DescriptionComponent(props) {
       case 2:
         return "Add info of the card";
       case 3:
-        return "Add link";
+        return "Add connection";
       case 4:
         return "Add georeference";
       default:
@@ -461,7 +461,7 @@ function DescriptionComponent(props) {
                     onClick={handleAddLink}
                     className="d-flex align-items-center"
                   >
-                    <i className="bi bi-plus-circle-fill me-2"></i> Create Link
+                    <i className="bi bi-plus-circle-fill me-2"></i> Create connection
                   </Button>
                 </div>
               </div>
