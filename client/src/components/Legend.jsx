@@ -25,7 +25,7 @@ const LegendCard = ({ maxHeight, setLegendVisible }) => {
     };
 
     return (
-        <Card style={{ height: maxHeight }}>
+        <Card >
             <Card.Body>
                 <div className="d-flex justify-content-between align-items-center mb-3">
                     <div style={{ flex: 1 }} />
