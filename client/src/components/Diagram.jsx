@@ -80,7 +80,7 @@ const TimelineDiagram = ({ documents, connections }) => {
         const adjustedHeight = margin.top + (maxRow + 1) * rowHeight + margin.bottom;
         const yScale = d3
             .scaleLinear()
-            .domain([0, maxRow])
+            .domain([0, maxRow+1])
             .range([margin.top, adjustedHeight - margin.bottom]);
 
         const svgElement = svgRef.current;
