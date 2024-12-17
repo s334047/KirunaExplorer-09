@@ -388,7 +388,7 @@ function MapViewer(props) {
 
             {/* Add Document Button */}
             {!selectedDoc && (
-                <div style={{ position: 'absolute', bottom: '140px', left: '10px', zIndex: 1000 }}>
+                <div style={{ position: 'absolute', bottom: '20px', left: '10px', zIndex: 1000 }}>
                     <OverlayTrigger
                         placement="right"
                         overlay={
@@ -420,7 +420,7 @@ function MapViewer(props) {
                 </div>
             )}
             {!selectedDoc && props.user.role === 'Urban Planner' && (
-                <div style={{ position: 'absolute', bottom: '20px', left: '10px', zIndex: 1000 }}>
+                <div style={{ position: 'absolute', bottom: '80px', left: '10px', zIndex: 1000 }}>
                     <OverlayTrigger
                         placement="right"
                         overlay={
@@ -442,7 +442,7 @@ function MapViewer(props) {
 
             {/* Add Area Button */}
             {!selectedDoc && props.user.role === 'Urban Planner' && (
-                <div style={{ position: 'absolute', bottom: '80px', left: '10px', zIndex: 1000 }}>
+                <div style={{ position: 'absolute', bottom: '140px', left: '10px', zIndex: 1000 }}>
                     <OverlayTrigger
                         placement="right"
                         overlay={
