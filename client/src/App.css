@@ -95,3 +95,9 @@
     
     background-color: #dcede6 !important;   
 }
+.icon-with-background {
+  background-color: white; /* Sfondo bianco */
+  border-radius: 5px; /* Angoli arrotondati (opzionale) */
+  padding: 3px; /* Spazio attorno all'icona */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Ombra leggera (opzionale) */
+}

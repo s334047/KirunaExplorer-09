@@ -3,11 +3,14 @@ import { Card, ListGroup, Button } from 'react-bootstrap';
 
 const LegendCard = ({ maxHeight, setLegendVisible }) => {
     const icons = [
-        { icon: 'icon_doc_blue.png', label: 'Informative document' },
-        { icon: 'icon_doc_green.png', label: 'Prescriptive document' },
-        { icon: 'icon_doc_orange.png', label: 'Design document' },
-        { icon: 'icon_doc_red.png', label: 'Technical document' },
-        { icon: 'icon_doc_yellow.png', label: 'Material effect' },
+        { icon: 'Informative Document.png', label: 'Informative document' },
+        { icon: 'Prescriptive Document.png', label: 'Prescriptive document' },
+        { icon: 'Design Document.png', label: 'Design document' },
+        { icon: 'Technical Document.png', label: 'Technical document' },
+        { icon: 'Material Effect.png', label: 'Material effect' },
+        { icon: 'Consultation.png', label: 'Consultation' },
+        { icon: 'Conflict.png', label: 'Conflict' },
+        { icon: 'Agreement.png', label: 'Agreement' },
     ];
 
     const connectionStyles = [
