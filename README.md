@@ -5,11 +5,17 @@
 This repository belongs to the group number 09 (2024/2025) of the course "Software Engineering II" at [Politecnico di Torino](https://www.polito.it/), Italy.  
 KirunaExplorer is a project concerning the creation of a web app interface for [Kiruna](https://it.wikipedia.org/wiki/Kiruna) city and its process of transformation.
 
+## How to section
+
+### How to run the web application
+
+### How to run all the tests of the application
+
 ## Working tree
 
-![Working tree](./)
+[Working tree](./tree.md)
 
-## Video
+## Presentation video
 
 Video not available now, it will be created later.
 
