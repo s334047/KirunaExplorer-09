@@ -16,20 +16,10 @@ function LoginComponent(props) {
     };
 
     return (
-        <Modal show={props.show} onHide={() => props.setShow(false)} size="lg" backdropClassName="custom-backdrop" centered>
-            <Modal.Body className="p-0">
+        <Modal show={props.show} onHide={() => props.setShow(false)} backdropClassName="custom-backdrop" centered>
+            <Modal.Body>
                 <Row>
-
-                    <Col md={6}>
-                        <img
-                            src="Kiruna.jpg"
-                            alt="login form"
-                            className="w-100 h-100 login-image"
-                            style={{ borderTopLeftRadius: '0.25rem', borderBottomLeftRadius: '0.25rem' }}
-                        />
-                    </Col>
-
-                    <Col md={6} className="d-flex flex-column justify-content-center align-items-center p-4">
+                    <Col className="d-flex flex-column justify-content-center align-items-center p-4">
                         <div>
                             <div className="text-center">
                                 <h1 className="fw-bold" style={{ color: "#154109" }}>Kiruna Explorer</h1>

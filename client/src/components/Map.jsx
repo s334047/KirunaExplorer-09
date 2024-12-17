@@ -277,12 +277,12 @@ function MapViewer(props) {
         }
     },[documentsArea])
     return (
-        <div style={{ display: 'flex', flex: 1, position: 'relative', height: '90vh' }}>
+        <div style={{ display: 'flex', flex: 1, position: 'relative', height: '93.3vh'}}>
             <MapContainer
                 ref={mapRef}
                 center={position}
                 zoom={13}
-                style={{ flex: 1, height: "100%", width: "100%", borderRadius: '10px' }}
+                style={{ flex: 1, height: "100%", width: "100%", borderRadius: '0px' }}
                 scrollWheelZoom={false}
             >
                 <LayersControl position="bottomright">
