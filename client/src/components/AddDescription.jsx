@@ -267,7 +267,7 @@ function DescriptionComponent(props) {
                   <Form.Label className="custom-label-color">Stakeholders:</Form.Label>
                   <fieldset>
                     <Row>
-                      {["Kiruna kommun", "LKAB", "White Arkitekter", "Residents"].map((stakeholder) => (
+                      {["Kiruna kommun", "LKAB", "White Arkitekter", "Residents","Norrbotten Museum"].map((stakeholder) => (
                         <Col md={3} key={stakeholder}>
                           <Form.Check
                             className='custom-checkbox'
