@@ -171,8 +171,8 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
   - `area` (string): Name of the associated area (optional).
   - `description` (string): Brief description of the document.
   - `formLink` (array of objects, optional): Links to related documents. Each link must include:
-      - `document` (string): Target document title.
-      - `type` (string): Type of the connection (e.g., "Reference").
+    - `document` (string): Target document title.
+    - `type` (string): Type of the connection (e.g., "Reference").
 - **Response**:
   - Returns `201 Created` on success.
   - Returns `503 Service Unavailable` if an error occurs.
@@ -280,7 +280,7 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
 - **Request Body**:
   - `file`: File to be uploaded (binary).
   - `docId` (number): The ID of the document associated with the resource.
- - **File Naming**: Uploaded files are saved in a folder named `./OriginalResources` on the server.
+- **File Naming**: Uploaded files are saved in a folder named `./OriginalResources` on the server.
   The filename will include a timestamp to prevent overwriting:
 - **Response**:
   - Returns `200 OK` on success.
