@@ -31,9 +31,6 @@ describe("Authenticator Tests", () => {
         passport.use = jest.fn() as any;        // Ensure `passport.use` exists as a mock
     });
 
-
-
-
     test('should handle passport authenticate failure', async () => {
         const req = { body: {username: process.env.MOCK_USERNAME, password: process.env.MOCK_PASSWORD}, login: jest.fn() };
         const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
@@ -108,9 +105,6 @@ describe("Authenticator Tests", () => {
         expect(resMock.status).toHaveBeenCalledWith(200);
         expect(resMock.json).toHaveBeenCalledWith(userMock);
     });
-    
-
-    
 
     test("should handle login failure due to req.login error", async () => {
         const reqMock: { login: jest.Mock } = {
@@ -294,8 +288,6 @@ describe("Authenticator Tests", () => {
         expect(nextMock).toHaveBeenCalled();
     });
     
-    
-    
     test("should perform full auth flow", async () => {
         const reqMock: any = {
             logout: jest.fn((callback: (err: any) => void) => callback(null)),
@@ -344,16 +336,6 @@ describe("Authenticator Tests", () => {
         expect(resMock.status).toHaveBeenCalledWith(200);
     });
     
-    test("should handle errors during passport initialization", () => {
-        const useSpy = jest.spyOn(passport, "use").mockImplementation(() => {
-            throw new Error("Initialization error");
-        });
-    
-        expect(() => auth.initAuth()).toThrow("Initialization error");
-    
-        useSpy.mockRestore();
-    });
-    
     test("should correctly serialize and deserialize user", () => {
         const userMock = { id: 1, username: "testuser" };
         let serializedUser: any;
@@ -393,7 +375,7 @@ describe("Authenticator Tests", () => {
         expect(mockApp.use).toHaveBeenCalledWith(expect.any(Function)); // Ensure session middleware is added
     });
     
-    test("should handle missing session secret", () => {
+    test("should handle missing session secret", () => { //UNO QUI
         const sessionMiddleware = jest.fn(() => {
             throw new Error("Session secret is missing");
         });
@@ -403,22 +385,11 @@ describe("Authenticator Tests", () => {
         expect(() => auth.initAuth()).toThrow("Session secret is missing");
     });
     
-    
-    
-    test("should handle invalid strategy in passport.use", () => {
-        jest.spyOn(passport, "use").mockImplementation(() => {
-            throw new Error("Invalid strategy");
-        });
-    
-        expect(() => auth.initAuth()).toThrow("Invalid strategy");
-    });
     test("should handle invalid strategy in passport.use", () => {
         const useSpy = jest.spyOn(passport, "use").mockImplementation(() => {
             throw new Error("Invalid strategy");
-        });
-    
+        });    
         expect(() => auth.initAuth()).toThrow("Invalid strategy");
-    
         useSpy.mockRestore(); // Restore the spy
     });
 
@@ -427,20 +398,9 @@ describe("Authenticator Tests", () => {
         const sessionMiddleware = jest.fn(() => {
             throw new Error("Invalid session options");
         });
-    
         mockApp.use = sessionMiddleware;
-    
         expect(() => auth.initAuth()).toThrow("Invalid session options");
     });
-
-
-
-
-
-
-    
-    
-    
     
     test("should handle invalid session options", () => {
         jest.mock("express-session", () => {
@@ -667,16 +627,6 @@ test("should handle missing user during login gracefully", async () => {
     expect(resMock.json).toHaveBeenCalledWith({ error: "Authentication failed" });
 });
 
-
-test("should throw an error if session secret is missing", () => {
-    const sessionMiddleware = jest.fn(() => {
-        throw new Error("Session secret is missing");
-    });
-
-    mockApp.use = sessionMiddleware;
-
-    expect(() => auth.initAuth()).toThrow("Session secret is missing");
-});
 test("should handle unexpected errors during middleware execution", () => {
     const middlewareError = jest.fn(() => {
         throw new Error("Unexpected middleware error");
