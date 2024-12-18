@@ -42,7 +42,7 @@ const LegendCard = ({ maxHeight, setLegendVisible }) => {
                     {icons.map((icon, index) => (
                         <ListGroup.Item key={index} style={{ display: 'flex', alignItems: 'center' }}>
                             <img src={icon.icon} alt={icon.label} style={{ width: 20, height: 20, marginRight: 10 }} />
-                            <span>{icon.label}</span>
+                            <span style={{ fontSize: '0.85rem' }}>{icon.label}</span>
                         </ListGroup.Item>
                     ))}
                 </ListGroup>
@@ -50,8 +50,17 @@ const LegendCard = ({ maxHeight, setLegendVisible }) => {
                 <Card.Subtitle className="mt-4 mb-3">Connections:</Card.Subtitle>
                 <ListGroup variant="flush">
                     {connectionStyles.map((style, index) => (
-                        <ListGroup.Item key={index} style={{ color: style.color }}>
-                            <b>{style.label}</b>
+                        <ListGroup.Item key={index} className="d-flex align-items-center">
+                            <div
+                                style={{
+                                    width: 16,
+                                    height: 16,
+                                    backgroundColor: style.color,
+                                    marginRight: 10,
+                                    borderRadius: 2,
+                                }}
+                            ></div>
+                            <span style={{ fontSize: '0.85rem' }}>{style.label}</span>
                         </ListGroup.Item>
                     ))}
                 </ListGroup>
