@@ -324,6 +324,7 @@ describe("Additional Tests for Uncovered Lines in index.ts", () => {
       expect(response.body).toEqual({ error: "Authentication failed" });
     });
   });
+});
 
 describe("Modified Tests for Uncovered Lines in index.ts", () => {
   afterEach(() => {
@@ -514,10 +515,6 @@ describe("Modified Tests for Uncovered Lines in index.ts", () => {
     });
   });
 
-  
-
- 
-
   describe("GET /api/areas - Error Handling", () => {
     test("should return 503 if fetching areas fails", async () => {
       jest.spyOn(DaoArea.prototype, "getAllAreas").mockRejectedValue(new Error("Database error"));
@@ -544,5 +541,4 @@ describe("Modified Tests for Uncovered Lines in index.ts", () => {
   });
   
 });
-  });
-});
+  }); //finisce qui
