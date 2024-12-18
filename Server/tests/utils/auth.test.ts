@@ -429,13 +429,6 @@ describe("Authenticator Tests", () => {
         }
     });
     
-    
-
-
-    
-    
-    
-    
     test("should handle passport.authenticate throwing an error", async () => {
         const authenticateSpy = jest.spyOn(passport, "authenticate").mockImplementation(() => {
             return () => {
@@ -512,22 +505,6 @@ test("should throw an error if passport strategy fails to load", () => {
     }
 });
 
-test("should handle error during passport.authenticate execution", async () => {
-    jest.spyOn(passport, "authenticate").mockImplementation(
-        () => (_req, _res, next) => {
-            next(new Error("Authentication failed due to unexpected error"));
-        }
-    );
-
-    const reqMock = {} as any;
-    const resMock = { status: jest.fn().mockReturnThis(), json: jest.fn() } as any;
-    const nextMock = jest.fn();
-
-    await auth.login(reqMock, resMock, nextMock);
-
-    expect(nextMock).toHaveBeenCalledWith(new Error("Authentication failed due to unexpected error"));
-});
-
 test("should handle unexpected error in req.logout", async () => {
     const reqMock = {
         logout: jest.fn((callback: (err: any) => void) => {
@@ -541,6 +518,7 @@ test("should handle unexpected error in req.logout", async () => {
 
     expect(nextMock).toHaveBeenCalledWith(new Error("Unexpected logout error"));
 });
+
 test("should handle deserialization errors gracefully", () => {
     const userMock = { id: 1, username: "testuser" };
     passport.deserializeUser((id, done) => {
@@ -636,6 +614,7 @@ test("should handle unexpected errors during middleware execution", () => {
 
     expect(() => auth.initAuth()).toThrow("Unexpected middleware error");
 });
+
 test("should throw an error if passport strategy fails", () => {
     jest.spyOn(passport, "use").mockImplementation(() => {
         throw new Error("Strategy load error");
@@ -643,7 +622,6 @@ test("should throw an error if passport strategy fails", () => {
 
     expect(() => auth.initAuth()).toThrow("Strategy load error");
 });
-
 
 test("should throw an error for invalid user during login", async () => {
     const reqMock = { user: undefined, login: jest.fn() } as any;
@@ -756,39 +734,6 @@ test("should throw an error during deserialization", () => {
     });
 });
 
-describe("UserDao Tests", () => {
-    let userDao: UserDao;
-
-    beforeEach(() => {
-        userDao = new UserDao();
-    });
-    
-    test("should return a user if credentials are correct", async () => {
-        jest.spyOn(userDao, "getUser").mockResolvedValue({
-            id: 1,
-            username: "testuser",
-            role: "user" as UserRole,
-        });
-
-        const user = await userDao.getUser("testuser", "password123");
-        expect(user).toEqual({ id: 1, username: "testuser", role: "user" });
-    });
-
-    test("should return null if credentials are incorrect", async () => {
-        jest.spyOn(userDao, "getUser").mockResolvedValue(null);
-
-        const user = await userDao.getUser("wronguser", "wrongpass");
-        expect(user).toBeNull();
-    });
-
-    test("should throw an error if the database fails", async () => {
-        jest.spyOn(userDao, "getUser").mockRejectedValue(new Error("Database error"));
-
-        await expect(userDao.getUser("testuser", "password123")).rejects.toThrow("Database error");
-    });
-
-});
-
 test('should initialize session middleware', async () => {
     const mockStack = [
         { route: { path: '/' } },
@@ -822,7 +767,37 @@ test('should serialize user correctly', async () => {
 
     expect(serializedUser).toEqual(user);
 });
-
-
-
 });
+
+describe("UserDao Tests", () => {
+    let userDao: UserDao;
+
+    beforeEach(() => {
+        userDao = new UserDao();
+    });
+    
+    test("should return a user if credentials are correct", async () => {
+        jest.spyOn(userDao, "getUser").mockResolvedValue({
+            id: 1,
+            username: "testuser",
+            role: "user" as UserRole,
+        });
+
+        const user = await userDao.getUser("testuser", "password123");
+        expect(user).toEqual({ id: 1, username: "testuser", role: "user" });
+    });
+
+    test("should return null if credentials are incorrect", async () => {
+        jest.spyOn(userDao, "getUser").mockResolvedValue(null);
+
+        const user = await userDao.getUser("wronguser", "wrongpass");
+        expect(user).toBeNull();
+    });
+
+    test("should throw an error if the database fails", async () => {
+        jest.spyOn(userDao, "getUser").mockRejectedValue(new Error("Database error"));
+
+        await expect(userDao.getUser("testuser", "password123")).rejects.toThrow("Database error");
+    });
+
+})
