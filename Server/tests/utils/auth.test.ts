@@ -31,6 +31,25 @@ describe("Authenticator Tests", () => {
         passport.use = jest.fn() as any;        // Ensure `passport.use` exists as a mock
     });
 
+
+
+
+    test('should handle passport authenticate failure', async () => {
+        const req = { body: { username: 'user', password: 'wrong' }, login: jest.fn() };
+        const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+        const next = jest.fn();
+    
+        jest.spyOn(passport, 'authenticate').mockImplementation(() => (req, res, next) => {
+            res.status(401).json({ error: 'Authentication failed' });
+            return () => {}; // Return a no-op function to simulate the middleware
+        });
+    
+        await auth.login(req, res, next);
+        expect(res.status).toHaveBeenCalledWith(401);
+        expect(res.json).toHaveBeenCalledWith({ error: 'Authentication failed' });
+    });
+    
+
     test("should initialize session and passport", () => {
         auth.initAuth();
 
