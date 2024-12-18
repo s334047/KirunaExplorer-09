@@ -136,7 +136,7 @@ function ModifyGeoreference(props) {
         } catch (error) {
             console.log(error)
         }
-        navigate("/")
+        navigate("/map")
     }
     useEffect(() => {
         setSelectedPoint([lat, lng]);
