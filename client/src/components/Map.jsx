@@ -19,7 +19,7 @@ function MoveMapToMarker({ position, view, setView }) {
 
     useEffect(() => {
         if (position) {
-            position.lat-=0.0005;
+            position.lat -= 0.0005;
             if (view == "normal") {
                 map.setView(position, map.getZoom());
             }
@@ -42,14 +42,14 @@ function MapViewer(props) {
     const [activePosition, setActivePosition] = useState(null);
     const [view, setView] = useState("normal");
     const [mode, setMode] = useState("normal")
-    const [listDocumentsArea,setListDocumentsArea]=useState([]);
-    const [totalArea,setTotalArea]=useState(null)
+    const [listDocumentsArea, setListDocumentsArea] = useState([]);
+    const [totalArea, setTotalArea] = useState(null)
     const [documentsArea, setDocumentsArea] = useState([]);
     const location = useLocation();
     const documentId = location.state?.documentId;
     const markerClusterRef = useRef();
     const mapRef = useRef();
-      
+
 
     useEffect(() => {
         const getDocs = async () => {
@@ -82,7 +82,7 @@ function MapViewer(props) {
                         if (areaDocuments) {
                             const positions = generateNonOverlappingPositions(doc.area, areaDocuments.length);
                             const docIndex = areaDocuments.findIndex(d => d.id === doc.id);
-                            checkSetPositions(docIndex,positions);
+                            checkSetPositions(docIndex, positions);
                         }
                     }
                 }
@@ -109,14 +109,14 @@ function MapViewer(props) {
                     if (areaDocuments) {
                         const positions = generateNonOverlappingPositions(doc.area, areaDocuments.length);
                         const docIndex = areaDocuments.findIndex(d => d.id === doc.id);
-                        checkSetPositions(docIndex,positions);
+                        checkSetPositions(docIndex, positions);
                     }
                 }
             }
 
         }
     }
-    const checkSetPositions= (docIndex, positions)=>{
+    const checkSetPositions = (docIndex, positions) => {
         if (docIndex !== -1) {
             setActivePosition({
                 lat: positions[docIndex][0],
@@ -124,25 +124,25 @@ function MapViewer(props) {
             });
         }
     }
-    const handleAreaShowDocuments = (document)=>{
+    const handleAreaShowDocuments = (document) => {
         const alreadyExists = listDocumentsArea.some(
-            (doc) => doc.id === document.id 
-          );
-        if(!alreadyExists){
-            setListDocumentsArea((prevDocuments) =>[...prevDocuments,document])
+            (doc) => doc.id === document.id
+        );
+        if (!alreadyExists) {
+            setListDocumentsArea((prevDocuments) => [...prevDocuments, document])
             setDocumentsArea((prevDocuments) => [...prevDocuments, turf.polygon(document.area.geometry.coordinates)])
         }
         else {
-            let index_remove=listDocumentsArea.findIndex((doc) => doc.id === document.id);
+            let index_remove = listDocumentsArea.findIndex((doc) => doc.id === document.id);
             setDocumentsArea((prevDocuments) =>
-                prevDocuments.filter((_, index) => 
-                  index !== index_remove
+                prevDocuments.filter((_, index) =>
+                    index !== index_remove
                 )
-              );
-            setListDocumentsArea((prevDocuments) =>
-              prevDocuments.filter((doc) => doc.id !== document.id)
             );
-          }
+            setListDocumentsArea((prevDocuments) =>
+                prevDocuments.filter((doc) => doc.id !== document.id)
+            );
+        }
     }
     const icons = {
         'Informative document': { iconUrl: 'Informative Document.png' },
@@ -154,12 +154,12 @@ function MapViewer(props) {
         'Conflict': { iconUrl: 'Conflict.png' },
         'Agreement': { iconUrl: 'Agreement.png' },
     };
-    
+
     const getIconByType = (type, selectedDoc, docTitle) => {
         const baseIcon = icons[type];
         let size = [35, 35]; // Dimensione predefinita
         let anchor = [12, 41]; // Punto di ancoraggio predefinito
-    
+
         // Logica per ingrandire l'icona
         if (selectedDoc && selectedDoc.title === docTitle) {
             size = [60, 60];
@@ -169,7 +169,7 @@ function MapViewer(props) {
                 size = [60, 60];
             }
         }
-    
+
         // Utilizzo di L.divIcon con un div HTML per supportare il CSS
         return L.divIcon({
             html: `<div class="icon-with-background" style="width: ${size[0]}px; height: ${size[1]}px;">
@@ -181,7 +181,7 @@ function MapViewer(props) {
             popupAnchor: [1, -34],
         });
     };
-    
+
 
     const createClusterCustomIcon = (cluster) => {
         const count = cluster.getChildCount();
@@ -261,23 +261,23 @@ function MapViewer(props) {
     }
 
     const { BaseLayer } = LayersControl;
-    useEffect(()=>{
-        if(documentsArea.length>1){
+    useEffect(() => {
+        if (documentsArea.length > 1) {
             let union = turf.union(turf.featureCollection(documentsArea));
             console.log(union)
             setTotalArea(union)
- 
-            
+
+
         }
-        else if (documentsArea.length>0){
+        else if (documentsArea.length > 0) {
             setTotalArea(turf.featureCollection([documentsArea[0]]))
         }
-        else if(documentsArea.length==0){
+        else if (documentsArea.length == 0) {
             setTotalArea(null);
         }
-    },[documentsArea])
+    }, [documentsArea])
     return (
-        <div style={{ display: 'flex', flex: 1, position: 'relative', height: '93.3vh'}}>
+        <div style={{ display: 'flex', flex: 1, position: 'relative', height: '93.3vh' }}>
             <MapContainer
                 ref={mapRef}
                 center={position}
@@ -301,7 +301,7 @@ function MapViewer(props) {
                 </LayersControl>
 
                 {/* Marker Cluster Group */}
-                <MarkerClusterGroup ref={markerClusterRef} showCoverageOnHover={false}  iconCreateFunction={createClusterCustomIcon}>
+                <MarkerClusterGroup ref={markerClusterRef} showCoverageOnHover={false} iconCreateFunction={createClusterCustomIcon}>
                     {docs.filter(doc => doc.coordinate != null).map(doc => (
                         <Marker key={doc.title} position={doc.coordinate} icon={getIconByType(doc.type, selectedDoc, doc.title)} eventHandlers={{
                             click: () => {
@@ -331,10 +331,9 @@ function MapViewer(props) {
                                                 setSelectedDoc(document);
                                                 setActivePosition({ lat: positions[index][0], lng: positions[index][1] })
                                             }
-                                            else{
+                                            else {
                                                 handleAreaShowDocuments(document);
                                             }
-
                                         },
                                     }}>
                                         <LeafletTooltip direction="top" offset={[5, -30]} opacity={1}>
@@ -361,7 +360,7 @@ function MapViewer(props) {
 
                     />
                 )}
-                {totalArea  && <GeoJSON key={JSON.stringify(totalArea)} data={totalArea} color="red" ></GeoJSON>}
+                {totalArea && <GeoJSON key={JSON.stringify(totalArea)} data={totalArea} color="red" ></GeoJSON>}
             </MapContainer>
 
             {/* Document Card */}
@@ -393,9 +392,9 @@ function MapViewer(props) {
                         placement="right"
                         overlay={
                             <Tooltip id="tooltip-draw-area">
-                                {mode==="normal" ? "Open multiple area visualization" : "Close multiple area visualization"}
+                                {mode === "normal" ? "Open multiple area visualization" : "Close multiple area visualization"}
                             </Tooltip>
-                            
+
                         }
                     >
                         <Button
@@ -419,8 +418,38 @@ function MapViewer(props) {
                     </OverlayTrigger>
                 </div>
             )}
-            {!selectedDoc && props.user.role === 'Urban Planner' && (
+            {!selectedDoc && (
                 <div style={{ position: 'absolute', bottom: '80px', left: '10px', zIndex: 1000 }}>
+                    <OverlayTrigger
+                        placement="right"
+                        overlay={
+                            <Tooltip id="tooltip-draw-area">
+                                See Municipality Area Documents
+                            </Tooltip>
+
+                        }
+                    >
+                        <Button
+                            variant="light"
+                            onClick={() => {
+                                const currentCenter = mapRef.current.getCenter();
+                                const targetCenter = { lat: 68.20815, lng: 20.593249999999998 };
+                                if (currentCenter.lat !== targetCenter.lat || currentCenter.lng !== targetCenter.lng) {
+                                    mapRef.current.setView(targetCenter, 10);
+                                } else {
+                                    mapRef.current.setView(position, 13);
+                                }
+                            }
+                            }
+                            style={{ borderRadius: '50%' }}
+                        >
+                            <i className="bi bi-map fs-3"></i>
+                        </Button>
+                    </OverlayTrigger>
+                </div>
+            )}
+            {!selectedDoc && props.user.role === 'Urban Planner' && (
+                <div style={{ position: 'absolute', bottom: '140px', left: '10px', zIndex: 1000 }}>
                     <OverlayTrigger
                         placement="right"
                         overlay={
@@ -442,7 +471,7 @@ function MapViewer(props) {
 
             {/* Add Area Button */}
             {!selectedDoc && props.user.role === 'Urban Planner' && (
-                <div style={{ position: 'absolute', bottom: '140px', left: '10px', zIndex: 1000 }}>
+                <div style={{ position: 'absolute', bottom: '200px', left: '10px', zIndex: 1000 }}>
                     <OverlayTrigger
                         placement="right"
                         overlay={
