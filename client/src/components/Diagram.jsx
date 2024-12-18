@@ -142,12 +142,8 @@ const TimelineDiagram = ({ documents, connections }) => {
                 // Distanza orizzontale tra source e target
                 const horizontalDistance = Math.abs(xTarget - xSource);
 
-                const maxCurvature = 120; // Curvatura massima generica
-                const adjustedControlOffset = Math.min(
-                    Math.max(minLineDistance, Math.abs(offset) * 2),
-                    Math.min(maxCurvature, horizontalDistance / 4) // Limita anche alla curvatura generica
-                );
-
+                const maxCurvature = horizontalDistance / 4; // Curvatura massima proporzionale alla distanza
+                const adjustedControlOffset = Math.min(Math.max(minLineDistance, Math.abs(offset) * 2), maxCurvature);
 
                 // Generazione della linea con curvatura limitata
                 return d3.line()
