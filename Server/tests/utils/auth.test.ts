@@ -35,7 +35,7 @@ describe("Authenticator Tests", () => {
 
 
     test('should handle passport authenticate failure', async () => {
-        const req = { body: { username: 'user', password: 'wrong' }, login: jest.fn() };
+        const req = { body: {username: process.env.MOCK_USERNAME, password: process.env.MOCK_PASSWORD}, login: jest.fn() };
         const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
         const next = jest.fn();
     
