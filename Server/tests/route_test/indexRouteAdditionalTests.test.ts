@@ -11,7 +11,7 @@ import { app } from "../../index.ts";
 // Centralized credentials configuration
 const TEST_CREDENTIALS = {
   valid: { username: process.env.TEST_USER || "testuser", password: process.env.TEST_PASS || "testpass" },
-  invalid: { username: "invaliduser", password: "wrongpass" },
+  invalid: { username: process.env.MOCK_USERNAME, password: process.env.MOCK_PASSWORD},
 };
 
 jest.mock("../../Dao/areaDao.ts");
