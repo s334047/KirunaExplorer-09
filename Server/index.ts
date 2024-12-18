@@ -212,6 +212,7 @@ app.get('/api/connections/:SourceDoc', async (req: any, res: any) => {
     }
 });
 
+//get detailed information about all connections associate to a doc
 app.get('/api/connections/info/:SourceDocId', async (req: any, res: any) => {
     try {
         const { SourceDocId } = req.params;
@@ -284,6 +285,7 @@ app.put('/api/modifyGeoreference', auth.isLoggedIn, async (req: any, res: any) =
 })
 
 /** Original Resources' APIs */
+
 app.post('/api/originalResources', auth.isLoggedIn, upload.single('file'), async (req: any, res: any) => {
     if (!req.file)
         return res.status(400).json({ message: 'No file updated' });
