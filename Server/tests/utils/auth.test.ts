@@ -31,22 +31,6 @@ describe("Authenticator Tests", () => {
         passport.use = jest.fn() as any;        // Ensure `passport.use` exists as a mock
     });
 
-    test('should handle passport authenticate failure', async () => {
-        const req = { body: {username: process.env.MOCK_USERNAME, password: process.env.MOCK_PASSWORD}, login: jest.fn() };
-        const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
-        const next = jest.fn();
-    
-        jest.spyOn(passport, 'authenticate').mockImplementation(() => (req, res, next) => {
-            res.status(401).json({ error: 'Authentication failed' });
-            return () => {}; // Return a no-op function to simulate the middleware
-        });
-    
-        await auth.login(req, res, next);
-        expect(res.status).toHaveBeenCalledWith(401);
-        expect(res.json).toHaveBeenCalledWith({ error: 'Authentication failed' });
-    });
-    
-
     test("should initialize session and passport", () => {
         auth.initAuth();
 
@@ -105,6 +89,9 @@ describe("Authenticator Tests", () => {
         expect(resMock.status).toHaveBeenCalledWith(200);
         expect(resMock.json).toHaveBeenCalledWith(userMock);
     });
+    
+
+    
 
     test("should handle login failure due to req.login error", async () => {
         const reqMock: { login: jest.Mock } = {
@@ -288,6 +275,8 @@ describe("Authenticator Tests", () => {
         expect(nextMock).toHaveBeenCalled();
     });
     
+    
+    
     test("should perform full auth flow", async () => {
         const reqMock: any = {
             logout: jest.fn((callback: (err: any) => void) => callback(null)),
@@ -336,6 +325,16 @@ describe("Authenticator Tests", () => {
         expect(resMock.status).toHaveBeenCalledWith(200);
     });
     
+    test("should handle errors during passport initialization", () => {
+        const useSpy = jest.spyOn(passport, "use").mockImplementation(() => {
+            throw new Error("Initialization error");
+        });
+    
+        expect(() => auth.initAuth()).toThrow("Initialization error");
+    
+        useSpy.mockRestore();
+    });
+    
     test("should correctly serialize and deserialize user", () => {
         const userMock = { id: 1, username: "testuser" };
         let serializedUser: any;
@@ -375,7 +374,7 @@ describe("Authenticator Tests", () => {
         expect(mockApp.use).toHaveBeenCalledWith(expect.any(Function)); // Ensure session middleware is added
     });
     
-    test("should handle missing session secret", () => { //UNO QUI
+    test("should handle missing session secret", () => {
         const sessionMiddleware = jest.fn(() => {
             throw new Error("Session secret is missing");
         });
@@ -385,11 +384,22 @@ describe("Authenticator Tests", () => {
         expect(() => auth.initAuth()).toThrow("Session secret is missing");
     });
     
+    
+    
+    test("should handle invalid strategy in passport.use", () => {
+        jest.spyOn(passport, "use").mockImplementation(() => {
+            throw new Error("Invalid strategy");
+        });
+    
+        expect(() => auth.initAuth()).toThrow("Invalid strategy");
+    });
     test("should handle invalid strategy in passport.use", () => {
         const useSpy = jest.spyOn(passport, "use").mockImplementation(() => {
             throw new Error("Invalid strategy");
-        });    
+        });
+    
         expect(() => auth.initAuth()).toThrow("Invalid strategy");
+    
         useSpy.mockRestore(); // Restore the spy
     });
 
@@ -398,9 +408,20 @@ describe("Authenticator Tests", () => {
         const sessionMiddleware = jest.fn(() => {
             throw new Error("Invalid session options");
         });
+    
         mockApp.use = sessionMiddleware;
+    
         expect(() => auth.initAuth()).toThrow("Invalid session options");
     });
+
+
+
+
+
+
+    
+    
+    
     
     test("should handle invalid session options", () => {
         jest.mock("express-session", () => {
@@ -428,6 +449,13 @@ describe("Authenticator Tests", () => {
             passport.initialize = originalPassportInitialize; // Restore the original state
         }
     });
+    
+    
+
+
+    
+    
+    
     
     test("should handle passport.authenticate throwing an error", async () => {
         const authenticateSpy = jest.spyOn(passport, "authenticate").mockImplementation(() => {
@@ -505,6 +533,22 @@ test("should throw an error if passport strategy fails to load", () => {
     }
 });
 
+test("should handle error during passport.authenticate execution", async () => {
+    jest.spyOn(passport, "authenticate").mockImplementation(
+        () => (_req, _res, next) => {
+            next(new Error("Authentication failed due to unexpected error"));
+        }
+    );
+
+    const reqMock = {} as any;
+    const resMock = { status: jest.fn().mockReturnThis(), json: jest.fn() } as any;
+    const nextMock = jest.fn();
+
+    await auth.login(reqMock, resMock, nextMock);
+
+    expect(nextMock).toHaveBeenCalledWith(new Error("Authentication failed due to unexpected error"));
+});
+
 test("should handle unexpected error in req.logout", async () => {
     const reqMock = {
         logout: jest.fn((callback: (err: any) => void) => {
@@ -518,7 +562,6 @@ test("should handle unexpected error in req.logout", async () => {
 
     expect(nextMock).toHaveBeenCalledWith(new Error("Unexpected logout error"));
 });
-
 test("should handle deserialization errors gracefully", () => {
     const userMock = { id: 1, username: "testuser" };
     passport.deserializeUser((id, done) => {
@@ -605,6 +648,16 @@ test("should handle missing user during login gracefully", async () => {
     expect(resMock.json).toHaveBeenCalledWith({ error: "Authentication failed" });
 });
 
+
+test("should throw an error if session secret is missing", () => {
+    const sessionMiddleware = jest.fn(() => {
+        throw new Error("Session secret is missing");
+    });
+
+    mockApp.use = sessionMiddleware;
+
+    expect(() => auth.initAuth()).toThrow("Session secret is missing");
+});
 test("should handle unexpected errors during middleware execution", () => {
     const middlewareError = jest.fn(() => {
         throw new Error("Unexpected middleware error");
@@ -614,7 +667,6 @@ test("should handle unexpected errors during middleware execution", () => {
 
     expect(() => auth.initAuth()).toThrow("Unexpected middleware error");
 });
-
 test("should throw an error if passport strategy fails", () => {
     jest.spyOn(passport, "use").mockImplementation(() => {
         throw new Error("Strategy load error");
@@ -622,6 +674,7 @@ test("should throw an error if passport strategy fails", () => {
 
     expect(() => auth.initAuth()).toThrow("Strategy load error");
 });
+
 
 test("should throw an error for invalid user during login", async () => {
     const reqMock = { user: undefined, login: jest.fn() } as any;
@@ -734,6 +787,39 @@ test("should throw an error during deserialization", () => {
     });
 });
 
+describe("UserDao Tests", () => {
+    let userDao: UserDao;
+
+    beforeEach(() => {
+        userDao = new UserDao();
+    });
+    
+    test("should return a user if credentials are correct", async () => {
+        jest.spyOn(userDao, "getUser").mockResolvedValue({
+            id: 1,
+            username: "testuser",
+            role: "user" as UserRole,
+        });
+
+        const user = await userDao.getUser("testuser", "password123");
+        expect(user).toEqual({ id: 1, username: "testuser", role: "user" });
+    });
+
+    test("should return null if credentials are incorrect", async () => {
+        jest.spyOn(userDao, "getUser").mockResolvedValue(null);
+
+        const user = await userDao.getUser("wronguser", "wrongpass");
+        expect(user).toBeNull();
+    });
+
+    test("should throw an error if the database fails", async () => {
+        jest.spyOn(userDao, "getUser").mockRejectedValue(new Error("Database error"));
+
+        await expect(userDao.getUser("testuser", "password123")).rejects.toThrow("Database error");
+    });
+
+});
+
 test('should initialize session middleware', async () => {
     const mockStack = [
         { route: { path: '/' } },
@@ -767,37 +853,7 @@ test('should serialize user correctly', async () => {
 
     expect(serializedUser).toEqual(user);
 });
+
+
+
 });
-
-describe("UserDao Tests", () => {
-    let userDao: UserDao;
-
-    beforeEach(() => {
-        userDao = new UserDao();
-    });
-    
-    test("should return a user if credentials are correct", async () => {
-        jest.spyOn(userDao, "getUser").mockResolvedValue({
-            id: 1,
-            username: "testuser",
-            role: "user" as UserRole,
-        });
-
-        const user = await userDao.getUser("testuser", "password123");
-        expect(user).toEqual({ id: 1, username: "testuser", role: "user" });
-    });
-
-    test("should return null if credentials are incorrect", async () => {
-        jest.spyOn(userDao, "getUser").mockResolvedValue(null);
-
-        const user = await userDao.getUser("wronguser", "wrongpass");
-        expect(user).toBeNull();
-    });
-
-    test("should throw an error if the database fails", async () => {
-        jest.spyOn(userDao, "getUser").mockRejectedValue(new Error("Database error"));
-
-        await expect(userDao.getUser("testuser", "password123")).rejects.toThrow("Database error");
-    });
-
-})
