@@ -21,14 +21,14 @@ const TimelineDiagram = ({ documents, connections }) => {
     const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, name: "" });
 
     const icons = {
-        'Informative document':  'Informative Document.png',
-        'Design document': 'Design Document.png' ,
-        'Prescriptive document':  'Prescriptive Document.png' ,
-        'Technical document': 'Technical Document.png' ,
-        'Material effect':  'Material Effect.png' ,
-        'Consultation':  'Consultation.png' ,
-        'Conflict': 'Conflict.png' ,
-        'Agreement':  'Agreement.png' ,
+        'Informative document': 'Informative Document.png',
+        'Design document': 'Design Document.png',
+        'Prescriptive document': 'Prescriptive Document.png',
+        'Technical document': 'Technical Document.png',
+        'Material effect': 'Material Effect.png',
+        'Consultation': 'Consultation.png',
+        'Conflict': 'Conflict.png',
+        'Agreement': 'Agreement.png',
     };
 
     // Handle resizing when the card is visible
@@ -56,9 +56,15 @@ const TimelineDiagram = ({ documents, connections }) => {
                 doc.date = dayjs(doc.date, "YYYY").toDate();
             }
         });
+        const dateExtent = d3.extent(documents, (d) => d.date);
+        const extendedDomain = [
+            dayjs(dateExtent[0]).subtract(1, "year").toDate(),
+            dayjs(dateExtent[1]).add(1, "year").toDate()
+        ];
+
         const xScale = d3
             .scaleTime()
-            .domain(d3.extent(documents, (d) => d.date))
+            .domain(extendedDomain)
             .range([margin.left, width - margin.right]);
         // Create a map of scales to assign unique row numbers
         const scaleMap = {};
@@ -80,7 +86,7 @@ const TimelineDiagram = ({ documents, connections }) => {
         const adjustedHeight = margin.top + (maxRow + 1) * rowHeight + margin.bottom;
         const yScale = d3
             .scaleLinear()
-            .domain([0, maxRow+1])
+            .domain([0, maxRow + 1])
             .range([margin.top, adjustedHeight - margin.bottom]);
 
         const svgElement = svgRef.current;
@@ -110,6 +116,14 @@ const TimelineDiagram = ({ documents, connections }) => {
             connections,
             (d) => `${d.source}-${d.target}`
         );
+        svg.append("defs")
+        .append("clipPath")
+        .attr("id", "clip-diagram")
+        .append("rect")
+        .attr("x", margin.left)
+        .attr("y", margin.top)
+        .attr("width", width - margin.left - margin.right)
+        .attr("height", adjustedHeight - margin.top - margin.bottom);
         // Add Bézier curves for the connections
         svg.append("g")
             .attr("class", "connections")
@@ -118,45 +132,46 @@ const TimelineDiagram = ({ documents, connections }) => {
             .join("path")
             .attr("d", (d, index) => {
                 const group = groupedConnections.get(`${d.source}-${d.target}`);
-                const offset = (index - (group.length - 1) / 2) * linePadding; // Space between lines
-                // Calculate the minimum distance between the curve and the circles
+                const offset = (index - (group.length - 1) / 2) * linePadding;
+
+                const xSource = xScale(assignedRows[d.source].date);
+                const xTarget = xScale(assignedRows[d.target].date);
                 const ySource = yScale(assignedRows[d.source].row);
                 const yTarget = yScale(assignedRows[d.target].row);
-                // Ensure the curve does not intersect the circles by calculating an offset
-                const adjustedControlOffset = Math.max(minLineDistance, Math.abs(offset) * 2);
-                // Calculate the control point for the curve, which will curve downward
+
+                // Distanza orizzontale tra source e target
+                const horizontalDistance = Math.abs(xTarget - xSource);
+
+                const maxCurvature = 120; // Curvatura massima generica
+                const adjustedControlOffset = Math.min(
+                    Math.max(minLineDistance, Math.abs(offset) * 2),
+                    Math.min(maxCurvature, horizontalDistance / 4) // Limita anche alla curvatura generica
+                );
+
+
+                // Generazione della linea con curvatura limitata
                 return d3.line()
                     .x((d) => d[0])
                     .y((d) => d[1])
                     .curve(d3.curveBundle.beta(0.8))([
-                        [xScale(assignedRows[d.source].date), ySource],
+                        [xSource, ySource],
                         [
-                            (xScale(assignedRows[d.source].date) +
-                                xScale(assignedRows[d.target].date)) /
-                            2,
-                            (ySource + yTarget) / 2 + adjustedControlOffset, // Downward curvature
+                            (xSource + xTarget) / 2, // Punto medio orizzontale
+                            (ySource + yTarget) / 2 + adjustedControlOffset, // Curvatura limitata
                         ],
-                        [xScale(assignedRows[d.target].date), yTarget],
+                        [xTarget, yTarget],
                     ]);
             })
             .attr("stroke", (d) => {
-                let strokeColor;
-                if (d.type === "Projection") {
-                    strokeColor = "red";
-                } else if (d.type === "Update") {
-                    strokeColor = "blue";
-                } else if (d.type === "Collateral Consequence") {
-                    strokeColor = "green";
-                }
-                else if (d.type === "Direct Consequence") {
-                    strokeColor = "black";
-                }
-                return strokeColor;
+                if (d.type === "Projection") return "red";
+                if (d.type === "Update") return "blue";
+                if (d.type === "Collateral Consequence") return "green";
+                if (d.type === "Direct Consequence") return "black";
+                return "black";
             })
             .attr("stroke-width", 4)
             .attr("fill", "none")
             .attr("stroke-dasharray", (d) => {
-                // Define the line style based on the type of connection
                 if (d.type === "Projection") return "5,5";
                 if (d.type === "Update") return "4,10,4";
                 if (d.type === "Direct Consequence") return "2,2";
@@ -170,6 +185,7 @@ const TimelineDiagram = ({ documents, connections }) => {
             .on("mouseout", () => {
                 setTooltip({ visible: false, x: 0, y: 0, name: "" });
             });
+
         // Add images for the documents
         svg.append("g")
             .attr("class", "documents")
@@ -246,7 +262,8 @@ const TimelineDiagram = ({ documents, connections }) => {
             .selectAll("line")
             .attr("stroke", "#5e5e5e")
             .attr("stroke-dasharray", "3,3");
-
+        svg.select(".connections").attr("clip-path", "url(#clip-diagram)");
+        svg.select(".documents").attr("clip-path", "url(#clip-diagram)");
         const zoom = d3
             .zoom()
             .scaleExtent([1, 10])
@@ -255,6 +272,7 @@ const TimelineDiagram = ({ documents, connections }) => {
                 const transform = event.transform;
                 const newXScale = transform.rescaleX(xScale);
                 const newYScale = transform.rescaleY(yScale);
+
 
                 // Aggiorna assi
                 svg.select(".x-axis").call(d3.axisBottom(newXScale)).selectAll("text").style("font-size", "16px");
@@ -295,21 +313,34 @@ const TimelineDiagram = ({ documents, connections }) => {
                     .attr("d", (d, index) => {
                         const group = groupedConnections.get(`${d.source}-${d.target}`);
                         const offset = (index - (group.length - 1) / 2) * linePadding;
+
+                        // Nuove coordinate con le scale aggiornate (post zoom)
+                        const xSource = newXScale(assignedRows[d.source].date);
+                        const xTarget = newXScale(assignedRows[d.target].date);
                         const ySource = newYScale(assignedRows[d.source].row);
                         const yTarget = newYScale(assignedRows[d.target].row);
-                        const adjustedControlOffset = Math.max(minLineDistance, Math.abs(offset) * 2);
+
+                        // Calcolo della distanza orizzontale tra source e target
+                        const horizontalDistance = Math.abs(xTarget - xSource);
+
+                        // Limita la curvatura in base alla distanza orizzontale
+                        const maxCurvature = horizontalDistance / 4; // Curvatura massima proporzionale alla distanza
+                        const adjustedControlOffset = Math.min(Math.max(minLineDistance, Math.abs(offset) * 2), maxCurvature);
+
+                        // Generazione della linea con curvatura limitata
                         return d3.line()
                             .x((d) => d[0])
                             .y((d) => d[1])
                             .curve(d3.curveBundle.beta(0.8))([
-                                [newXScale(assignedRows[d.source].date), ySource],
+                                [xSource, ySource],
                                 [
-                                    (newXScale(assignedRows[d.source].date) + newXScale(assignedRows[d.target].date)) / 2,
-                                    (ySource + yTarget) / 2 + adjustedControlOffset,
+                                    (xSource + xTarget) / 2, // Punto medio orizzontale
+                                    (ySource + yTarget) / 2 + adjustedControlOffset, // Curvatura limitata
                                 ],
-                                [newXScale(assignedRows[d.target].date), yTarget],
+                                [xTarget, yTarget],
                             ]);
                     });
+
             });
         svg.call(zoom);
     }, [width, height, documents, connections, selectedDoc]);
