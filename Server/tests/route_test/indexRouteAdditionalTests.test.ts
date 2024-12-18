@@ -8,6 +8,12 @@ import DaoResource from "../../Dao/resourceDao.ts";
 import Authenticator from "../../auth.ts";
 import { app } from "../../index.ts";
 
+// Centralized credentials configuration
+const TEST_CREDENTIALS = {
+  valid: { username: process.env.TEST_USER || "testuser", password: process.env.TEST_PASS || "testpass" },
+  invalid: { username: "invaliduser", password: "wrongpass" },
+};
+
 jest.mock("../../Dao/areaDao.ts");
 jest.mock("../../Dao/documentDao.ts");
 jest.mock("../../Dao/connectionDao.ts");
@@ -301,9 +307,7 @@ describe("Additional Tests for Uncovered Lines in index.ts", () => {
         return res.status(200).json({ message: "Login successful" });
       });
 
-      const credentials = { username: "testuser", password: "testpass" };
-
-      const response = await request(app).post("/api/sessions").send(credentials);
+      const response = await request(app).post("/api/sessions").send(TEST_CREDENTIALS.valid);
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual({ message: "Login successful" });
@@ -314,15 +318,12 @@ describe("Additional Tests for Uncovered Lines in index.ts", () => {
         return res.status(401).json({ error: "Authentication failed" });
       });
 
-      const invalidCredentials = { username: "invaliduser", password: "wrongpass" };
-
-      const response = await request(app).post("/api/sessions").send(invalidCredentials);
+      const response = await request(app).post("/api/sessions").send(TEST_CREDENTIALS.invalid);
 
       expect(response.status).toBe(401);
       expect(response.body).toEqual({ error: "Authentication failed" });
     });
-});
-
+  });
 
 describe("Modified Tests for Uncovered Lines in index.ts", () => {
   afterEach(() => {
@@ -536,7 +537,12 @@ describe("Modified Tests for Uncovered Lines in index.ts", () => {
     });
   });
 
- 
+  test("should return 404 for missing endpoint", async () => {
+    const response = await request(app).get("/nonexistent-route");
+  
+    expect(response.status).toBe(404);
+  });
+  
 });
   });
 });
