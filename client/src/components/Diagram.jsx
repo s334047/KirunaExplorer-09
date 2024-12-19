@@ -42,7 +42,7 @@ const TimelineDiagram = ({ documents, connections }) => {
     }, [selectedDoc, legendVisible]);
 
     useEffect(() => {
-        const margin = { top: 30, right: 20, bottom: 50, left: 100 };
+        const margin = { top: 30, right: 20, bottom: 50, left: 150 };
         const maxHeight = height * 0.9; // Maximum height available (90% of the viewport height)
         const linePadding = 30; // Greater line spacing
         const minLineDistance = 30; // Minimum distance between the line and the circles (to avoid intersections)
