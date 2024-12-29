@@ -31,7 +31,7 @@ The `Document` table represents a document that serves as a node of the diagram,
   Specifies the type/category of the document.
 - `Language`: TEXT  
   Specifies the language in which the document is written.
-- `Page`: INTEGER 
+- `Page`: INTEGER
   Specifies the number of pages in the document.
 - `Coordinate`: TEXT  
   Specifies the geographic coordinate of the document, if applicable (e.g., latitude and longitude).
@@ -111,10 +111,11 @@ Since a Visitor and a Resident do not need to log-in, these types of users are n
   Specifies the user's role from the predefined list (Resident, Urban Developer, Urban Planner, Visitor).
 
 #### Credential
-It is possible to log-in as:
- - `Urban Planner`: username: 'user0', password: 'password'
- - `Urban Developer`: username: 'user2', password: 'password1'
 
+It is possible to log-in as:
+
+- `Urban Planner`: username: 'user0', password: 'password'
+- `Urban Developer`: username: 'user2', password: 'password1'
 
 ### Summary
 
@@ -227,9 +228,9 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
 - **Response**:
   - Returns an array of detailed connection information.
     Each connection information must include:
-      - `id` (number): Target document id
-      - `document` (string): Target document title.
-      - `type` (string): Type of the connection (e.g., "Reference").
+    - `id` (number): Target document id
+    - `document` (string): Target document title.
+    - `type` (string): Type of the connection (e.g., "Reference").
 
 ### GET /api/connections
 
@@ -259,7 +260,6 @@ This documentation outlines the available API endpoints for the Kiruna Explorer 
 - **Response**:
   - Returns an array of areas.
   - Returns `503 Service Unavailable` if an error occurs.
-
 
 ### POST /api/areas
 
