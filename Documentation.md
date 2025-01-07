@@ -116,6 +116,7 @@ It is possible to log-in as:
 
 - `Urban Planner`: username: 'user0', password: 'password'
 - `Urban Developer`: username: 'user2', password: 'password1'
+- `Urban Developer`: username: 'freja_johansson', password: 'password2'
 
 ### Summary
 
