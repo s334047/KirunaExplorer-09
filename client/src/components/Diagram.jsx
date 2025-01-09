@@ -117,13 +117,13 @@ const TimelineDiagram = ({ documents, connections }) => {
             (d) => `${d.source}-${d.target}`
         );
         svg.append("defs")
-        .append("clipPath")
-        .attr("id", "clip-diagram")
-        .append("rect")
-        .attr("x", margin.left)
-        .attr("y", margin.top)
-        .attr("width", width - margin.left - margin.right)
-        .attr("height", adjustedHeight - margin.top - margin.bottom);
+            .append("clipPath")
+            .attr("id", "clip-diagram")
+            .append("rect")
+            .attr("x", margin.left)
+            .attr("y", margin.top)
+            .attr("width", width - margin.left - margin.right)
+            .attr("height", adjustedHeight - margin.top - margin.bottom);
         // Add Bézier curves for the connections
         svg.append("g")
             .attr("class", "connections")
@@ -186,50 +186,86 @@ const TimelineDiagram = ({ documents, connections }) => {
         svg.append("g")
             .attr("class", "documents")
             .raise()
-            .selectAll("circle")
+            .selectAll("circle") // Crea un cerchio per ogni immagine
+            .data(Object.values(assignedRows))
+            .join("circle")
+            .attr("cx", (d) => xScale(d.date)) // Posizione X del centro del cerchio
+            .attr("cy", (d) => yScale(d.row)) // Posizione Y del centro del cerchio
+            .attr("r", (d) => {
+                if (selectedDoc) {
+                    if (selectedDoc.title == d.title) {
+                        return 25; // Raggio maggiore per il documento selezionato (cerchio più grande)
+                    }
+                    else {
+                        return 17.5; // Raggio normale
+                    }
+                }
+                else {
+                    return 17.5; // Raggio di default
+                }
+            })
+            .style("fill", "none") // Nessun riempimento per il cerchio
+            .style("stroke", (d) => {
+                if (selectedDoc && selectedDoc.title === d.title) {
+                    return "blue"; // Bordo blu se il documento è selezionato
+                }
+                return "none"; // Nessun bordo se non selezionato
+            })
+            .style("stroke-width", 3) // Larghezza del bordo
+            .style("stroke-linejoin", "round") // Angoli arrotondati
+            .on("click", (_, d) => {
+                setSelectedDoc(d);
+                setLegendVisible(false);
+            });
+
+        svg.append("g")
+            .attr("class", "documents")
+            .raise()
+            .selectAll("image")
             .data(Object.values(assignedRows))
             .join("image")
             .attr("xlink:href", (d) => icons[d.type])
-            .attr("x", (d) => xScale(d.date) - 17.5)
-            .attr("y", (d) => yScale(d.row) - 17.5)
+            .attr("x", (d) => xScale(d.date) - 26) // Posizione X dell'immagine (centrata rispetto al cerchio)
+            .attr("y", (d) => yScale(d.row) - 22.75) // Posizione Y dell'immagine (centrata rispetto al cerchio)
             .attr("width", (d) => {
                 if (selectedDoc) {
                     if (selectedDoc.title == d.title) {
-                        return 50
+                        return 50; // Dimensione maggiore per il documento selezionato
                     }
                     else {
-                        return 35
+                        return 35; // Dimensione normale
                     }
                 }
                 else {
-                    return 35
+                    return 35;
                 }
-            }) // Condizione per la larghezza
+            })
             .attr("height", (d) => {
                 if (selectedDoc) {
                     if (selectedDoc.title == d.title) {
-                        return 50
+                        return 50; // Dimensione maggiore per il documento selezionato
                     }
                     else {
-                        return 35
+                        return 35; // Dimensione normale
                     }
                 }
                 else {
-                    return 35
+                    return 35;
                 }
             })
-            .style("z-index", "10")
+            .style("z-index", "10") // Garantisci che l'immagine sia sopra il cerchio
             .on("click", (_, d) => {
-                // Event handler for click on the circle
                 setSelectedDoc(d);
                 setLegendVisible(false);
-                // Here you can add further logic to handle the click, like opening a modal or navigating
-            }).on("mouseover", (event, d) => {
+            })
+            .on("mouseover", (event, d) => {
                 setTooltip({ visible: true, x: event.pageX, y: event.pageY, name: d.title });
             })
             .on("mouseout", () => {
                 setTooltip({ visible: false, x: 0, y: 0, name: "" });
             });
+
+
         // Add vertical gridlines
         const makeXGridlines = () => d3.axisBottom(xScale);
         svg.append("g")
@@ -300,9 +336,25 @@ const TimelineDiagram = ({ documents, connections }) => {
                     .attr("stroke-dasharray", "3,3"); // Mantieni tratteggio
 
                 // Aggiorna cerchi
+                svg.selectAll(".documents circle")
+                    .attr("cx", (d) => newXScale(d.date)) // Ricalcola la posizione X
+                    .attr("cy", (d) => newYScale(d.row)) // Ricalcola la posizione Y
+                    .attr("r", (d) => {
+                        if (selectedDoc) {
+                            if (selectedDoc.title === d.title) {
+                                return 25; // Raggio maggiore per il documento selezionato
+                            } else {
+                                return 17.5; // Raggio normale
+                            }
+                        } else {
+                            return 17.5; // Raggio di default
+                        }
+                    });
+
+                // Aggiorna cerchi
                 svg.selectAll(".documents image")
-                    .attr("x", (d) => newXScale(d.date) - 17.5)
-                    .attr("y", (d) => newYScale(d.row) - 17.5);
+                    .attr("x", (d) => newXScale(d.date) - 26)
+                    .attr("y", (d) => newYScale(d.row) - 23.5);
 
                 // Aggiorna curve di Bézier
                 svg.selectAll(".connections path")

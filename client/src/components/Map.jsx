@@ -162,18 +162,36 @@ function MapViewer(props) {
 
         // Logica per ingrandire l'icona
         if (selectedDoc && selectedDoc.title === docTitle) {
-            size = [60, 60];
+            size = [50, 50];
+            return L.divIcon({
+                html: `<div class="icon-with-background-big" style="width: ${size[0]}px; height: ${size[1]}px;">
+                           <img src="${baseIcon.iconUrl}"style="width: 180%; height: 180%; object-fit: cover;" />
+                       </div>`,
+                className: '', // Nessuna classe Leaflet predefinita
+                iconSize: size,                   // Dimensioni
+                iconAnchor: anchor,               // Punto di ancoraggio
+                popupAnchor: [1, -34],
+            });
         } else if (listDocumentsArea.length > 0) {
             const alreadyExists = listDocumentsArea.some((doc) => doc.title === docTitle);
             if (alreadyExists) {
-                size = [60, 60];
+                size = [50, 50];
+                return L.divIcon({
+                    html: `<div class="icon-with-background-big" style="width: ${size[0]}px; height: ${size[1]}px;">
+                               <img src="${baseIcon.iconUrl}"style="width: 180%; height: 180%; object-fit: cover;" alt="${type}" />
+                           </div>`,
+                    className: '', // Nessuna classe Leaflet predefinita
+                    iconSize: size,                   // Dimensioni
+                    iconAnchor: anchor,               // Punto di ancoraggio
+                    popupAnchor: [1, -34],
+                });
             }
         }
 
         // Utilizzo di L.divIcon con un div HTML per supportare il CSS
         return L.divIcon({
             html: `<div class="icon-with-background" style="width: ${size[0]}px; height: ${size[1]}px;">
-                       <img src="${baseIcon.iconUrl}" style="width: 100%; height: 100%;" alt="${type}" />
+                       <img src="${baseIcon.iconUrl}"style="width: 180%; height: 180%; object-fit: cover;" alt="${type}" />
                    </div>`,
             className: '', // Nessuna classe Leaflet predefinita
             iconSize: size,                   // Dimensioni

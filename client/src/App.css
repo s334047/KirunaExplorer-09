@@ -97,7 +97,21 @@
 }
 .icon-with-background {
   background-color: white; /* Sfondo bianco */
-  border-radius: 5px; /* Angoli arrotondati (opzionale) */
-  padding: 3px; /* Spazio attorno all'icona */
+  border-radius: 50%; /* Rende l'elemento rotondo */
+  padding: 10px; /* Spazio attorno all'icona */
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Ombra leggera (opzionale) */
+  display: inline-flex; /* Centrare il contenuto */
+  justify-content: center; /* Centrare orizzontalmente */
+  align-items: center; /* Centrare verticalmente */
 }
+.icon-with-background-big {
+  border: 3px solid blue;
+  background-color: white; /* Sfondo bianco */
+  border-radius: 50%; /* Rende l'elemento rotondo */
+  padding: 10px; /* Spazio attorno all'icona */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Ombra leggera (opzionale) */
+  display: inline-flex; /* Centrare il contenuto */
+  justify-content: center; /* Centrare orizzontalmente */
+  align-items: center; /* Centrare verticalmente */
+}
+
