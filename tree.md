@@ -1,5 +1,5 @@
-# Repository tree  
-  
+# Repository tree
+
 .  
 ├── client  
 │   ├── API.mjs  
@@ -49,7 +49,6 @@
 │   │   │   ├── Legend.jsx  
 │   │   │   ├── Link.jsx  
 │   │   │   ├── ListDocuments.jsx  
-│   │   │   ├── Login.jsx  
 │   │   │   ├── Map.jsx  
 │   │   │   ├── ModifyGeorefernce.jsx  
 │   │   │   └── NavHeader.jsx  
@@ -64,13 +63,16 @@
 ├── README.md  
 ├── Retrospective  
 │   ├── coverageSprint2.png  
+│   ├── coverageSprint4.png  
 │   ├── ExcelFiles  
 │   │   ├── Sprint1_Kiruna.xls  
 │   │   ├── Sprint2_Kiruna.xls  
-│   │   └── Sprint3_Kiruna.xls  
+│   │   ├── Sprint3_Kiruna.xls  
+│   │   └── Sprint4_Kiruna.xls  
 │   ├── Retrospective-Sprint1.md  
 │   ├── Retrospective-Sprint2.md  
 │   ├── Retrospective-Sprint3.md  
+│   ├── Retrospective-Sprint4.md  
 │   ├── Retrospective-Template.md  
 │   └── Retrospective-Template-v2.md  
 ├── Screenshots  
@@ -107,6 +109,30 @@
 │   │   ├── doc_65_info-1732125435785-1732145466126.pdf  
 │   │   ├── doc_65_info-1732125435785.pdf  
 │   │   ├── doc_69_info (1)-1732123974788.pdf  
+│   │   ├── doc OR 18_1-1734546529925.pdf  
+│   │   ├── doc OR 18_2-1734546529961.pdf  
+│   │   ├── doc OR 18_3-1734546529977.pdf  
+│   │   ├── doc OR 2-1734546642625.jpg  
+│   │   ├── doc OR 41-1734546556314.pdf  
+│   │   ├── doc OR 4_1-1734546685217.pdf  
+│   │   ├── doc OR 42_1-1734546655185.pdf  
+│   │   ├── doc OR 4_2-1734546685230.pdf  
+│   │   ├── doc OR 42_2-1734546655199.pdf  
+│   │   ├── doc OR 44 \_1-1734546663513.pdf  
+│   │   ├── doc OR 44_2-1734546663524.pdf  
+│   │   ├── doc OR 44_3-1734546663594.pdf  
+│   │   ├── doc OR 44_4-1734546663604.pdf  
+│   │   ├── doc OR 45_1-1734546573530.png  
+│   │   ├── doc OR 45_2-1734546573547.png  
+│   │   ├── doc OR 47-1734546582529.pdf  
+│   │   ├── doc OR 49_1-1734553998047.pdf  
+│   │   ├── doc OR 49_2-1734553998068.pdf  
+│   │   ├── doc OR 58_1-1734546698136.pdf  
+│   │   ├── doc OR 58_2-1734546698153.pdf  
+│   │   ├── doc OR 62-1734546714673.jpg  
+│   │   ├── doc OR 76-1734551196966.pdf  
+│   │   ├── doc OR 81_1-1734551212604.pdf  
+│   │   ├── doc OR 81_2-1734551212625.pdf  
 │   │   ├── download-1732068504507.jpg  
 │   │   ├── images-1732068504493.jpg  
 │   │   └── W8-SonarQube-1732093753728.pdf  
@@ -133,11 +159,10 @@
 │   │   │   ├── resourcesRoute.test.ts  
 │   │   │   └── sessionsRoute.test.ts  
 │   │   └── utils  
-│   │       ├── auth.test.ts  
-│   │       └── database.test.ts  
+│   │   ├── auth.test.ts  
+│   │   └── database.test.ts  
 │   └── tsconfig.json  
 ├── TD_stategy.md  
-└── tree.md  
-  
-19 directories, 119 files  
-  
+└── tree.md
+
+19 directories, 145 files
